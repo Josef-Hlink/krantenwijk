@@ -1,0 +1,54 @@
+#!/bin/sh
+# Privacy guard: krantenwijk's public repo must never contain real data,
+# real configs, or place-specific strings. This hook is installed
+# automatically via `git config core.hooksPath .githooks` (flake shellHook).
+#
+# 1. Block forbidden paths outright — even a forced `git add -f`.
+# 2. Grep the staged diff against .githooks/secret-patterns (gitignored;
+#    copy secret-patterns.example and add your real deny-list).
+
+set -eu
+
+staged_files=$(git diff --cached --name-only --diff-filter=ACMR)
+[ -z "$staged_files" ] && exit 0
+
+fail() {
+    echo "pre-commit: BLOCKED — $1" >&2
+    exit 1
+}
+
+# ── 1. path blocks ──────────────────────────────────────────────────────
+for f in $staged_files; do
+    case "$f" in
+        docs/DESIGN.md)          fail "docs/DESIGN.md is local-only (references private specifics)" ;;
+        data/*)                  fail "data/ is private ($f)" ;;
+        .env)                    fail ".env holds secrets" ;;
+        .githooks/secret-patterns) fail "the deny-list itself is private" ;;
+        config/*.example.yaml)   ;; # committed siblings are fine
+        config/*.yaml)           fail "real configs are private ($f); commit a .example instead" ;;
+        web/static/sample/amsterdam.csv) ;; # the synthetic demo file is fine
+        *.csv)                   fail "CSVs are private ($f); only the synthetic sample is committed" ;;
+    esac
+done
+
+# ── 2. content scan against the private deny-list ───────────────────────
+patterns=.githooks/secret-patterns
+if [ -f "$patterns" ]; then
+    # Strip comments/blank lines; grep the staged additions case-insensitively.
+    pat_file=$(mktemp)
+    grep -v '^[[:space:]]*\(#\|$\)' "$patterns" >"$pat_file" || true
+    if [ -s "$pat_file" ]; then
+        hits=$(git diff --cached -U0 | grep '^+' | grep -iE -f "$pat_file" || true)
+        if [ -n "$hits" ]; then
+            rm -f "$pat_file"
+            echo "pre-commit: BLOCKED — staged content matches the private deny-list:" >&2
+            printf '%s\n' "$hits" | head -10 >&2
+            exit 1
+        fi
+    fi
+    rm -f "$pat_file"
+else
+    echo "pre-commit: note — no .githooks/secret-patterns found; content scan skipped" >&2
+fi
+
+exit 0

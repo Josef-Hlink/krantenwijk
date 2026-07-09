@@ -1,0 +1,42 @@
+# ── privacy spine ────────────────────────────────────────────────
+# Real data, coords, outputs — never committed.
+data/
+# Real configs are gitignored; each has a committed .example sibling.
+config/*.yaml
+!config/*.example.yaml
+.env
+# No CSVs except the synthetic Amsterdam demo file.
+*.csv
+!web/static/sample/amsterdam.csv
+# The design doc references private specifics; it lives locally only.
+docs/DESIGN.md
+# Real deny-list for the pre-commit guard (contains private patterns).
+.githooks/secret-patterns
+
+# ── python ───────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+*.egg-info/
+dist/
+build/
+.ruff_cache/
+.pytest_cache/
+
+# ── node / sveltekit ─────────────────────────────────────────────
+node_modules/
+web/build/
+web/.svelte-kit/
+vite.config.ts.timestamp-*
+
+# ── nix / direnv ─────────────────────────────────────────────────
+.direnv/
+result
+result-*
+# Commit our generic .envrc (overrides a global gitignore that excludes it)
+!.envrc
+
+# ── OS / tooling ─────────────────────────────────────────────────
+.DS_Store
+.playwright-mcp/

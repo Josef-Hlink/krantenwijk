@@ -1,0 +1,12 @@
+# Copy to carriers.yaml (gitignored) and list your actual carriers ("lopers").
+# max_stops drives the per-bucket capacity warning (default 50).
+
+carriers:
+  - name: Anna
+    max_stops: 50
+  - name: Bram
+    max_stops: 50
+  - name: Chris
+    max_stops: 50
+  - name: Daan
+    max_stops: 50
