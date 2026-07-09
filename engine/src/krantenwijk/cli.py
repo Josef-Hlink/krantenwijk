@@ -1,13 +1,13 @@
 """krantenwijk CLI.
 
-Today: ``serve`` (the dev/prod API server) and ``synth`` (demo data). The
+Today: ``serve`` (the dev/prod API server) and ``demo`` (demo data). The
 batch pipeline for headless runs (cluster/route/export on a CSV) arrives
 with a later phase.
 """
 
 import click
 
-from .synth import synth
+from .demo import demo
 
 
 @click.group()
@@ -26,4 +26,4 @@ def serve(host: str, port: int, reload: bool) -> None:
     uvicorn.run("krantenwijk.api:app", host=host, port=port, reload=reload)
 
 
-cli.add_command(synth)
+cli.add_command(demo)

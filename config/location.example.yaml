@@ -1,23 +1,24 @@
-# Copy to location.yaml (gitignored) and fill in your own town.
-# All demo material uses Amsterdam; nothing here is required to run the web
-# app (it derives its view from the uploaded points), but the CLI and synth
-# generator read it.
+# Copy to location.yaml (gitignored) and fill in your own values — e.g. the
+# depot below is the town centre, not anyone's actual starting point.
+# Nothing here is required to run the web app (it derives its view from the
+# uploaded points), but the CLI reads it.
 
-city: Amsterdam
+city: Vlissingen
 
-# Map center / default view anchor.
+# Map center / default view anchor (town centre).
 center:
-  lat: 52.3728
-  lon: 4.8936
+  lat: 51.4426
+  lon: 3.5735
 
 # Bounding box that generated/accepted points should fall inside.
 bbox:
-  min_lon: 4.76
-  min_lat: 52.29
-  max_lon: 5.02
-  max_lat: 52.42
+  min_lon: 3.53
+  min_lat: 51.42
+  max_lon: 3.64
+  max_lat: 51.49
 
 # Shared start/end anchor for routes ("home" in the old workflow).
+# Example value: the Oude Markt. Set your real one in location.yaml.
 depot:
-  lat: 52.3676
-  lon: 4.9041
+  lat: 51.4426
+  lon: 3.5735

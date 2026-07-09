@@ -37,8 +37,10 @@ uv run krantenwijk serve --reload   # engine  → 127.0.0.1:4381
 cd web && pnpm dev                  # web app → localhost:4382, proxies /api
 ```
 
-Try it with the synthetic Amsterdam demo file on the landing page —
-generated data, no real addresses anywhere in this repo.
+Try it with the Vlissingen demo on the landing page — real addresses from
+[OpenStreetMap](https://www.openstreetmap.org/copyright) (© OpenStreetMap
+contributors, ODbL), carrying an entirely fictional delivery round. No real
+people, patients, or deliveries are referenced anywhere in this repo.
 
 ## License
 

@@ -26,8 +26,8 @@ for f in $staged_files; do
         .githooks/secret-patterns) fail "the deny-list itself is private" ;;
         config/*.example.yaml)   ;; # committed siblings are fine
         config/*.yaml)           fail "real configs are private ($f); commit a .example instead" ;;
-        web/static/sample/amsterdam.csv) ;; # the synthetic demo file is fine
-        *.csv)                   fail "CSVs are private ($f); only the synthetic sample is committed" ;;
+        web/static/sample/vlissingen.csv) ;; # the demo file is fine
+        *.csv)                   fail "CSVs are private ($f); only the demo sample is committed" ;;
     esac
 done
 

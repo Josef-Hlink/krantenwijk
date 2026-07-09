@@ -5,9 +5,9 @@ data/
 config/*.yaml
 !config/*.example.yaml
 .env
-# No CSVs except the synthetic Amsterdam demo file.
+# No CSVs except the demo file (real OSM addresses, fictional round).
 *.csv
-!web/static/sample/amsterdam.csv
+!web/static/sample/vlissingen.csv
 # The design doc references private specifics; it lives locally only.
 docs/DESIGN.md
 # Real deny-list for the pre-commit guard (contains private patterns).

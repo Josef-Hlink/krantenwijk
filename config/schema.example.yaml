@@ -3,7 +3,7 @@
 #
 # krantenwijk never assumes column names: on upload you map your CSV's
 # columns to these canonical roles. The sample names below match the
-# synthetic Amsterdam demo file.
+# Vlissingen demo file.
 #
 # Required: id, plus EITHER (street + house_number) OR (lat + lon).
 # Unmapped columns ride along untouched and reappear in the export.

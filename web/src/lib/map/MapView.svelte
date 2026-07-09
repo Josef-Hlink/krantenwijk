@@ -241,8 +241,8 @@
 				container: el,
 				style: basemapStyle(flavorName()),
 				bounds: recordsStore.bounds ?? [
-					[4.7, 52.25],
-					[5.05, 52.45]
+					[3.53, 51.42],
+					[3.64, 51.49]
 				],
 				fitBoundsOptions: { padding: 60 }
 			});

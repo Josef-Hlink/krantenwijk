@@ -19,7 +19,7 @@
 	}
 
 	async function loadDemo() {
-		const res = await fetch('/sample/amsterdam.csv');
+		const res = await fetch('/sample/vlissingen.csv');
 		const text = await res.text();
 		await handleFile(text);
 	}
@@ -76,8 +76,11 @@
 				<input type="file" accept=".csv,text/csv" onchange={onPick} />
 			</label>
 			<p class="or">·</p>
-			<button class="primary" onclick={loadDemo}>Try the Amsterdam demo</button>
-			<p class="fine">400 generated addresses — no real people, no real letterboxes.</p>
+			<button class="primary" onclick={loadDemo}>Try the Vlissingen demo</button>
+			<p class="fine">
+				400 real letterboxes (© OpenStreetMap contributors), an entirely fictional
+				round — no real people, no real deliveries.
+			</p>
 		</section>
 
 		{#if error}
