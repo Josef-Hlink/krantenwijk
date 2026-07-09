@@ -1,0 +1,5 @@
+# pnpm project settings. esbuild ships a postinstall that fetches its native
+# binary; allow it so Vite has a working esbuild. Every other dependency
+# stays build-sandboxed.
+allowBuilds:
+  esbuild: true
