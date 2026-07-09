@@ -1,0 +1,7 @@
+{
+  "venvPath": "engine",
+  "venv": ".venv",
+  "pythonVersion": "3.13",
+  "extraPaths": ["engine/src"],
+  "exclude": ["**/node_modules", "**/.venv", "web/.svelte-kit", "data"]
+}

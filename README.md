@@ -33,8 +33,8 @@ pmtiles extract <europe-or-planet.pmtiles> data/tiles/basemap.pmtiles \
 Run (two terminals):
 
 ```sh
-uv run krantenwijk serve --reload   # engine  → 127.0.0.1:9455
-cd web && pnpm dev                  # web app → localhost:9456, proxies /api
+uv run krantenwijk serve --reload   # engine  → 127.0.0.1:4381
+cd web && pnpm dev                  # web app → localhost:4382, proxies /api
 ```
 
 Try it with the synthetic Amsterdam demo file on the landing page —

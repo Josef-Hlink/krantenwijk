@@ -22,7 +22,7 @@
         # Engine (Python via uv) + web app (Node via pnpm). Both managers vendor
         # their deps locally — uv into engine/.venv, pnpm into web/node_modules —
         # and use only pre-built wheels/packages, so mkShellNoCC keeps the
-        # C/clang toolchain off PATH. go-pmtiles provides the `pmtiles` CLI for
+        # C/clang toolchain off PATH. pmtiles (go-pmtiles) provides the CLI for
         # carving the basemap extract into data/tiles/.
         default = pkgs.mkShellNoCC {
           packages = [
@@ -30,7 +30,7 @@
             pkgs.uv
             pkgs.nodejs_22
             pkgs.pnpm
-            pkgs.go-pmtiles
+            pkgs.pmtiles
           ];
 
           shellHook = ''
