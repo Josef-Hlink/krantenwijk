@@ -1,21 +1,37 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import MapView from '$lib/map/MapView.svelte';
+	import Toolbar from '$lib/map/Toolbar.svelte';
 	import GeocodePanel from '$lib/geocode/GeocodePanel.svelte';
+	import BucketList from '$lib/buckets/BucketList.svelte';
 	import { recordsStore } from '$lib/records/records.svelte';
+	import { bucketsStore } from '$lib/buckets/buckets.svelte';
 
 	// Direct navigation to /plan without data → back to upload.
 	$effect(() => {
 		if (recordsStore.records.length === 0) goto('/');
 	});
+
+	function onKeydown(e: KeyboardEvent) {
+		const mod = e.metaKey || e.ctrlKey;
+		if (!mod || e.key.toLowerCase() !== 'z') return;
+		const target = e.target as HTMLElement;
+		if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
+		e.preventDefault();
+		if (e.shiftKey) bucketsStore.redo();
+		else bucketsStore.undo();
+	}
 </script>
+
+<svelte:window onkeydown={onKeydown} />
 
 <div class="workspace">
 	<aside class="rail">
 		<div class="section">
 			<h2>round</h2>
 			<p class="stat">
-				<span class="mono">{recordsStore.located.length}</span> on the map
+				<span class="mono">{recordsStore.located.length}</span> on the map ·
+				<span class="mono">{bucketsStore.assignment.size}</span> bucketed
 				{#if recordsStore.needGeocode.length > 0}
 					· <span class="mono">{recordsStore.needGeocode.length}</span> to geocode
 				{/if}
@@ -33,12 +49,13 @@
 		</div>
 		<hr class="rule-double" />
 		<GeocodePanel />
-		<div class="section muted">
-			<p>Buckets arrive in the next step — draw tools land here.</p>
-		</div>
+		<BucketList />
 	</aside>
-	<div class="mapwrap">
-		<MapView />
+	<div class="main">
+		<Toolbar />
+		<div class="mapwrap">
+			<MapView />
+		</div>
 	</div>
 </div>
 
@@ -49,7 +66,7 @@
 	}
 
 	.rail {
-		width: 300px;
+		width: 320px;
 		flex-shrink: 0;
 		border-right: 1px solid var(--border);
 		padding: 0.9rem;
@@ -74,8 +91,15 @@
 		font-size: 0.85rem;
 	}
 
-	.mapwrap {
+	.main {
 		flex: 1;
 		min-width: 0;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.mapwrap {
+		flex: 1;
+		min-height: 0;
 	}
 </style>
