@@ -1,0 +1,137 @@
+/* krantenwijk — Dutch functionalism over newsprint.
+   Chrome stays quiet (paper, ink, hairlines, one postal-orange accent) so
+   the map data is the loudest thing on screen. Data is always mono. */
+
+@import '@fontsource-variable/bricolage-grotesque';
+@import '@fontsource-variable/instrument-sans';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/600.css';
+
+:root {
+	--font-display: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+	--font-body: 'Instrument Sans Variable', system-ui, sans-serif;
+	--font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+:root[data-theme='ochtend'] {
+	--bg: #fafaf7;
+	--panel: #ffffff;
+	--fg: #1a1b1e;
+	--muted: #6e6d66;
+	--border: #e4e3dc;
+	--accent: #ee5f00;
+	--accent-soft: #fce9dc;
+	--warn: #b4231f;
+	color-scheme: light;
+}
+
+:root[data-theme='avond'] {
+	--bg: #16181d;
+	--panel: #1d2026;
+	--fg: #e9e8e3;
+	--muted: #8e8d86;
+	--border: #2a2d34;
+	--accent: #ff7a1a;
+	--accent-soft: #3a2413;
+	--warn: #ff5c57;
+	color-scheme: dark;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	margin: 0;
+	height: 100%;
+}
+
+body {
+	background: var(--bg);
+	color: var(--fg);
+	font-family: var(--font-body);
+	font-size: 15px;
+	line-height: 1.45;
+}
+
+h1,
+h2,
+h3 {
+	font-family: var(--font-display);
+	font-weight: 640;
+	letter-spacing: -0.015em;
+	margin: 0;
+}
+
+code,
+.mono {
+	font-family: var(--font-mono);
+	font-size: 0.86em;
+}
+
+a {
+	color: var(--accent);
+}
+
+button {
+	font: inherit;
+	color: inherit;
+	background: var(--panel);
+	border: 1px solid var(--border);
+	border-radius: 4px;
+	padding: 0.35rem 0.8rem;
+	cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+	border-color: var(--fg);
+}
+
+button:disabled {
+	opacity: 0.45;
+	cursor: default;
+}
+
+button.primary {
+	background: var(--accent);
+	border-color: var(--accent);
+	color: #fff;
+	font-weight: 600;
+}
+
+button.primary:hover:not(:disabled) {
+	filter: brightness(0.94);
+}
+
+select,
+input[type='text'],
+input[type='number'] {
+	font: inherit;
+	color: inherit;
+	background: var(--panel);
+	border: 1px solid var(--border);
+	border-radius: 4px;
+	padding: 0.25rem 0.5rem;
+}
+
+:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 1px;
+}
+
+/* Newspaper column rule: the masthead divider, reused across panels. */
+.rule-double {
+	border: 0;
+	border-top: 1px solid var(--fg);
+	border-bottom: 1px solid var(--fg);
+	height: 3px;
+	margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	* {
+		animation-duration: 0.01ms !important;
+		transition-duration: 0.01ms !important;
+	}
+}
