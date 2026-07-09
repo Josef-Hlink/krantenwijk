@@ -73,6 +73,15 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
+    @app.get("/", include_in_schema=False)
+    def root() -> dict[str, str]:
+        # a courtesy for whoever clicks the uvicorn URL — the app lives on /api
+        return {
+            "service": "krantenwijk engine",
+            "status": "/api/status",
+            "docs": "/docs",
+        }
+
     @app.get("/api/status")
     def status() -> dict[str, str]:
         backend = "ors" if os.environ.get("ORS_API_KEY") else "fallback"
