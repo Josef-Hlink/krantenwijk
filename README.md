@@ -22,13 +22,19 @@ direnv reload                 # picks up engine/.venv
 cd web && pnpm install
 ```
 
-Basemap (one-time): place a PMTiles extract at `data/tiles/basemap.pmtiles`,
-e.g. carved from a Protomaps build:
+Basemap: by default the app reads tiles, glyphs, and sprites from the shared
+self-hosted tile service at `tiles.hlink.dev` (Protomaps-schema PMTiles —
+no third-party map requests). To go fully offline or self-host, place a
+PMTiles extract at `data/tiles/basemap.pmtiles` (the engine serves it at
+`/api/tiles/basemap.pmtiles` with range requests):
 
 ```sh
 pmtiles extract <europe-or-planet.pmtiles> data/tiles/basemap.pmtiles \
   --bbox=3.2,50.7,7.3,53.7      # the Netherlands
 ```
+
+and point the web build at it with `VITE_TILES_URL` (plus `VITE_TILES_ASSETS`
+for a glyphs/sprites host).
 
 Run (two terminals):
 
