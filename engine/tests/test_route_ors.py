@@ -18,11 +18,16 @@ class FakeOrsClient:
         self.reverse_jobs = True
 
     def optimization(self, jobs, vehicles):
+        # mirror the real client, which asserts on its Job/Vehicle types
+        from openrouteservice.optimization import Job, Vehicle
+
+        assert all(isinstance(j, Job) for j in jobs)
+        assert all(isinstance(v, Vehicle) for v in vehicles)
         self.optimization_calls.append({"jobs": jobs, "vehicles": vehicles})
         ordered = list(reversed(jobs)) if self.reverse_jobs else jobs
         steps = (
             [{"type": "start"}]
-            + [{"type": "job", "job": j["id"]} for j in ordered]
+            + [{"type": "job", "job": j.id} for j in ordered]
             + [{"type": "end"}]
         )
         return {"routes": [{"steps": steps}]}
@@ -67,9 +72,9 @@ def test_vehicle_carries_start_end(backend, fake, small_points):
     start, end = small_points[2], small_points[5]
     backend.route(small_points, start_id=start.id, end_id=end.id)
     vehicle = fake.optimization_calls[0]["vehicles"][0]
-    assert vehicle["start"] == [start.lon, start.lat]
-    assert vehicle["end"] == [end.lon, end.lat]
-    assert vehicle["profile"] == "foot-walking"
+    assert vehicle.start == [start.lon, start.lat]
+    assert vehicle.end == [end.lon, end.lat]
+    assert vehicle.profile == "foot-walking"
 
 
 def test_directions_called_with_ordered_lonlat(backend, fake, small_points):

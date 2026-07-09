@@ -18,8 +18,10 @@ import click
 
 from .models import AddressRecord
 
-# Amsterdam bounding box (matches config/location.example.yaml).
-BBOX = (4.76, 52.29, 5.02, 52.42)  # min_lon, min_lat, max_lon, max_lat
+# Central Amsterdam — deliberately tighter than the city bbox in
+# config/location.example.yaml so synthetic streets land in the dense urban
+# core rather than in the lakes/port at the city edges (walking-unroutable).
+BBOX = (4.85, 52.335, 4.95, 52.395)  # min_lon, min_lat, max_lon, max_lat
 
 CATEGORIES = [("griep", 0.8), ("pneum", 0.2)]
 

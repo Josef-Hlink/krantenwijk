@@ -22,6 +22,8 @@ import os
 from typing import Any, Protocol
 
 import openrouteservice
+from openrouteservice import exceptions as ors_exceptions
+from openrouteservice import optimization as ors_optimization
 
 from .models import Point, RouteResult
 
@@ -31,9 +33,20 @@ WALKING_SPEED_M_S = 1.33  # ~4.8 km/h
 # defaults to 50 so a legal bucket always fits.
 MAX_ORS_STOPS = 50
 
+# HeiGIT split the public API per service (api.heigit.org/<service>/<version>):
+# directions lives under /openrouteservice, Vroom optimization under /vroom.
+# The client appends /v2/directions/… and /optimization to these bases. A
+# self-hosted classic ORS instance sets both env vars to the same base URL.
+DEFAULT_ORS_URL = "https://api.heigit.org/openrouteservice"
+DEFAULT_ORS_OPTIMIZATION_URL = "https://api.heigit.org/vroom/v0"
+
 
 class BucketTooLarge(ValueError):
     """Raised when a bucket exceeds what the routing backend accepts."""
+
+
+class RoutingError(RuntimeError):
+    """The routing service failed or rejected the request."""
 
 
 class RoutingBackend(Protocol):
@@ -156,13 +169,23 @@ class OrsBackend:
 
     engine = "ors"
 
-    def __init__(self, client: Any | None = None):
+    def __init__(
+        self, client: Any | None = None, optimization_client: Any | None = None
+    ):
         if client is None:
+            key = os.environ["ORS_API_KEY"]
             client = openrouteservice.Client(
-                key=os.environ["ORS_API_KEY"],
-                base_url=os.environ.get("ORS_URL", "https://api.heigit.org"),
+                key=key, base_url=os.environ.get("ORS_URL", DEFAULT_ORS_URL)
+            )
+            optimization_client = optimization_client or openrouteservice.Client(
+                key=key,
+                base_url=os.environ.get(
+                    "ORS_OPTIMIZATION_URL", DEFAULT_ORS_OPTIMIZATION_URL
+                ),
             )
         self.client = client
+        # tests inject one fake for both roles
+        self.optimization_client = optimization_client or client
 
     def route(
         self,
@@ -187,14 +210,19 @@ class OrsBackend:
 
         start, end, middle = _split_fixed(points, start_id, end_id)
         ordered = [start, *middle, end]
-        if optimize and middle:
-            ordered = self._optimize_order(start, end, middle)
+        try:
+            if optimize and middle:
+                ordered = self._optimize_order(start, end, middle)
 
-        directions = self.client.directions(
-            [(p.lon, p.lat) for p in ordered],
-            profile="foot-walking",
-            format="geojson",
-        )
+            directions = self.client.directions(
+                [(p.lon, p.lat) for p in ordered],
+                profile="foot-walking",
+                format="geojson",
+            )
+        except ors_exceptions.ApiError as e:
+            raise RoutingError(f"OpenRouteService rejected the request: {e}") from e
+        except (ors_exceptions.HTTPError, ors_exceptions.Timeout) as e:
+            raise RoutingError(f"OpenRouteService unreachable: {e}") from e
         feature = directions["features"][0]
         summary = feature["properties"]["summary"]
         return RouteResult(
@@ -208,16 +236,18 @@ class OrsBackend:
     def _optimize_order(
         self, start: Point, end: Point, middle: list[Point]
     ) -> list[Point]:
+        # The client asserts on its own Job/Vehicle types — plain dicts fail.
         jobs = [
-            {"id": i, "location": [p.lon, p.lat]} for i, p in enumerate(middle)
+            ors_optimization.Job(id=i, location=[p.lon, p.lat])
+            for i, p in enumerate(middle)
         ]
-        vehicle = {
-            "id": 0,
-            "profile": "foot-walking",
-            "start": [start.lon, start.lat],
-            "end": [end.lon, end.lat],
-        }
-        result = self.client.optimization(jobs=jobs, vehicles=[vehicle])
+        vehicle = ors_optimization.Vehicle(
+            id=0,
+            profile="foot-walking",
+            start=[start.lon, start.lat],
+            end=[end.lon, end.lat],
+        )
+        result = self.optimization_client.optimization(jobs=jobs, vehicles=[vehicle])
         steps = result["routes"][0]["steps"]
         visited = [middle[s["job"]] for s in steps if s["type"] == "job"]
         return [start, *visited, end]

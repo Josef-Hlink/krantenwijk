@@ -106,6 +106,8 @@ def create_app() -> FastAPI:
             raise HTTPException(422, str(e)) from e
         except ValueError as e:
             raise HTTPException(422, str(e)) from e
+        except route.RoutingError as e:
+            raise HTTPException(502, str(e)) from e
 
     @app.post("/api/estimate", response_model=EstimateResponse)
     def estimate_time(req: EstimateRequest) -> EstimateResponse:

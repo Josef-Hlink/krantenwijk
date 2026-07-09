@@ -99,17 +99,29 @@
 			type: 'circle',
 			source: 'records',
 			paint: {
+				// zoom expressions must be top-level, so the active-bucket size
+				// boost lives inside each interpolation stop
 				'circle-radius': [
-					'+',
-					['interpolate', ['linear'], ['zoom'], 10, 2.5, 13, 4.5, 16, 8],
-					['case', ['get', 'active'], 1.5, 0]
+					'interpolate',
+					['linear'],
+					['zoom'],
+					10,
+					['case', ['get', 'active'], 4, 2.5],
+					13,
+					['case', ['get', 'active'], 6, 4.5],
+					16,
+					['case', ['get', 'active'], 9.5, 8]
 				],
 				'circle-color': ['get', 'color'],
 				'circle-opacity': ['case', ['get', 'assigned'], 1, 0.8],
 				'circle-stroke-width': [
-					'*',
-					['interpolate', ['linear'], ['zoom'], 10, 0.5, 16, 1.5],
-					['case', ['get', 'active'], 2, 1]
+					'interpolate',
+					['linear'],
+					['zoom'],
+					10,
+					['case', ['get', 'active'], 1, 0.5],
+					16,
+					['case', ['get', 'active'], 3, 1.5]
 				],
 				'circle-stroke-color': ['case', ['get', 'active'], cssColor('--fg', '#1a1b1e'), halo]
 			}
