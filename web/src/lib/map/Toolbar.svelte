@@ -2,7 +2,9 @@
 	import { ui, type Tool, type DrawShape } from '$lib/ui.svelte';
 	import { bucketsStore } from '$lib/buckets/buckets.svelte';
 	import { recordsStore } from '$lib/records/records.svelte';
+	import { routesStore } from '$lib/routes/routes.svelte';
 	import { cluster } from '$lib/api/client';
+	import { downloadExport } from '$lib/export/sorted';
 
 	const TOOLS: { id: Tool; label: string; title: string; needsActive?: boolean }[] = [
 		{ id: 'select', label: 'select', title: 'Click a dot to activate its bucket' },
@@ -96,6 +98,28 @@
 		</label>
 		<button disabled={seedBusy || recordsStore.located.length === 0} onclick={autoSeed}>
 			{seedBusy ? 'seeding…' : 'auto-seed'}
+		</button>
+	</div>
+
+	<div class="group">
+		<button
+			class="primary"
+			disabled={routesStore.running || routesStore.stale.length === 0}
+			title="Compute a walking route for every changed bucket"
+			onclick={() => routesStore.computeAll()}
+		>
+			{routesStore.running
+				? `routing ${routesStore.results.size + 1}/${bucketsStore.list.length}…`
+				: routesStore.stale.length > 0
+					? `compute routes (${routesStore.stale.length})`
+					: 'routes up to date'}
+		</button>
+		<button
+			disabled={bucketsStore.assignment.size === 0}
+			title="Download the ordering as CSV, keyed by id"
+			onclick={downloadExport}
+		>
+			export csv
 		</button>
 	</div>
 </div>
