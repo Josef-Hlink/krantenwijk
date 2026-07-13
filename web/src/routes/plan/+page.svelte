@@ -36,16 +36,6 @@
 					· <span class="mono">{recordsStore.needGeocode.length}</span> to geocode
 				{/if}
 			</p>
-			{#if recordsStore.categories.length > 0}
-				<p class="stat muted">
-					{#each recordsStore.categories as cat, i (cat)}
-						{i > 0 ? ' · ' : ''}{cat}
-						<span class="mono"
-							>{recordsStore.records.filter((r) => r.category === cat).length}</span
-						>
-					{/each}
-				</p>
-			{/if}
 		</div>
 		<hr class="rule-double" />
 		<GeocodePanel />
@@ -84,11 +74,6 @@
 	.stat {
 		margin: 0.3rem 0 0;
 		font-size: 0.9rem;
-	}
-
-	.muted {
-		color: var(--muted);
-		font-size: 0.85rem;
 	}
 
 	.main {

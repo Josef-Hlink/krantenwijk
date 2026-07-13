@@ -2,11 +2,15 @@
 # reuse (the web app can also export one from its mapping screen).
 #
 # krantenwijk never assumes column names: on upload you map your CSV's
-# columns to these canonical roles. The sample names below match the
+# columns to the essential roles below. The sample names match the
 # Vlissingen demo file.
 #
 # Required: id, plus EITHER (street + house_number) OR (lat + lon).
-# Unmapped columns ride along untouched and reappear in the export.
+# Every other column is an "extra detail": it rides along untouched and
+# reappears in the export, and in the web app you can optionally show it
+# in the map popup under a name of your choosing (the demo's naam/soort)
+# — or leave it alone entirely (the demo's bsn: present in the file,
+# used nowhere, never leaves the browser).
 
 roles:
   id: id                  # opaque row id — the only join key you ever need
@@ -16,5 +20,3 @@ roles:
   city: plaats            # optional
   lat: lat                # optional — skip geocoding entirely by providing these
   lon: lon
-  category: soort         # optional grouping, e.g. griep / pneum
-  carrier: loper          # optional pre-assigned carrier

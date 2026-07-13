@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { parseCsv, type ParsedCsv } from '$lib/csv/parse';
 	import ColumnMapper from '$lib/csv/ColumnMapper.svelte';
-	import { recordsStore, type Rec } from '$lib/records/records.svelte';
+	import { recordsStore, type Rec, type Detail } from '$lib/records/records.svelte';
 
 	let parsed = $state<ParsedCsv | null>(null);
 	let error = $state<string | null>(null);
@@ -36,8 +36,8 @@
 		if (file) handleFile(file);
 	}
 
-	function onReady(records: Rec[]) {
-		recordsStore.load(records);
+	function onReady(records: Rec[], details: Detail[]) {
+		recordsStore.load(records, details);
 		goto('/plan');
 	}
 </script>

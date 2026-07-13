@@ -17,7 +17,6 @@ function baseColumns(records: Rec[]): string[] {
 	if (has('postcode')) cols.push('postcode');
 	if (has('city')) cols.push('city');
 	if (has('lat')) cols.push('lat', 'lon');
-	if (has('category')) cols.push('category');
 	return cols;
 }
 
@@ -50,15 +49,14 @@ export function buildExport(): string {
 		const row: Record<string, string | number> = {
 			id: r.id,
 			bucket: bucket?.name ?? '',
-			carrier: bucket?.carrier ?? r.carrier ?? '',
+			carrier: bucket?.carrier ?? '',
 			visit_order: visitOrder.get(r.id) ?? '',
 			street: r.street ?? '',
 			house_number: r.houseNumber ?? '',
 			postcode: r.postcode ?? '',
 			city: r.city ?? '',
 			lat: r.lat ?? '',
-			lon: r.lon ?? '',
-			category: r.category ?? ''
+			lon: r.lon ?? ''
 		};
 		for (const c of extraCols) row[c] = r.extra[c] ?? '';
 		return columns.map((c) => row[c] ?? '');
