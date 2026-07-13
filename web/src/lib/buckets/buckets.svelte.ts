@@ -206,11 +206,29 @@ class BucketsStore {
 	}
 
 	setStart(bucketId: string, recordId: string | undefined): void {
-		this.history.run(this.updateCommand('set start', bucketId, { startId: recordId }));
+		this.history.run(this.markerCommand('set start', bucketId, { startId: recordId }, recordId));
 	}
 
 	setEnd(bucketId: string, recordId: string | undefined): void {
-		this.history.run(this.updateCommand('set end', bucketId, { endId: recordId }));
+		this.history.run(this.markerCommand('set end', bucketId, { endId: recordId }, recordId));
+	}
+
+	/** A start/end marker only makes sense on a member — setting one on an
+	 * outside record pulls it into the bucket first, as one undo step. */
+	private markerCommand(
+		label: string,
+		bucketId: string,
+		patch: Partial<Bucket>,
+		recordId: string | undefined
+	): Command {
+		const update = this.updateCommand(label, bucketId, patch);
+		if (recordId != null && this.assignment.get(recordId) !== bucketId) {
+			return new CompositeCommand(label, [
+				this.assignCommand(label, [recordId], bucketId),
+				update
+			]);
+		}
+		return update;
 	}
 
 	/** Merge several buckets into the first: one undo step. */
