@@ -10,23 +10,57 @@ import {
 	TerraDraw,
 	TerraDrawPolygonMode,
 	TerraDrawRectangleMode,
-	TerraDrawFreehandMode
+	TerraDrawFreehandMode,
+	type HexColor,
+	type SetCursor
 } from 'terra-draw';
 import { TerraDrawMapLibreGLAdapter } from 'terra-draw-maplibre-gl-adapter';
 import type { DrawShape } from '$lib/ui.svelte';
+
+// The drawing cursor: a pencil, paper-white with an ink outline so it reads
+// on any basemap. Terra-draw's modes re-assert their configured cursor as
+// they handle events (stomping anything set from outside), so the pencil is
+// wired into the modes below rather than only set on the canvas.
+const pencilSvg =
+	'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24">' +
+	'<path d="M3 21l2.2-6.2L16.8 3.2l4 4L9.2 18.8z" fill="#fbfaf6" stroke="#1a1b1e" stroke-width="1.6" stroke-linejoin="round"/>' +
+	'<path d="M5.2 14.8l4 4M14.5 5.5l4 4" stroke="#1a1b1e" stroke-width="1.6"/>' +
+	'</svg>';
+export const PENCIL_CURSOR = `url("data:image/svg+xml,${encodeURIComponent(pencilSvg)}") 3 21, crosshair`;
+
+// terra-draw types cursors as a fixed union of CSS keywords, but its
+// maplibre adapter assigns the string verbatim, so url(…) cursors work.
+const pencil = PENCIL_CURSOR as Parameters<SetCursor>[0];
 
 export interface DrawManager {
 	setShape(shape: DrawShape | null): void;
 	destroy(): void;
 }
 
-export function createDraw(map: MlMap, onShape: (polygon: Polygon) => void): DrawManager {
+export function createDraw(
+	map: MlMap,
+	onShape: (polygon: Polygon) => void,
+	getColor: () => string
+): DrawManager {
+	// The in-progress shape paints in the active bucket's color — the lasso
+	// previews where its points will land. Function-valued styles are
+	// re-evaluated as the shape updates, so the getter stays live.
+	const color = () => getColor() as HexColor;
+	const shape = {
+		fillColor: color,
+		fillOpacity: 0.12,
+		outlineColor: color,
+		outlineWidth: 2
+	};
+	const closing = {
+		closingPointColor: color
+	};
 	const draw = new TerraDraw({
 		adapter: new TerraDrawMapLibreGLAdapter({ map }),
 		modes: [
-			new TerraDrawPolygonMode(),
-			new TerraDrawRectangleMode(),
-			new TerraDrawFreehandMode()
+			new TerraDrawPolygonMode({ cursors: { start: pencil }, styles: { ...shape, ...closing } }),
+			new TerraDrawRectangleMode({ cursors: { start: pencil }, styles: shape }),
+			new TerraDrawFreehandMode({ cursors: { start: pencil }, styles: { ...shape, ...closing } })
 		]
 	});
 	draw.start();

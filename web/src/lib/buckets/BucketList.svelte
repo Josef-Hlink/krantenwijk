@@ -37,8 +37,9 @@
 
 	{#if bucketsStore.list.length === 0}
 		<p class="empty">
-			No buckets yet. Arm <strong>+ bucket</strong> in the toolbar and draw around some
-			dots, or use auto-seed as a starting point.
+			No buckets yet. Add one with <strong>+</strong> above, then draw dots into it
+			with <strong>add to</strong> in the toolbar — or use auto-seed as a starting
+			point.
 		</p>
 	{/if}
 

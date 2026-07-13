@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { GeoJSONSource, Map as MlMap, MapMouseEvent } from 'maplibre-gl';
+	import type { GeoJSONSource, Map as MlMap, MapMouseEvent, Popup } from 'maplibre-gl';
 	import type { FeatureCollection, Point, Polygon, LineString } from 'geojson';
 	import { loadMapLibre, flavorName, cssColor } from './basemap';
-	import { createDraw, type DrawManager } from './draw';
-	import { recordsStore } from '$lib/records/records.svelte';
+	import { createDraw, PENCIL_CURSOR, type DrawManager } from './draw';
+	import { recordsStore, type Rec } from '$lib/records/records.svelte';
 	import { bucketsStore } from '$lib/buckets/buckets.svelte';
 	import { routesStore } from '$lib/routes/routes.svelte';
 	import { UNASSIGNED_COLOR } from '$lib/buckets/palette';
@@ -16,6 +16,9 @@
 	let map = $state<MlMap | undefined>();
 	let drawManager: DrawManager | undefined;
 	let styleReady = $state(0); // bumped on every style.load → effects re-add data
+	let hoverPopup: Popup | undefined;
+	let pinnedPopup: Popup | undefined;
+	let hoverId: string | null = null;
 
 	// ── data derivations ─────────────────────────────────────────────────
 
@@ -167,27 +170,136 @@
 		(map?.getSource('routes') as GeoJSONSource | undefined)?.setData(routesData);
 	});
 
+	// ── cursors ──────────────────────────────────────────────────────────
+	// Each tool announces itself at the pointer: a pencil while drawing, a
+	// cell cross while toggling, a crosshair while picking start/end.
+	const toolCursor = $derived(
+		ui.drawing
+			? PENCIL_CURSOR
+			: ui.tool === 'toggle'
+				? 'cell'
+				: ui.tool === 'pick-start' || ui.tool === 'pick-end'
+					? 'crosshair'
+					: ''
+	);
+
 	// The armed tool decides whether terra-draw is live and the cursor shape.
 	$effect(() => {
 		drawManager?.setShape(ui.drawing ? ui.drawShape : null);
-		if (map) {
-			const c = map.getCanvas();
-			c.style.cursor = ui.drawing ? 'crosshair' : '';
-		}
+		if (map) map.getCanvas().style.cursor = toolCursor;
 	});
 
 	// ── interactions ─────────────────────────────────────────────────────
+
+	// The lasso previews in the active bucket's color (see createDraw).
+	function activeBucketColor(): string {
+		return (
+			(bucketsStore.activeId
+				? bucketsStore.buckets.get(bucketsStore.activeId)?.color
+				: undefined) ?? UNASSIGNED_COLOR
+		);
+	}
 
 	function onShape(polygon: Polygon) {
 		const inside = recordsStore.located
 			.filter((r) => pointInPolygon(r.lon!, r.lat!, polygon))
 			.map((r) => r.id);
 		if (!inside.length) return;
-		if (ui.tool === 'draw-new') {
-			bucketsStore.createWithPoints(inside);
-		} else if (ui.tool === 'draw-assign' && bucketsStore.activeId) {
+		if (ui.tool === 'draw-assign' && bucketsStore.activeId) {
 			bucketsStore.assignToActive(inside);
+			ui.tool = 'select';
 		}
+	}
+
+	// Popup content is user CSV data — built as DOM text nodes, never HTML.
+	// `interactive` adds the start/end actions; only the pinned popup can be
+	// interacted with (the hover one vanishes on mouseleave).
+	function popupContent(r: Rec, interactive = false): HTMLElement {
+		const root = document.createElement('div');
+		root.className = 'dot-popup';
+		const title = document.createElement('div');
+		title.className = 'title';
+		title.textContent = [r.street, r.houseNumber].filter(Boolean).join(' ') || r.id;
+		root.appendChild(title);
+
+		const detailRow = (label: string, value: string, cls = 'drow') => {
+			const row = document.createElement('div');
+			row.className = cls;
+			const lbl = document.createElement('span');
+			lbl.className = 'dlbl';
+			lbl.textContent = label;
+			const val = document.createElement('span');
+			val.className = 'dval';
+			val.textContent = value;
+			row.append(lbl, val);
+			root.appendChild(row);
+			return row;
+		};
+
+		for (const d of recordsStore.shownDetails) {
+			const v = r.extra[d.column]?.trim();
+			if (v) detailRow(d.label, v);
+		}
+
+		// Live plan state: the dot's bucket (and its carrier, if set) —
+		// this is where an assigned carrier shows up, not the CSV columns.
+		const bucketId = bucketsStore.assignment.get(r.id);
+		const bucket = bucketId ? bucketsStore.buckets.get(bucketId) : undefined;
+		if (bucket) {
+			const row = detailRow('bucket', bucket.name, 'drow brow');
+			const chip = document.createElement('span');
+			chip.className = 'dchip';
+			chip.style.background = bucket.color;
+			row.querySelector('.dval')?.prepend(chip);
+			if (bucket.carrier) detailRow('carrier', bucket.carrier);
+
+			if (interactive) {
+				const actions = document.createElement('div');
+				actions.className = 'dactions';
+				for (const [role, key] of [
+					['start', 'startId'],
+					['end', 'endId']
+				] as const) {
+					const isSet = bucket[key] === r.id;
+					const btn = document.createElement('button');
+					btn.textContent = isSet ? `unmark ${role}` : `mark as ${role}`;
+					btn.onclick = () => {
+						const set = role === 'start' ? 'setStart' : 'setEnd';
+						bucketsStore[set](bucket.id, isSet ? undefined : r.id);
+						pinnedPopup?.setDOMContent(popupContent(r, true));
+					};
+					actions.appendChild(btn);
+				}
+				root.appendChild(actions);
+			}
+		}
+		return root;
+	}
+
+	function onHover(m: MlMap, e: MapMouseEvent) {
+		if (ui.drawing) {
+			// terra-draw owns the pointer, but it occasionally unsets the
+			// cursor (letting maplibre's grab hand through) — restore the
+			// pencil whenever the inline cursor has been cleared.
+			const c = m.getCanvas();
+			if (!c.style.cursor) c.style.cursor = toolCursor;
+			return;
+		}
+		const recordId = clickedRecordId(m, e);
+		// dots are clickable in select mode; other tools keep their cursor
+		m.getCanvas().style.cursor =
+			recordId && ui.tool === 'select' ? 'pointer' : toolCursor;
+		if (!recordId) {
+			hoverId = null;
+			hoverPopup?.remove();
+			return;
+		}
+		if (pinnedPopup?.isOpen()) return; // a pinned card wins over the peek
+		if (recordId === hoverId) return;
+		const r = recordsStore.located.find((rec) => rec.id === recordId);
+		if (!r) return;
+		hoverId = recordId;
+		hoverPopup?.setLngLat([r.lon!, r.lat!]).setDOMContent(popupContent(r)).addTo(m);
 	}
 
 	function clickedRecordId(m: MlMap, e: MapMouseEvent): string | null {
@@ -204,11 +316,23 @@
 	function onClick(m: MlMap, e: MapMouseEvent) {
 		if (ui.drawing) return; // terra-draw owns the pointer
 		const recordId = clickedRecordId(m, e);
-		if (!recordId) return;
+		if (!recordId) {
+			pinnedPopup?.remove(); // click on empty map dismisses the pinned card
+			return;
+		}
 		switch (ui.tool) {
 			case 'select': {
 				const bucketId = bucketsStore.assignment.get(recordId);
 				if (bucketId) bucketsStore.activeId = bucketId;
+				const r = recordsStore.located.find((rec) => rec.id === recordId);
+				if (r) {
+					hoverId = null;
+					hoverPopup?.remove();
+					pinnedPopup
+						?.setLngLat([r.lon!, r.lat!])
+						.setDOMContent(popupContent(r, true))
+						.addTo(m);
+				}
 				break;
 			}
 			case 'toggle':
@@ -250,6 +374,12 @@
 			m.addControl(new ml.NavigationControl({ showCompass: false }), 'top-right');
 			m.addControl(new ml.ScaleControl({}), 'bottom-left');
 
+			// Popups: a cursor-following peek and a click-pinned card. Both are
+			// DOM overlays, so they survive theme restyles.
+			hoverPopup = new ml.Popup({ closeButton: false, closeOnClick: false, offset: 10, maxWidth: '260px' });
+			pinnedPopup = new ml.Popup({ closeButton: true, closeOnClick: false, offset: 10, maxWidth: '260px' });
+			m.on('mousemove', (e) => onHover(m, e));
+
 			// setStyle drops user sources/layers, so everything app-owned is
 			// (re)added on every style.load — including the very first one.
 			m.on('style.load', () => {
@@ -259,7 +389,7 @@
 
 			m.on('load', () => {
 				if (destroyed) return;
-				drawManager = createDraw(m, onShape);
+				drawManager = createDraw(m, onShape, activeBucketColor);
 				drawManager.setShape(ui.drawing ? ui.drawShape : null);
 			});
 
@@ -273,7 +403,7 @@
 				m.setStyle(basemapStyle(flavorName()));
 				m.once('idle', () => {
 					if (destroyed) return;
-					drawManager = createDraw(m, onShape);
+					drawManager = createDraw(m, onShape, activeBucketColor);
 					drawManager.setShape(ui.drawing ? ui.drawShape : null);
 				});
 			});
@@ -288,6 +418,8 @@
 			observer?.disconnect();
 			drawManager?.destroy();
 			drawManager = undefined;
+			hoverPopup?.remove();
+			pinnedPopup?.remove();
 			map?.remove();
 			map = undefined;
 		};
@@ -300,5 +432,91 @@
 	.map {
 		width: 100%;
 		height: 100%;
+	}
+
+	/* Popups are injected into the map container, outside Svelte's scope. */
+	.map :global(.maplibregl-popup-content) {
+		background: var(--panel);
+		color: var(--fg);
+		border: 1px solid var(--border);
+		border-radius: 4px;
+		box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+		padding: 0.5rem 0.7rem;
+		font-family: var(--font-body);
+		font-size: 0.82rem;
+	}
+
+	.map :global(.maplibregl-popup-anchor-bottom .maplibregl-popup-tip),
+	.map :global(.maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip),
+	.map :global(.maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip) {
+		border-top-color: var(--panel);
+	}
+
+	.map :global(.maplibregl-popup-anchor-top .maplibregl-popup-tip),
+	.map :global(.maplibregl-popup-anchor-top-left .maplibregl-popup-tip),
+	.map :global(.maplibregl-popup-anchor-top-right .maplibregl-popup-tip) {
+		border-bottom-color: var(--panel);
+	}
+
+	.map :global(.maplibregl-popup-anchor-left .maplibregl-popup-tip) {
+		border-right-color: var(--panel);
+	}
+
+	.map :global(.maplibregl-popup-anchor-right .maplibregl-popup-tip) {
+		border-left-color: var(--panel);
+	}
+
+	.map :global(.maplibregl-popup-close-button) {
+		color: var(--muted);
+		font-size: 1.1rem;
+		padding: 0 0.35rem;
+	}
+
+	.map :global(.dot-popup .title) {
+		font-family: var(--font-display);
+		font-weight: 640;
+		font-size: 0.88rem;
+		margin-right: 1rem; /* keep clear of the close button when pinned */
+	}
+
+	.map :global(.dot-popup .drow) {
+		display: flex;
+		justify-content: space-between;
+		gap: 0.8rem;
+		margin-top: 0.2rem;
+	}
+
+	.map :global(.dot-popup .dlbl) {
+		color: var(--muted);
+	}
+
+	.map :global(.dot-popup .dval) {
+		font-family: var(--font-mono);
+		font-size: 0.78rem;
+	}
+
+	.map :global(.dot-popup .brow) {
+		margin-top: 0.4rem;
+		padding-top: 0.35rem;
+		border-top: 1px solid var(--border);
+	}
+
+	.map :global(.dot-popup .dchip) {
+		display: inline-block;
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		margin-right: 0.35rem;
+	}
+
+	.map :global(.dot-popup .dactions) {
+		display: flex;
+		gap: 0.4rem;
+		margin-top: 0.45rem;
+	}
+
+	.map :global(.dot-popup .dactions button) {
+		font-size: 0.72rem;
+		padding: 0.15rem 0.5rem;
 	}
 </style>

@@ -167,17 +167,6 @@ class BucketsStore {
 
 	// ── public operations (each = one undo step) ────────────────────────
 
-	/** New bucket from a selection (drawn shape or otherwise). */
-	createWithPoints(recordIds: string[]): void {
-		const bucket = this.freshBucket();
-		this.history.run(
-			new CompositeCommand(`new ${bucket.name} (${recordIds.length})`, [
-				this.createCommand(bucket),
-				this.assignCommand('assign', recordIds, bucket.id)
-			])
-		);
-	}
-
 	/** Assign a selection to the active bucket (stealing where needed). */
 	assignToActive(recordIds: string[]): void {
 		if (!this.activeId) return;
