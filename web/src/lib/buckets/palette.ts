@@ -1,6 +1,6 @@
 /**
  * Categorical bucket colors — saturated enough to read on both basemap
- * flavors, distinct from the postal-orange chrome accent. Cycles past 12.
+ * flavors, distinct from the green chrome accent. Cycles past 12.
  */
 export const BUCKET_COLORS = [
 	'#1f6feb', // blue

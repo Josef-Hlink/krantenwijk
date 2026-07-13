@@ -118,7 +118,7 @@
 
 	.drop {
 		margin-top: 1.8rem;
-		border: 1.5px dashed var(--border);
+		border: 1.5px dashed var(--band);
 		border-radius: 8px;
 		padding: 2.2rem 1.5rem;
 		text-align: center;

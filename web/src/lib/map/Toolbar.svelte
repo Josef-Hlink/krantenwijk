@@ -154,8 +154,8 @@
 	}
 
 	button.armed {
-		background: var(--accent);
-		border-color: var(--accent);
+		background: var(--postal);
+		border-color: var(--postal);
 		color: #fff;
 	}
 

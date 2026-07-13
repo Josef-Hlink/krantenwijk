@@ -1,6 +1,9 @@
 /* krantenwijk — Dutch functionalism over newsprint.
-   Chrome stays quiet (paper, ink, hairlines, one postal-orange accent) so
-   the map data is the loudest thing on screen. Data is always mono. */
+   Chrome stays quiet (paper, ink, hairlines) with the bundle's greens as
+   the accent — groen 2 by morning, groen 1 by evening — the elastic's
+   beige for the odd border, and postal orange demoted to a complementary
+   flash. The map data stays the loudest thing on screen. Data is always
+   mono. Inks live in src/lib/branding/logo.ts. */
 
 @import '@fontsource-variable/bricolage-grotesque';
 @import '@fontsource-variable/instrument-sans';
@@ -19,8 +22,11 @@
 	--fg: #1a1b1e;
 	--muted: #6e6d66;
 	--border: #e4e3dc;
-	--accent: #ee5f00;
-	--accent-soft: #fce9dc;
+	--accent: #3d7a4e;
+	--accent-soft: #e3eee6;
+	--accent-ink: #fbfaf6;
+	--band: #d8c39a;
+	--postal: #ee5f00;
 	--warn: #b4231f;
 	color-scheme: light;
 }
@@ -31,8 +37,11 @@
 	--fg: #e9e8e3;
 	--muted: #8e8d86;
 	--border: #2a2d34;
-	--accent: #ff7a1a;
-	--accent-soft: #3a2413;
+	--accent: #4d9861;
+	--accent-soft: #1d2a22;
+	--accent-ink: #16181d;
+	--band: #b89f74;
+	--postal: #ff7a1a;
 	--warn: #ff5c57;
 	color-scheme: dark;
 }
@@ -96,7 +105,7 @@ button:disabled {
 button.primary {
 	background: var(--accent);
 	border-color: var(--accent);
-	color: #fff;
+	color: var(--accent-ink);
 	font-weight: 600;
 }
 

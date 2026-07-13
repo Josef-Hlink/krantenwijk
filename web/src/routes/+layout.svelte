@@ -1,5 +1,6 @@
 <script lang="ts">
 	import '../app.css';
+	import { mark } from '$lib/branding/logo';
 
 	let { children } = $props();
 
@@ -13,8 +14,10 @@
 
 <div class="shell">
 	<header>
-		<a class="masthead" href="/">krantenwijk</a>
-		<span class="tagline">delivery rounds, planned by hand</span>
+		<a class="masthead" href="/">
+			<span class="mark">{@html mark}</span>
+			krantenwijk
+		</a>
 		<button class="theme" onclick={toggleTheme} title="Toggle theme">☾/☀</button>
 	</header>
 	<hr class="rule-double" />
@@ -38,6 +41,9 @@
 	}
 
 	.masthead {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
 		font-family: var(--font-display);
 		font-weight: 700;
 		font-size: 1.35rem;
@@ -46,9 +52,14 @@
 		text-decoration: none;
 	}
 
-	.tagline {
-		color: var(--muted);
-		font-size: 0.85rem;
+	.mark {
+		width: 30px;
+		display: flex;
+	}
+
+	.mark :global(svg) {
+		width: 100%;
+		height: auto;
 	}
 
 	.theme {
