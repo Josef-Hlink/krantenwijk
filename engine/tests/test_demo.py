@@ -1,4 +1,4 @@
-from krantenwijk.demo import CSV_COLUMNS, make_round
+from krantenwijk.demo import CSV_COLUMNS, make_round, synth_person
 from krantenwijk.models import AddressRecord
 
 
@@ -50,6 +50,29 @@ def test_committed_demo_file(records):
 
 def test_csv_columns_match_schema_example():
     assert CSV_COLUMNS == [
-        "id", "straat", "huisnr", "postcode", "plaats",
-        "lat", "lon", "soort", "loper",
+        "id",
+        "naam",
+        "bsn",
+        "straat",
+        "huisnr",
+        "postcode",
+        "plaats",
+        "lat",
+        "lon",
+        "soort",
+        "loper",
     ]
+
+
+def test_synth_person_deterministic_per_id():
+    assert synth_person("v-0000") == synth_person("v-0000")
+    assert synth_person("v-0000") != synth_person("v-0001")
+
+
+def test_synth_bsn_passes_elfproef():
+    for i in range(200):
+        _, bsn = synth_person(f"v-{i:04d}")
+        assert len(bsn) == 9 and bsn.isdigit()
+        digits = [int(d) for d in bsn]
+        weighted = sum((9 - i) * d for i, d in enumerate(digits[:8])) - digits[8]
+        assert weighted % 11 == 0

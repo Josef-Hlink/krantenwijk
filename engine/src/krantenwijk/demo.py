@@ -3,8 +3,11 @@
 The committed demo file uses *real* Vlissingen addresses — public data from
 OpenStreetMap (© OpenStreetMap contributors, ODbL; address data in the
 Netherlands originates from the public BAG register). What's fabricated is
-the round itself: opaque ids, a category split, and the sampling. No real
-person or delivery is referenced, only letterboxes that exist.
+the round itself: opaque ids, invented residents (random names and
+elfproef-valid but meaningless BSNs, there to show that sensitive columns
+can ride along without ever being used), a category split, and the
+sampling. No real person or delivery is referenced, only letterboxes that
+exist.
 
 Fetching hits the Overpass API (network); sampling/writing is deterministic
 and offline, so tests only exercise ``make_round``/``write_csv``.
@@ -40,6 +43,8 @@ CATEGORIES = [("griep", 0.8), ("pneum", 0.2)]
 
 CSV_COLUMNS = [
     "id",
+    "naam",
+    "bsn",
     "straat",
     "huisnr",
     "postcode",
@@ -49,6 +54,81 @@ CSV_COLUMNS = [
     "soort",
     "loper",
 ]
+
+FIRST_NAMES = [
+    "Ada",
+    "Anna",
+    "Bram",
+    "Carla",
+    "Daan",
+    "Els",
+    "Femke",
+    "Gijs",
+    "Hanna",
+    "Hendrik",
+    "Iris",
+    "Jan",
+    "Johanna",
+    "Kees",
+    "Lieke",
+    "Marijke",
+    "Niels",
+    "Otto",
+    "Pieter",
+    "Roos",
+    "Sanne",
+    "Sem",
+    "Teun",
+    "Willem",
+]
+
+SURNAMES = [
+    "Bakker",
+    "Bos",
+    "Brouwer",
+    "de Boer",
+    "de Bruin",
+    "de Groot",
+    "de Vries",
+    "de Wit",
+    "Dekker",
+    "Dijkstra",
+    "Hendriks",
+    "Jansen",
+    "Kuipers",
+    "Maas",
+    "Mulder",
+    "Peters",
+    "Post",
+    "Smits",
+    "van den Berg",
+    "van der Meer",
+    "van Dijk",
+    "van Leeuwen",
+    "Visser",
+    "Vos",
+]
+
+
+def make_bsn(rng: random.Random) -> str:
+    """A random 9-digit number satisfying the BSN elfproef: 9·d1 + 8·d2 +
+    … + 2·d8 − d9 ≡ 0 (mod 11). Valid-looking, tied to nobody."""
+    while True:
+        digits = [rng.randint(1, 9)] + [rng.randint(0, 9) for _ in range(7)]
+        check = sum((9 - i) * d for i, d in enumerate(digits)) % 11
+        if check == 10:
+            continue
+        return "".join(map(str, digits + [check]))
+
+
+def synth_person(record_id: str, seed: int = 7) -> tuple[str, str]:
+    """Deterministic invented resident for a demo row: (naam, bsn).
+
+    Seeded per record id, so the committed CSV can be re-derived or
+    augmented offline without reshuffling everyone."""
+    rng = random.Random(f"{seed}:{record_id}")
+    naam = f"{rng.choice(FIRST_NAMES)} {rng.choice(SURNAMES)}"
+    return naam, make_bsn(rng)
 
 
 def fetch_addresses(place: str, bbox: str = DEFAULT_BBOX) -> list[AddressRecord]:
@@ -97,9 +177,7 @@ def make_round(
 ) -> list[AddressRecord]:
     """Deterministically sample a fictional round from real addresses."""
     rng = random.Random(seed)
-    pool = sorted(
-        addresses, key=lambda r: (r.street, r.postcode or "", r.house_number)
-    )
+    pool = sorted(addresses, key=lambda r: (r.street, r.postcode or "", r.house_number))
     sample = rng.sample(pool, min(n, len(pool)))
     return [
         r.model_copy(
@@ -114,14 +192,17 @@ def make_round(
     ]
 
 
-def write_csv(records: list[AddressRecord], out: TextIO) -> None:
+def write_csv(records: list[AddressRecord], out: TextIO, seed: int = 7) -> None:
     """Write records using the demo column names from schema.example.yaml."""
     writer = csv.writer(out)
     writer.writerow(CSV_COLUMNS)
     for r in records:
+        naam, bsn = synth_person(r.id, seed=seed)
         writer.writerow(
             [
                 r.id,
+                naam,
+                bsn,
                 r.street,
                 r.house_number,
                 r.postcode,
@@ -154,7 +235,7 @@ def demo(place: str, bbox: str, n: int, seed: int, out: Path) -> None:
     records = make_round(addresses, n=n, seed=seed)
     out.parent.mkdir(parents=True, exist_ok=True)
     with out.open("w", newline="", encoding="utf-8") as f:
-        write_csv(records, f)
+        write_csv(records, f, seed=seed)
     click.echo(f"wrote {len(records)} demo addresses to {out}")
 
 
