@@ -20,7 +20,6 @@ class AddressRecord(BaseModel):
     lat: float | None = None
     lon: float | None = None
     category: str | None = None
-    carrier: str | None = None
     extra: dict[str, str] = {}
 
 

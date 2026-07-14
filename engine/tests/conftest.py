@@ -27,7 +27,6 @@ def records() -> list[AddressRecord]:
                 lat=float(row["lat"]),
                 lon=float(row["lon"]),
                 category=row["soort"] or None,
-                carrier=row["loper"] or None,
             )
             for row in csv.DictReader(f)
         ]

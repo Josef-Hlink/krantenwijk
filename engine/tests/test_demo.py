@@ -60,7 +60,6 @@ def test_csv_columns_match_schema_example():
         "lat",
         "lon",
         "soort",
-        "loper",
     ]
 
 

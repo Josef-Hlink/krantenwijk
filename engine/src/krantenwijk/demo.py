@@ -52,7 +52,6 @@ CSV_COLUMNS = [
     "lat",
     "lon",
     "soort",
-    "loper",
 ]
 
 FIRST_NAMES = [
@@ -210,7 +209,6 @@ def write_csv(records: list[AddressRecord], out: TextIO, seed: int = 7) -> None:
                 r.lat,
                 r.lon,
                 r.category,
-                r.carrier or "",
             ]
         )
 
