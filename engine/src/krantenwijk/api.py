@@ -7,13 +7,14 @@ cannot hold them. Nothing is persisted, nothing is logged with payloads.
 import os
 from pathlib import Path
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
-from . import cluster, estimate, route
+from . import cluster, estimate, rounds, route
 from .models import Assignment, Point, RouteResult
+from .rounds import Round, RoundNotFound, RoundSummary
 
 # Web dev server origins (vite, port 4382). In production the static build is
 # served same-origin, so CORS mostly matters for odd dev setups without the
@@ -83,9 +84,15 @@ def create_app() -> FastAPI:
         }
 
     @app.get("/api/status")
-    def status() -> dict[str, str]:
+    def status() -> dict[str, object]:
         backend = "ors" if os.environ.get("ORS_API_KEY") else "fallback"
-        return {"status": "ok", "routing": backend}
+        # `rounds` tells the app whether this instance can save plans at all,
+        # so it can hide the save control and keep its privacy copy honest.
+        return {
+            "status": "ok",
+            "routing": backend,
+            "rounds": rounds.rounds_dir() is not None,
+        }
 
     @app.post("/api/cluster", response_model=ClusterResponse)
     def cluster_points(req: ClusterRequest) -> ClusterResponse:
@@ -137,6 +144,52 @@ def create_app() -> FastAPI:
         # FileResponse answers Range requests with 206 partials, which is
         # exactly what the pmtiles protocol issues.
         return FileResponse(path, media_type="application/octet-stream")
+
+    # ── saved rounds ────────────────────────────────────────────────────
+    # Unlike everything above, these carry addresses and names (see
+    # rounds.py). They exist only when KRANTENWIJK_ROUNDS_DIR is set; on the
+    # public instance every one of them 404s and nothing is ever written.
+
+    def require_rounds() -> None:
+        if rounds.rounds_dir() is None:
+            raise HTTPException(
+                404,
+                "this instance does not store rounds",
+            )
+
+    @app.get("/api/rounds", response_model=list[RoundSummary])
+    def list_rounds(_: None = Depends(require_rounds)) -> list[RoundSummary]:
+        return rounds.list_rounds()
+
+    @app.post("/api/rounds", response_model=Round)
+    def create_round(req: Round, _: None = Depends(require_rounds)) -> Round:
+        # A new round always gets a fresh id, whatever the client sent.
+        return rounds.write_round(req.model_copy(update={"id": ""}))
+
+    @app.get("/api/rounds/{round_id}", response_model=Round)
+    def get_round(round_id: str, _: None = Depends(require_rounds)) -> Round:
+        try:
+            return rounds.read_round(round_id)
+        except RoundNotFound as e:
+            raise HTTPException(404, str(e)) from e
+
+    @app.put("/api/rounds/{round_id}", response_model=Round)
+    def put_round(
+        round_id: str, req: Round, _: None = Depends(require_rounds)
+    ) -> Round:
+        try:
+            rounds.read_round(round_id)  # 404 rather than silently creating
+            return rounds.write_round(req.model_copy(update={"id": round_id}))
+        except RoundNotFound as e:
+            raise HTTPException(404, str(e)) from e
+
+    @app.delete("/api/rounds/{round_id}", status_code=204)
+    def remove_round(round_id: str, _: None = Depends(require_rounds)) -> Response:
+        try:
+            rounds.delete_round(round_id)
+        except RoundNotFound as e:
+            raise HTTPException(404, str(e)) from e
+        return Response(status_code=204)
 
     return app
 
