@@ -8,6 +8,7 @@
  * gesture is one atomic undo step.
  */
 import { SvelteMap } from 'svelte/reactivity';
+import { recordsStore } from '$lib/records/records.svelte';
 import { bucketColor } from './palette';
 import { History, CompositeCommand, type Command } from './history';
 
@@ -39,12 +40,30 @@ class BucketsStore {
 
 	list = $derived([...this.buckets.values()]);
 
+	/** Cards per bucket — what you carry. */
 	counts = $derived.by(() => {
 		const c = new Map<string, number>();
 		for (const bucketId of this.assignment.values()) {
 			c.set(bucketId, (c.get(bucketId) ?? 0) + 1);
 		}
 		return c;
+	});
+
+	/**
+	 * Doors per bucket — what you walk, and what capacity is really about:
+	 * `maxStops` exists because ORS optimization tops out around 50 waypoints,
+	 * and a waypoint is a place, not a card.
+	 */
+	doorCounts = $derived.by(() => {
+		const seen = new Map<string, Set<string>>();
+		for (const [recordId, bucketId] of this.assignment) {
+			const key = recordsStore.stopOf.get(recordId);
+			if (!key) continue;
+			let set = seen.get(bucketId);
+			if (!set) seen.set(bucketId, (set = new Set()));
+			set.add(key);
+		}
+		return new Map([...seen].map(([bucketId, keys]) => [bucketId, keys.size]));
 	});
 
 	active = $derived(this.activeId ? (this.buckets.get(this.activeId) ?? null) : null);
@@ -175,12 +194,16 @@ class BucketsStore {
 		);
 	}
 
-	/** Toggle one point's membership in the active bucket. */
-	togglePoint(recordId: string): void {
-		if (!this.activeId) return;
-		const currently = this.assignment.get(recordId);
-		const to = currently === this.activeId ? null : this.activeId;
-		this.history.run(this.assignCommand('toggle point', [recordId], to));
+	/**
+	 * Toggle a whole doorstep's membership in the active bucket. Every card
+	 * at the door moves together — the first one decides the direction, so a
+	 * partially-assigned household resolves to "all in".
+	 */
+	toggleDoor(recordIds: string[]): void {
+		if (!this.activeId || recordIds.length === 0) return;
+		const allIn = recordIds.every((id) => this.assignment.get(id) === this.activeId);
+		const to = allIn ? null : this.activeId;
+		this.history.run(this.assignCommand('toggle door', recordIds, to));
 	}
 
 	createEmpty(): void {

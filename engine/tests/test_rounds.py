@@ -37,7 +37,7 @@ def sample() -> Round:
                 city="Vlissingen",
                 lat=51.4426,
                 lon=3.5736,
-                details={"naam": "J. de Vries"},
+                cards=[{"naam": "J. de Vries"}, {"naam": "M. de Vries"}],
             ),
             RoundStop(
                 id="a2",
@@ -69,7 +69,8 @@ def test_round_trip(store, sample):
     assert stored.id and stored.saved_at
     back = rounds.read_round(stored.id)
     assert back.name == "Vlissingen najaar"
-    assert back.stops[0].details == {"naam": "J. de Vries"}
+    # a household called up twice is one stop carrying two cards
+    assert back.stops[0].cards == [{"naam": "J. de Vries"}, {"naam": "M. de Vries"}]
     assert back.buckets[0].order == ["a1", "a2"]
 
 
@@ -95,6 +96,16 @@ def test_listing_is_newest_first_and_carries_no_pii(store, sample):
     # a summary is id/name/counts only — no way to leak an address through it
     blob = json.dumps([s.model_dump() for s in summaries])
     assert "Badhuisstraat" not in blob and "de Vries" not in blob
+
+
+def test_a_door_may_carry_several_cards(store, sample):
+    """A stop is a doorstep, not a card: the phone shows every name behind
+    one letterbox and ticks the lot off together."""
+    stored = rounds.write_round(sample)
+    back = rounds.read_round(stored.id)
+    assert len(back.stops[0].cards) == 2
+    assert len(back.stops[1].cards) == 0  # a door with nothing shown is fine
+    assert back.buckets[0].order == ["a1", "a2"], "one entry per door, not per card"
 
 
 def test_corrupt_file_is_skipped_not_fatal(store, sample):
@@ -168,7 +179,7 @@ def test_api_create_read_delete(store, sample):
     assert [s["id"] for s in listed] == [round_id]
 
     got = client.get(f"/api/rounds/{round_id}").json()
-    assert got["stops"][0]["details"]["naam"] == "J. de Vries"
+    assert got["stops"][0]["cards"][0]["naam"] == "J. de Vries"
 
     assert client.delete(f"/api/rounds/{round_id}").status_code == 204
     assert client.get(f"/api/rounds/{round_id}").status_code == 404

@@ -37,7 +37,12 @@ MAX_ROUND_BYTES = 8 * 1024 * 1024
 
 
 class RoundStop(BaseModel):
-    """One deliverable address as the phone needs to see it."""
+    """One doorstep as the phone needs to see it.
+
+    A stop is a door, not a card. A household called up twice is one place
+    you walk to carrying two cards, so ``cards`` holds one entry per card —
+    each the shown detail columns, keyed by the label the user chose.
+    """
 
     id: str
     street: str | None = None
@@ -46,8 +51,7 @@ class RoundStop(BaseModel):
     city: str | None = None
     lat: float
     lon: float
-    # Shown detail columns only, keyed by the label the user chose.
-    details: dict[str, str] = {}
+    cards: list[dict[str, str]] = []
 
 
 class RoundLeg(BaseModel):

@@ -7,7 +7,7 @@
  * street, the house number and the resident's name so the carrier can match
  * the screen against the card in their hand.
  *
- * The fence is `details`. It holds *only* the columns the user ticked "show
+ * The fence is `cards`. Each holds *only* the columns the user ticked "show
  * on map" during column mapping, already resolved to the labels they chose —
  * never the full `Rec.extra` bag. That is what keeps a `bsn` column in the
  * upload from ever reaching a phone screen. `buildRound()` in ./serialize.ts
@@ -22,8 +22,12 @@ export interface Stop {
 	city?: string | null;
 	lat: number;
 	lon: number;
-	/** Shown detail columns only, keyed by the label the user chose. */
-	details: Record<string, string>;
+	/**
+	 * One entry per card delivered at this door — a household called up twice
+	 * is one stop with two cards. Each holds the shown detail columns only,
+	 * keyed by the label the user chose.
+	 */
+	cards: Record<string, string>[];
 }
 
 export interface RoundLeg {

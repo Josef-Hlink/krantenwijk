@@ -44,18 +44,27 @@
 	<div class="top">
 		<span class="seq">{stop.seq}<em>/{walkStore.total}</em></span>
 		<div class="who">
-			{#if stop.name}<span class="name">{stop.name}</span>{/if}
-			<span class="addr">{addressOf(stop)}</span>
+			{#each stop.people as person, p (p)}
+				{#if person.name}<span class="name">{person.name}</span>{/if}
+			{/each}
+			<span class="addr">
+				{addressOf(stop)}
+				{#if stop.people.length > 1}
+					<em class="cards">{stop.people.length} cards</em>
+				{/if}
+			</span>
 		</div>
 		{#if away != null}
 			<span class="away" class:live={geo.fix != null}>{fmtM(away)}</span>
 		{/if}
 	</div>
 
-	{#if stop.rest.length}
+	{#if stop.people.some((p) => p.rest.length)}
 		<div class="rest">
-			{#each stop.rest as [label, value] (label)}
-				<span><em>{label}</em> {value}</span>
+			{#each stop.people as person, p (p)}
+				{#each person.rest as [label, value] (label)}
+					<span><em>{label}</em> {value}</span>
+				{/each}
 			{/each}
 		</div>
 	{/if}
@@ -118,6 +127,14 @@
 	.addr {
 		font-size: 1.05rem;
 		color: var(--muted);
+	}
+
+	.cards {
+		font-style: normal;
+		font-size: 0.8rem;
+		color: var(--accent);
+		font-weight: 600;
+		margin-left: 0.4rem;
 	}
 
 	.away {

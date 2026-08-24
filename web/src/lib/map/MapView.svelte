@@ -22,16 +22,20 @@
 
 	// ── data derivations ─────────────────────────────────────────────────
 
+	// One dot per door, not per card: a household called up twice is one
+	// place you walk to. `id` is the door's first card, which is also how it
+	// is represented to the engine.
 	const dotsData = $derived.by<FeatureCollection<Point>>(() => ({
 		type: 'FeatureCollection',
-		features: recordsStore.located.map((r) => {
-			const bucketId = bucketsStore.assignment.get(r.id);
+		features: recordsStore.stops.map((stop) => {
+			const bucketId = bucketsStore.assignment.get(stop.recIds[0]);
 			const bucket = bucketId ? bucketsStore.buckets.get(bucketId) : undefined;
 			return {
 				type: 'Feature',
-				geometry: { type: 'Point', coordinates: [r.lon!, r.lat!] },
+				geometry: { type: 'Point', coordinates: [stop.lon, stop.lat] },
 				properties: {
-					id: r.id,
+					id: stop.recIds[0],
+					cards: stop.recIds.length,
 					color: bucket?.color ?? UNASSIGNED_COLOR,
 					active: bucketId != null && bucketId === bucketsStore.activeId,
 					assigned: bucket != null
@@ -104,16 +108,21 @@
 			paint: {
 				// zoom expressions must be top-level, so the active-bucket size
 				// boost lives inside each interpolation stop
+				// A doorstep with several cards reads a shade larger. Like the
+				// active boost, the multiplier has to live *inside* each stop:
+				// a zoom expression may only be the top-level input to
+				// interpolate, so wrapping this in a '*' silently rejects the
+				// whole layer.
 				'circle-radius': [
 					'interpolate',
 					['linear'],
 					['zoom'],
 					10,
-					['case', ['get', 'active'], 4, 2.5],
+					['*', ['case', ['>', ['get', 'cards'], 1], 1.35, 1], ['case', ['get', 'active'], 4, 2.5]],
 					13,
-					['case', ['get', 'active'], 6, 4.5],
+					['*', ['case', ['>', ['get', 'cards'], 1], 1.35, 1], ['case', ['get', 'active'], 6, 4.5]],
 					16,
-					['case', ['get', 'active'], 9.5, 8]
+					['*', ['case', ['>', ['get', 'cards'], 1], 1.35, 1], ['case', ['get', 'active'], 9.5, 8]]
 				],
 				'circle-color': ['get', 'color'],
 				'circle-opacity': ['case', ['get', 'assigned'], 1, 0.8],
@@ -201,9 +210,11 @@
 	}
 
 	function onShape(polygon: Polygon) {
-		const inside = recordsStore.located
-			.filter((r) => pointInPolygon(r.lon!, r.lat!, polygon))
-			.map((r) => r.id);
+		// Select doors, then take every card behind each — a lasso edge must
+		// never cut a household in half.
+		const inside = recordsStore.stops
+			.filter((stop) => pointInPolygon(stop.lon, stop.lat, polygon))
+			.flatMap((stop) => stop.recIds);
 		if (!inside.length) return;
 		if (ui.tool === 'draw-assign' && bucketsStore.activeId) {
 			bucketsStore.assignToActive(inside);
@@ -236,9 +247,30 @@
 			return row;
 		};
 
-		for (const d of recordsStore.shownDetails) {
-			const v = r.extra[d.column]?.trim();
-			if (v) detailRow(d.label, v);
+		// Every card at this door, not just the one that happens to represent
+		// it — otherwise a household of three looks like a single delivery.
+		const door = recordsStore.doorOf(r.id);
+		const cards = (door?.recIds ?? [r.id])
+			.map((id) => recordsStore.records.find((rec) => rec.id === id))
+			.filter((rec) => rec != null);
+
+		if (cards.length > 1) {
+			const count = document.createElement('div');
+			count.className = 'dcount';
+			count.textContent = `${cards.length} cards at this door`;
+			root.appendChild(count);
+		}
+
+		for (const card of cards) {
+			if (cards.length > 1) {
+				const sep = document.createElement('div');
+				sep.className = 'dcard';
+				root.appendChild(sep);
+			}
+			for (const d of recordsStore.shownDetails) {
+				const v = card.extra[d.column]?.trim();
+				if (v) detailRow(d.label, v);
+			}
 		}
 
 		// Live plan state: the dot's bucket (and its carrier, if set) —
@@ -336,7 +368,7 @@
 				break;
 			}
 			case 'toggle':
-				bucketsStore.togglePoint(recordId);
+				bucketsStore.toggleDoor(recordsStore.expandToDoors([recordId]));
 				break;
 			case 'pick-start':
 				if (bucketsStore.activeId) {
@@ -493,6 +525,18 @@
 	.map :global(.dot-popup .dval) {
 		font-family: var(--font-mono);
 		font-size: 0.78rem;
+	}
+
+	.map :global(.dot-popup .dcount) {
+		font-size: 0.72rem;
+		color: var(--muted);
+		margin-top: 0.15rem;
+	}
+
+	.map :global(.dot-popup .dcard) {
+		border-top: 1px dotted var(--border);
+		margin-top: 0.35rem;
+		padding-top: 0.1rem;
 	}
 
 	.map :global(.dot-popup .brow) {

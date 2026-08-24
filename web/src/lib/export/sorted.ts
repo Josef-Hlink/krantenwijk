@@ -27,9 +27,15 @@ export function buildExport(): string {
 
 	// visit order per record: bucket routes first, in visit order
 	const visitOrder = new Map<string, number>();
+	// `order` holds one id per door; every card behind it shares that place in
+	// the walk, so the printed list keeps a household together.
 	for (const [bucketId, result] of routesStore.results) {
 		if (!bucketsStore.buckets.has(bucketId)) continue;
-		result.order.forEach((id, i) => visitOrder.set(id, i + 1));
+		result.order.forEach((id, i) => {
+			for (const cardId of recordsStore.expandToDoors([id])) {
+				visitOrder.set(cardId, i + 1);
+			}
+		});
 	}
 
 	const bucketRank = new Map(bucketsStore.list.map((b, i) => [b.id, i]));

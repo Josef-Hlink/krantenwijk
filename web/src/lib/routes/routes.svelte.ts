@@ -48,12 +48,9 @@ class RoutesStore {
 		const bucket = bucketsStore.buckets.get(bucketId);
 		if (!bucket) return;
 		const version = bucketsStore.dirty.get(bucketId) ?? 0;
-		const byId = new Map(recordsStore.located.map((r) => [r.id, r]));
-		const points = bucketsStore
-			.memberIds(bucketId)
-			.map((id) => byId.get(id))
-			.filter((r) => r != null)
-			.map((r) => ({ id: r.id, lat: r.lat!, lon: r.lon! }));
+		// Route doors, not cards: three cards at one address would otherwise
+		// spend three of ORS's ~50 waypoints standing on the same doormat.
+		const points = recordsStore.doorPoints(bucketsStore.memberIds(bucketId));
 
 		if (points.length === 0) {
 			this.results.delete(bucketId);

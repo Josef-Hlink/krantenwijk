@@ -75,13 +75,17 @@
 		seedBusy = true;
 		seedError = null;
 		try {
-			const points = recordsStore.located.map((r) => ({
-				id: r.id,
-				lat: r.lat!,
-				lon: r.lon!
-			}));
+			// One point per door: capacity, and ORS's ~50-waypoint ceiling, are
+			// both about places you walk to, not cards you carry.
+			const points = recordsStore.doorPoints();
 			const assignments = await cluster(points, bucketsStore.maxStops, nCarriers);
-			bucketsStore.applySeed(assignments);
+			bucketsStore.applySeed(
+				assignments.flatMap((a) =>
+					recordsStore
+						.expandToDoors([a.id])
+						.map((id) => ({ id, bucket: a.bucket }))
+				)
+			);
 		} catch (e) {
 			seedError = e instanceof Error ? e.message : 'auto-seed failed';
 		} finally {

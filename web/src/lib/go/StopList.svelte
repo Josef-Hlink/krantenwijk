@@ -41,17 +41,24 @@
 				{stop.seq}
 			</button>
 			<button class="what" onclick={() => onpick?.(stop)}>
-				{#if stop.name}
-					<span class="name">{stop.name}</span>
-				{/if}
-				<span class="addr">{addressOf(stop)}</span>
-				{#if stop.rest.length}
-					<span class="rest">
-						{#each stop.rest as [label, value] (label)}
-							<span class="bit"><em>{label}</em> {value}</span>
-						{/each}
-					</span>
-				{/if}
+				{#each stop.people as person, p (p)}
+					{#if person.name}
+						<span class="name">{person.name}</span>
+					{/if}
+					{#if person.rest.length}
+						<span class="rest">
+							{#each person.rest as [label, value] (label)}
+								<span class="bit"><em>{label}</em> {value}</span>
+							{/each}
+						</span>
+					{/if}
+				{/each}
+				<span class="addr">
+					{addressOf(stop)}
+					{#if stop.people.length > 1}
+						<em class="cards">{stop.people.length} cards</em>
+					{/if}
+				</span>
 			</button>
 			<button
 				class="tick"
@@ -144,6 +151,16 @@
 	.addr {
 		font-size: 1rem;
 		color: var(--muted);
+	}
+
+	/* A household is one doorstep and one tick, but you post several cards —
+	   say how many so a hand full of them is accounted for. */
+	.cards {
+		font-style: normal;
+		font-size: 0.75rem;
+		color: var(--accent);
+		font-weight: 600;
+		margin-left: 0.35rem;
 	}
 
 	.rest {

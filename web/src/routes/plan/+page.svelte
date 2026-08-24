@@ -30,8 +30,10 @@
 		<div class="section">
 			<h2>round</h2>
 			<p class="stat">
-				<span class="mono">{recordsStore.located.length}</span> on the map ·
-				<span class="mono">{bucketsStore.assignment.size}</span> bucketed
+				<span class="mono">{recordsStore.stops.length}</span> doors ·
+				<span class="mono">{recordsStore.located.length}</span> cards ·
+				<span class="mono">{bucketsStore.doorCounts.values().reduce((a, b) => a + b, 0)}</span>
+				bucketed
 				{#if recordsStore.needGeocode.length > 0}
 					· <span class="mono">{recordsStore.needGeocode.length}</span> to geocode
 				{/if}

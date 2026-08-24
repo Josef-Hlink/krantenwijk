@@ -44,8 +44,9 @@
 	{/if}
 
 	{#each bucketsStore.list as bucket (bucket.id)}
-		{@const count = bucketsStore.counts.get(bucket.id) ?? 0}
-		{@const over = count > bucketsStore.maxStops}
+		{@const doors = bucketsStore.doorCounts.get(bucket.id) ?? 0}
+		{@const cards = bucketsStore.counts.get(bucket.id) ?? 0}
+		{@const over = doors > bucketsStore.maxStops}
 		{@const routeResult = routesStore.results.get(bucket.id)}
 		{@const status = routesStore.status.get(bucket.id)}
 		{@const stale =
@@ -75,7 +76,11 @@
 					onclick={(e) => e.stopPropagation()}
 					onchange={(e) => bucketsStore.rename(bucket.id, e.currentTarget.value)}
 				/>
-				<span class="count mono" class:over>{count}</span>
+				<!-- doors is what capacity is measured in; the card count only
+				     shows when a household makes the two differ -->
+				<span class="count mono" class:over title="{doors} doors · {cards} cards">
+					{doors}{#if cards !== doors}<em>+{cards - doors}</em>{/if}
+				</span>
 				<button
 					class="del"
 					title="Delete bucket (points become unassigned)"
@@ -183,6 +188,13 @@
 		background: none;
 		padding: 0.1rem 0.2rem;
 		font-weight: 600;
+	}
+
+	.count em {
+		font-style: normal;
+		font-size: 0.85em;
+		color: var(--accent);
+		margin-left: 0.05em;
 	}
 
 	.count {

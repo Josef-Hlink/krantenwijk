@@ -36,9 +36,12 @@ export function buildRound(name: string): Round {
 		const route = routesStore.results.get(b.id);
 		// A routed bucket walks in the computed order; an unrouted one still
 		// travels, just unsorted, so a half-planned round is never a dead end.
-		const order = (route?.order ?? bucketsStore.memberIds(b.id)).filter((id) =>
-			located.has(id)
-		);
+		// A routed bucket walks its doors in the computed order; an unrouted
+		// one still travels, collapsed to one entry per door so the phone
+		// never lists the same doorstep twice.
+		const order = (
+			route?.order ?? recordsStore.doorPoints(bucketsStore.memberIds(b.id)).map((p) => p.id)
+		).filter((id) => located.has(id));
 		const routed = route != null && order.length === route.order.length;
 		return {
 			id: b.id,
@@ -53,9 +56,18 @@ export function buildRound(name: string): Round {
 		};
 	});
 
+	// `order` holds one id per door — the door's first card. Each saved stop
+	// carries every card behind that door, so the phone shows all the names
+	// you are about to post through one letterbox.
 	const visited = new Set(buckets.flatMap((b) => b.order));
 	const stops: Stop[] = [...visited].map((id) => {
 		const r = located.get(id)!;
+		const cards = recordsStore
+			.expandToDoors([id])
+			.map((cardId) => located.get(cardId))
+			.filter((c) => c != null)
+			.map(detailsOf)
+			.filter((d) => Object.keys(d).length > 0);
 		return {
 			id: r.id,
 			street: r.street ?? null,
@@ -64,7 +76,7 @@ export function buildRound(name: string): Round {
 			city: r.city ?? null,
 			lat: r.lat!,
 			lon: r.lon!,
-			details: detailsOf(r)
+			cards
 		};
 	});
 

@@ -23,18 +23,22 @@ const SERVICE_TIME_S = 45; // reaching the door and dropping the card
 export const BEHIND = 3;
 export const AHEAD = 6;
 
+/** One card at a door: who it is for, and whatever else was shown. */
+export interface WalkCard {
+	name: string | null;
+	rest: [string, string][];
+}
+
 export interface WalkStop extends Stop {
 	/** 1-based position in the walk. */
 	seq: number;
 	/** Distance/duration to the next stop; null on the last one. */
 	legToNext: { distance_m: number; duration_s: number } | null;
-	/** The resident's name, if a name-ish column was shown. */
-	name: string | null;
-	/** Every shown detail except the one used as the name. */
-	rest: [string, string][];
+	/** Everyone called up at this door — usually one, sometimes a household. */
+	people: WalkCard[];
 }
 
-function splitDetails(details: Record<string, string>) {
+function splitDetails(details: Record<string, string>): WalkCard {
 	const entries = Object.entries(details);
 	const idx = entries.findIndex(([label]) =>
 		NAMEISH.includes(label.trim().toLowerCase())
@@ -73,13 +77,15 @@ class WalkStore {
 					...stop,
 					seq: i + 1,
 					legToNext: bucket.legs[i] ?? null,
-					...splitDetails(stop.details)
+					people: (stop.cards ?? []).map(splitDetails)
 				}
 			];
 		});
 	});
 
 	total = $derived(this.stops.length);
+	/** Cards, not doors — what you are actually carrying. */
+	totalCards = $derived(this.stops.reduce((n, s) => n + Math.max(s.people.length, 1), 0));
 	doneCount = $derived(this.stops.filter((s) => this.delivered.has(s.id)).length);
 
 	/**
