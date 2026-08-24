@@ -1,36 +1,42 @@
 <script lang="ts">
 	import '../app.css';
+	import { page } from '$app/state';
 	import { mark } from '$lib/branding/logo';
+	import { toggleTheme } from '$lib/theme';
 
 	let { children } = $props();
 
-	function toggleTheme() {
-		const next =
-			document.documentElement.dataset.theme === 'avond' ? 'ochtend' : 'avond';
-		document.documentElement.dataset.theme = next;
-		localStorage.setItem('krantenwijk-theme', next);
-	}
+	// /go is a full-bleed phone surface: the masthead would eat a fifth of the
+	// screen and the map has to reach the edges. It carries its own chrome.
+	const bare = $derived(page.url.pathname.startsWith('/go'));
 </script>
 
-<div class="shell">
-	<header>
-		<a class="masthead" href="/">
-			<span class="mark">{@html mark}</span>
-			krantenwijk
-		</a>
-		<button class="theme" onclick={toggleTheme} title="Toggle theme">☾/☀</button>
-	</header>
-	<hr class="rule-double" />
-	<main>
-		{@render children()}
-	</main>
-</div>
+{#if bare}
+	{@render children()}
+{:else}
+	<div class="shell">
+		<header>
+			<a class="masthead" href="/">
+				<span class="mark">{@html mark}</span>
+				krantenwijk
+			</a>
+			<button class="theme" onclick={toggleTheme} title="Toggle theme">☾/☀</button>
+		</header>
+		<hr class="rule-double" />
+		<main>
+			{@render children()}
+		</main>
+	</div>
+{/if}
 
 <style>
 	.shell {
 		height: 100%;
 		display: flex;
 		flex-direction: column;
+		/* viewport-fit=cover lets content under the notch — keep it out */
+		padding-left: env(safe-area-inset-left);
+		padding-right: env(safe-area-inset-right);
 	}
 
 	header {
