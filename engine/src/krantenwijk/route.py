@@ -25,7 +25,7 @@ import openrouteservice
 from openrouteservice import exceptions as ors_exceptions
 from openrouteservice import optimization as ors_optimization
 
-from .models import Point, RouteResult
+from .models import Leg, Point, RouteResult
 
 WALKING_SPEED_M_S = 1.33  # ~4.8 km/h
 
@@ -67,6 +67,15 @@ def haversine_m(a: tuple[float, float], b: tuple[float, float]) -> float:
         + math.cos(lat1) * math.cos(lat2) * math.sin((lon2 - lon1) / 2) ** 2
     )
     return 2 * 6_371_000 * math.asin(math.sqrt(h))
+
+
+def _straight_legs(ordered: list[Point]) -> list[Leg]:
+    """Per-pair legs from straight-line distance at walking speed."""
+    legs = []
+    for a, b in zip(ordered, ordered[1:], strict=False):
+        d = haversine_m((a.lat, a.lon), (b.lat, b.lon))
+        legs.append(Leg(distance_m=d, duration_s=d / WALKING_SPEED_M_S))
+    return legs
 
 
 def _split_fixed(
@@ -113,16 +122,15 @@ class FallbackBackend:
             ordered = self._nearest_neighbor(start, end, middle)
             ordered = self._two_opt(ordered)
 
-        distance = sum(
-            haversine_m((a.lat, a.lon), (b.lat, b.lon))
-            for a, b in zip(ordered, ordered[1:], strict=False)
-        )
+        legs = _straight_legs(ordered)
+        distance = sum(leg.distance_m for leg in legs)
         return RouteResult(
             order=[p.id for p in ordered],
             geometry=[(p.lon, p.lat) for p in ordered],
             duration_s=distance / WALKING_SPEED_M_S,
             distance_m=distance,
             engine=self.engine,
+            legs=legs,
         )
 
     @staticmethod
@@ -231,7 +239,23 @@ class OrsBackend:
             duration_s=summary["duration"],
             distance_m=summary["distance"],
             engine=self.engine,
+            legs=self._legs(feature["properties"].get("segments"), ordered),
         )
+
+    @staticmethod
+    def _legs(segments: Any, ordered: list[Point]) -> list[Leg]:
+        """ORS returns one directions segment per consecutive waypoint pair.
+
+        Self-hosted instances and older responses may omit them, so a
+        wrong-length or missing ``segments`` falls back to straight lines
+        rather than handing the caller legs that don't line up with ``order``.
+        """
+        expected = len(ordered) - 1
+        if not isinstance(segments, list) or len(segments) != expected:
+            return _straight_legs(ordered)
+        return [
+            Leg(distance_m=s["distance"], duration_s=s["duration"]) for s in segments
+        ]
 
     def _optimize_order(
         self, start: Point, end: Point, middle: list[Point]

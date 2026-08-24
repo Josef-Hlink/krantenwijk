@@ -40,6 +40,13 @@ class Assignment(BaseModel):
     bucket: str
 
 
+class Leg(BaseModel):
+    """The walk between two consecutive stops."""
+
+    distance_m: float
+    duration_s: float
+
+
 class RouteResult(BaseModel):
     """An ordered visit sequence for one bucket."""
 
@@ -48,3 +55,6 @@ class RouteResult(BaseModel):
     duration_s: float
     distance_m: float
     engine: str  # "ors" | "fallback"
+    # One per consecutive pair in ``order``, so ``len(legs) == len(order) - 1``.
+    # Defaults to empty: older callers and clients that never asked are unaffected.
+    legs: list[Leg] = []

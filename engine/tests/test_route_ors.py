@@ -16,6 +16,7 @@ class FakeOrsClient:
         self.directions_calls = []
         # visit middle jobs in reverse submission order, to prove we map ids
         self.reverse_jobs = True
+        self.with_segments = True
 
     def optimization(self, jobs, vehicles):
         # mirror the real client, which asserts on its Job/Vehicle types
@@ -36,6 +37,13 @@ class FakeOrsClient:
         self.directions_calls.append(
             {"coordinates": coordinates, "profile": profile, "format": format}
         )
+        properties = {"summary": {"duration": 1234.5, "distance": 1650.0}}
+        if self.with_segments:
+            # real ORS returns one segment per consecutive waypoint pair
+            properties["segments"] = [
+                {"distance": 100.0 + i, "duration": 80.0 + i}
+                for i in range(len(coordinates) - 1)
+            ]
         return {
             "features": [
                 {
@@ -43,7 +51,7 @@ class FakeOrsClient:
                         # a plausible densified line: echo the inputs plus a bend
                         "coordinates": [list(c) for c in coordinates] + [[4.9, 52.37]],
                     },
-                    "properties": {"summary": {"duration": 1234.5, "distance": 1650.0}},
+                    "properties": properties,
                 }
             ]
         }
@@ -105,3 +113,33 @@ def test_bucket_too_large():
     pts = [Point(id=f"p{i}", lat=52.3 + i * 1e-4, lon=4.9) for i in range(51)]
     with pytest.raises(BucketTooLarge):
         OrsBackend(client=FakeOrsClient()).route(pts)
+
+
+def test_legs_come_from_directions_segments(backend, small_points):
+    result = backend.route(small_points)
+    assert len(result.legs) == len(result.order) - 1
+    assert [leg.distance_m for leg in result.legs][:3] == [100.0, 101.0, 102.0]
+    assert result.legs[0].duration_s == 80.0
+
+
+def test_legs_fall_back_to_straight_lines_without_segments(backend, fake, small_points):
+    fake.with_segments = False
+    result = backend.route(small_points)
+    # a self-hosted instance that omits segments still gets usable legs, one
+    # per pair, rather than a list that doesn't line up with `order`
+    assert len(result.legs) == len(result.order) - 1
+    assert all(leg.distance_m > 0 for leg in result.legs)
+
+
+def test_mismatched_segment_count_is_not_trusted(backend, fake, small_points):
+    real_directions = fake.directions
+
+    def truncated(coordinates, profile, format):
+        out = real_directions(coordinates, profile, format)
+        out["features"][0]["properties"]["segments"] = [{"distance": 1, "duration": 1}]
+        return out
+
+    fake.directions = truncated
+    result = backend.route(small_points)
+    assert len(result.legs) == len(result.order) - 1
+    assert result.legs[0].distance_m != 1

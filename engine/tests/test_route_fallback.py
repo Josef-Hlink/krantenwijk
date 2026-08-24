@@ -1,5 +1,7 @@
 import math
 
+import pytest
+
 from krantenwijk.route import FallbackBackend, haversine_m
 
 
@@ -41,3 +43,11 @@ def test_single_point(small_points):
     result = FallbackBackend().route(small_points[:1])
     assert result.order == [small_points[0].id]
     assert result.distance_m == 0
+
+
+def test_legs_line_up_with_the_order_and_sum_to_the_total(small_points):
+    result = FallbackBackend().route(small_points)
+    assert len(result.legs) == len(result.order) - 1
+    assert sum(leg.distance_m for leg in result.legs) == pytest.approx(
+        result.distance_m
+    )
