@@ -121,21 +121,39 @@ def make_bsn(rng: random.Random) -> str:
 
 
 def synth_person(
-    record_id: str, seed: int = 7, household: str | None = None
+    person_key: str, seed: int = 7, household: str | None = None
 ) -> tuple[str, str]:
-    """Deterministic invented resident for a demo row: (naam, bsn).
+    """Deterministic invented resident: (naam, bsn).
 
-    Seeded per record id, so the committed CSV can be re-derived or
-    augmented offline without reshuffling everyone. When a household key is
-    given the surname is seeded from that instead, so the several cards at
-    one address read as one family — which is the whole point of having
-    them in the demo.
+    Seeded per *person*, not per row — one resident can be called up twice
+    in the same round (a griep card and a pneum card), and both rows must
+    carry the same name and BSN. When a household key is given the surname
+    is seeded from that, so several residents at one address read as one
+    family.
     """
-    rng = random.Random(f"{seed}:{record_id}")
+    rng = random.Random(f"{seed}:{person_key}")
     first = rng.choice(FIRST_NAMES)
     surname_rng = random.Random(f"{seed}:huis:{household}") if household else rng
     naam = f"{first} {surname_rng.choice(SURNAMES)}"
     return naam, make_bsn(rng)
+
+
+def assign_people(door: str, n_cards: int, seed: int = 7) -> list[tuple[str, str]]:
+    """Who each of a door's cards is for.
+
+    Cards are not people. A resident called up for both griep and pneum gets
+    two cards at one address, so a door with three cards may hold only two
+    names — the case the walking view has to collapse.
+    """
+    rng = random.Random(f"{seed}:mensen:{door}")
+    n_people = n_cards
+    if n_cards > 1 and rng.random() < 0.4:
+        n_people = n_cards - 1
+    people = [
+        synth_person(f"{door}:{i}", seed=seed, household=door) for i in range(n_people)
+    ]
+    # the extra card falls to the last resident listed
+    return [people[min(i, n_people - 1)] for i in range(n_cards)]
 
 
 def household_key(r: AddressRecord) -> str:
@@ -228,8 +246,36 @@ def write_csv(records: list[AddressRecord], out: TextIO, seed: int = 7) -> None:
     """Write records using the demo column names from schema.example.yaml."""
     writer = csv.writer(out)
     writer.writerow(CSV_COLUMNS)
+
+    # Cards at one door are consecutive, so residents can be assigned per door.
+    people: dict[str, list[tuple[str, str]]] = {}
+    counts: dict[str, int] = {}
     for r in records:
-        naam, bsn = synth_person(r.id, seed=seed, household=household_key(r))
+        counts[household_key(r)] = counts.get(household_key(r), 0) + 1
+    for door, n_cards in counts.items():
+        people[door] = assign_people(door, n_cards, seed=seed)
+
+    # A resident called up twice holds one griep card and one pneum card —
+    # never two of the same. Their cards' categories are fixed here, where
+    # the person assignment is known.
+    per_person: dict[tuple[str, str], int] = {}
+    first_category: dict[tuple[str, str], str] = {}
+
+    used: dict[str, int] = {}
+    for r in records:
+        door = household_key(r)
+        i = used.get(door, 0)
+        used[door] = i + 1
+        naam, bsn = people[door][i]
+        who = (door, naam)
+        nth = per_person.get(who, 0)
+        per_person[who] = nth + 1
+        if nth == 0:
+            category = r.category or CATEGORIES[0][0]
+            first_category[who] = category
+        else:
+            others = [c for c, _ in CATEGORIES if c != first_category.get(who)]
+            category = others[(nth - 1) % len(others)] if others else r.category
         writer.writerow(
             [
                 r.id,
@@ -241,7 +287,7 @@ def write_csv(records: list[AddressRecord], out: TextIO, seed: int = 7) -> None:
                 r.city,
                 r.lat,
                 r.lon,
-                r.category,
+                category,
             ]
         )
 

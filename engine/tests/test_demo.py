@@ -1,4 +1,4 @@
-from krantenwijk.demo import CSV_COLUMNS, make_round, synth_person
+from krantenwijk.demo import CSV_COLUMNS, assign_people, make_round, synth_person
 from krantenwijk.models import AddressRecord
 
 
@@ -48,7 +48,7 @@ def test_some_doors_hold_more_than_one_card():
     assert len(doors) < len(result)
 
 
-def test_cards_at_one_door_share_a_surname_and_a_coordinate():
+def test_cards_at_one_door_share_a_coordinate_and_keep_their_own_ids():
     result = make_round(fake_addresses(600), n=400, seed=7)
     grouped: dict[tuple[str, str], list[AddressRecord]] = {}
     for r in result:
@@ -57,11 +57,33 @@ def test_cards_at_one_door_share_a_surname_and_a_coordinate():
     assert multi, "expected at least one multi-card door"
     for rs in multi:
         assert len({(r.lat, r.lon) for r in rs}) == 1
-        surnames = {synth_person(r.id, household=f"{r.street.lower()}|"
-                                 f"{r.house_number.lower()}")[0].split()[-1]
-                    for r in rs}
-        assert len(surnames) == 1, "one household, one surname"
         assert len({r.id for r in rs}) == len(rs), "each card keeps its own id"
+
+
+def test_a_household_shares_a_surname():
+    people = assign_people("badhuisstraat|34", 3, seed=7)
+    assert len({naam.split()[-1] for naam, _ in people}) == 1
+
+
+def test_one_resident_can_be_called_up_twice():
+    """Cards are not people: griep and pneum go to the same door, for the
+    same person, as two rows. The walking view has to collapse that to one
+    name, so the demo has to contain it."""
+    shapes = {
+        len({naam for naam, _ in assign_people(f"straat|{i}", 3, seed=7)})
+        for i in range(60)
+    }
+    assert 2 in shapes, "expected some 3-card doors to hold only two residents"
+    assert 3 in shapes, "and some to hold three"
+
+
+def test_a_repeat_call_up_keeps_one_identity():
+    people = assign_people("straat|1", 3, seed=7)
+    by_name: dict[str, set[str]] = {}
+    for naam, bsn in people:
+        by_name.setdefault(naam, set()).add(bsn)
+    for naam, bsns in by_name.items():
+        assert len(bsns) == 1, f"{naam} must be one person with one BSN"
 
 
 def test_categories_assigned():
