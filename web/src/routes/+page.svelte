@@ -3,6 +3,10 @@
 	import { parseCsv, type ParsedCsv } from '$lib/csv/parse';
 	import ColumnMapper from '$lib/csv/ColumnMapper.svelte';
 	import { recordsStore, type Rec, type Detail } from '$lib/records/records.svelte';
+	import { capability } from '$lib/rounds/capability.svelte';
+
+	// Which deployment profile this is decides what we can honestly promise.
+	capability.ensure();
 
 	let parsed = $state<ParsedCsv | null>(null);
 	let error = $state<string | null>(null);
@@ -48,10 +52,23 @@
 			<h1>plan a delivery round<br />without handing anyone your addresses</h1>
 			<p>
 				Drop a CSV of addresses, see them as dots on a map, draw delivery buckets by
-				hand, and export a sorted walking order. Everything runs in your browser:
-				your file is never uploaded, never stored, and gone when you close the tab.
-				The routing engine only ever sees anonymous coordinates.
+				hand, and export a sorted walking order. Parsing, mapping and export all
+				happen in your browser, and the routing engine only ever sees anonymous
+				coordinates.
 			</p>
+			{#if capability.rounds}
+				<p>
+					This instance can also <strong>save a planned round</strong> so a phone can
+					walk it. That saved copy is the one thing that does leave your browser: it
+					carries the addresses, and the columns you tick "show on map" — a resident's
+					name, so the screen matches the card in your hand. Everything you leave
+					unticked stays here.
+				</p>
+			{:else}
+				<p>
+					Your file is never uploaded, never stored, and gone when you close the tab.
+				</p>
+			{/if}
 			<p class="fine">
 				If your CSV has no coordinates, addresses are geocoded one by one via
 				OpenStreetMap's public Nominatim — you'll be asked first. Include
@@ -83,6 +100,12 @@
 			</p>
 		</section>
 
+		{#if capability.rounds}
+			<p class="walk">
+				Already planned one? <a href="/go">Walk a saved round →</a>
+			</p>
+		{/if}
+
 		{#if error}
 			<p class="error">{error}</p>
 		{/if}
@@ -109,6 +132,11 @@
 
 	.intro p {
 		max-width: 38rem;
+	}
+
+	.walk {
+		text-align: center;
+		margin-top: 1.2rem;
 	}
 
 	.fine {

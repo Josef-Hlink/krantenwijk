@@ -1,8 +1,13 @@
 /**
  * Thin typed client for the engine. Always relative /api — the vite proxy
- * (dev) or same-origin host (prod) resolves it; no hardcoded hosts. Only
- * ids and coordinates ever travel through here.
+ * (dev) or same-origin host (prod) resolves it; no hardcoded hosts.
+ *
+ * Only ids and coordinates travel through the planning endpoints (/cluster,
+ * /route, /estimate). The /rounds endpoints at the bottom are the deliberate
+ * exception — they carry addresses and names, exist only on an instance
+ * configured to store rounds, and 404 everywhere else. See $lib/rounds/types.
  */
+import type { Round, RoundSummary } from '$lib/rounds/types';
 
 export interface ApiPoint {
 	id: string;
@@ -15,12 +20,19 @@ export interface Assignment {
 	bucket: string;
 }
 
+export interface Leg {
+	distance_m: number;
+	duration_s: number;
+}
+
 export interface RouteResult {
 	order: string[];
 	geometry: [number, number][]; // [lon, lat]
 	duration_s: number;
 	distance_m: number;
 	engine: 'ors' | 'fallback';
+	/** One per consecutive pair in `order`, so `legs.length === order.length - 1`. */
+	legs: Leg[];
 }
 
 export interface EstimateResult {
@@ -53,6 +65,31 @@ async function post<T>(path: string, body: unknown): Promise<T> {
 		throw new ApiError(res.status, detail);
 	}
 	return res.json();
+}
+
+async function get<T>(path: string): Promise<T> {
+	const res = await fetch(`/api${path}`);
+	if (!res.ok) {
+		let detail = res.statusText;
+		try {
+			detail = (await res.json()).detail ?? detail;
+		} catch {
+			// non-JSON error body — keep statusText
+		}
+		throw new ApiError(res.status, detail);
+	}
+	return res.json();
+}
+
+export interface Status {
+	status: string;
+	routing: 'ors' | 'fallback';
+	/** Whether this instance stores rounds at all — false on the public one. */
+	rounds: boolean;
+}
+
+export async function status(): Promise<Status> {
+	return get<Status>('/status');
 }
 
 export async function cluster(
@@ -91,4 +128,21 @@ export async function estimate(
 		n_stops: nStops,
 		service_time_s: serviceTimeS
 	});
+}
+
+// ── saved rounds ──────────────────────────────────────────────────────
+// Unlike everything above, these carry addresses and names. They only exist
+// on an instance configured to store rounds; elsewhere they 404. See the
+// engine's rounds.py for why that fence is where it is.
+
+export async function listRounds(): Promise<RoundSummary[]> {
+	return get<RoundSummary[]>('/rounds');
+}
+
+export async function getRound(id: string): Promise<Round> {
+	return get<Round>(`/rounds/${encodeURIComponent(id)}`);
+}
+
+export async function createRound(round: Round): Promise<Round> {
+	return post<Round>('/rounds', round);
 }

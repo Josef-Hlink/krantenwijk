@@ -42,7 +42,7 @@ const ALIASES: Record<Role, string[]> = {
 };
 
 /** Detail columns that look like a person's name start out shown. */
-const NAMEISH = ['naam', 'name', 'ontvanger', 'bewoner', 'recipient'];
+export const NAMEISH = ['naam', 'name', 'ontvanger', 'bewoner', 'recipient'];
 
 const STORAGE_PREFIX = 'krantenwijk.mapping.v2.';
 

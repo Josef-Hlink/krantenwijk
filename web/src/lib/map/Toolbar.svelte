@@ -4,8 +4,10 @@
 	import { recordsStore } from '$lib/records/records.svelte';
 	import { routesStore } from '$lib/routes/routes.svelte';
 	import { UNASSIGNED_COLOR } from '$lib/buckets/palette';
-	import { cluster } from '$lib/api/client';
+	import { cluster, createRound, ApiError } from '$lib/api/client';
 	import { downloadExport } from '$lib/export/sorted';
+	import { buildRound } from '$lib/rounds/serialize';
+	import { capability } from '$lib/rounds/capability.svelte';
 
 	const TOOLS: { id: Tool; label: string; title: string; needsActive?: boolean }[] = [
 		{ id: 'select', label: 'select', title: 'Click a dot to activate its bucket' },
@@ -47,6 +49,27 @@
 	let seedBusy = $state(false);
 	let seedError = $state<string | null>(null);
 	let nCarriers = $state(4);
+
+	// Saving only exists on an instance configured to store rounds.
+	capability.ensure();
+	let saveState = $state<'idle' | 'saving' | 'saved'>('idle');
+
+	async function saveRound() {
+		const name = prompt('Name this round', 'ronde')?.trim();
+		if (!name) return;
+		saveState = 'saving';
+		seedError = null;
+		try {
+			const saved = await createRound(buildRound(name));
+			saveState = 'saved';
+			// The id is how a phone finds it, so say it rather than hide it.
+			seedError = `saved as "${saved.name}" — open /go on your phone to walk it`;
+		} catch (e) {
+			saveState = 'idle';
+			seedError =
+				e instanceof ApiError ? `could not save: ${e.message}` : 'engine unreachable';
+		}
+	}
 
 	async function autoSeed() {
 		seedBusy = true;
@@ -217,6 +240,15 @@
 		>
 			export csv
 		</button>
+		{#if capability.rounds}
+			<button
+				disabled={bucketsStore.assignment.size === 0 || saveState === 'saving'}
+				title="Save this round on the server so a phone can walk it"
+				onclick={saveRound}
+			>
+				{saveState === 'saving' ? 'saving…' : 'save round'}
+			</button>
+		{/if}
 	</div>
 </div>
 {#if seedError}
