@@ -8,7 +8,7 @@
 	 * needs a secure context; the name, the address, the leg distance and the
 	 * checkbox need neither. If the map dies mid-round, this still delivers it.
 	 */
-	import { walkStore, fmtM, type WalkStop } from './walk.svelte';
+	import { walkStore, fmtM, nameLine, type WalkStop } from './walk.svelte';
 	import { addressOf } from '$lib/rounds/types';
 
 	let {
@@ -41,24 +41,15 @@
 				{stop.seq}
 			</button>
 			<button class="what" onclick={() => onpick?.(stop)}>
-				{#each stop.people as person, p (p)}
-					{#if person.name}
-						<span class="name">{person.name}</span>
-					{/if}
-					{#if person.rest.length}
-						<span class="rest">
-							{#each person.rest as [label, value] (label)}
-								<span class="bit"><em>{label}</em> {value}</span>
-							{/each}
-						</span>
-					{/if}
-				{/each}
 				<span class="addr">
 					{addressOf(stop)}
-					{#if stop.people.length > 1}
-						<em class="cards">{stop.people.length} cards</em>
+					{#if stop.cardCount > 1}
+						<em class="cards">{stop.cardCount} cards</em>
 					{/if}
 				</span>
+				{#if stop.names.length}
+					<span class="names">{nameLine(stop.names)}</span>
+				{/if}
 			</button>
 			<button
 				class="tick"
@@ -102,7 +93,6 @@
 		padding-left: 0.6rem;
 	}
 
-	.row.done .name,
 	.row.done .addr {
 		text-decoration: line-through;
 	}
@@ -141,16 +131,19 @@
 		text-align: left;
 	}
 
-	.name {
+	/* The address is what you match against the house in front of you, so it
+	   leads and carries the weight. The names confirm it once you are there. */
+	.addr {
 		font-family: var(--font-display);
 		font-weight: 640;
 		font-size: 1.15rem;
-		line-height: 1.2;
+		line-height: 1.25;
 	}
 
-	.addr {
-		font-size: 1rem;
+	.names {
+		font-size: 0.95rem;
 		color: var(--muted);
+		line-height: 1.25;
 	}
 
 	/* A household is one doorstep and one tick, but you post several cards —
@@ -161,19 +154,6 @@
 		color: var(--accent);
 		font-weight: 600;
 		margin-left: 0.35rem;
-	}
-
-	.rest {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-		font-size: 0.8rem;
-		color: var(--muted);
-	}
-
-	.bit em {
-		font-style: normal;
-		opacity: 0.7;
 	}
 
 	.tick {

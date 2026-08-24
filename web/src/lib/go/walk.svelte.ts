@@ -23,34 +23,40 @@ const SERVICE_TIME_S = 45; // reaching the door and dropping the card
 export const BEHIND = 3;
 export const AHEAD = 6;
 
-/** One card at a door: who it is for, and whatever else was shown. */
-export interface WalkCard {
-	name: string | null;
-	rest: [string, string][];
-}
-
 export interface WalkStop extends Stop {
 	/** 1-based position in the walk. */
 	seq: number;
 	/** Distance/duration to the next stop; null on the last one. */
 	legToNext: { distance_m: number; duration_s: number } | null;
-	/** Everyone called up at this door — usually one, sometimes a household. */
-	people: WalkCard[];
+	/**
+	 * Who lives here, deduplicated. Cards are not people: a resident called
+	 * up for both griep and pneum holds two cards at one address, and you
+	 * still only want to read one name off the screen.
+	 */
+	names: string[];
+	/** How many cards to post here — what is actually in your hand. */
+	cardCount: number;
 }
 
-function splitDetails(details: Record<string, string>): WalkCard {
+/** The name on a card, if one of the shown columns looks like a name. */
+function nameOf(details: Record<string, string>): string | null {
 	const entries = Object.entries(details);
-	const idx = entries.findIndex(([label]) =>
-		NAMEISH.includes(label.trim().toLowerCase())
-	);
-	// Fall back to the first shown detail: if the user ticked exactly one
-	// column it is overwhelmingly likely to be the name they deliver by.
-	const pick = idx >= 0 ? idx : entries.length === 1 ? 0 : -1;
-	if (pick < 0) return { name: null, rest: entries };
-	return {
-		name: entries[pick][1],
-		rest: entries.filter((_, i) => i !== pick)
-	};
+	const hit = entries.find(([label]) => NAMEISH.includes(label.trim().toLowerCase()));
+	// Fall back to the only shown column: if the user ticked exactly one it is
+	// overwhelmingly likely to be the name they deliver by.
+	const pick = hit ?? (entries.length === 1 ? entries[0] : undefined);
+	return pick?.[1]?.trim() || null;
+}
+
+/**
+ * How a doorstep's residents read on one line. Two names both show — that is
+ * the case worth seeing, a couple at one address. Beyond that the line would
+ * wrap and stop being scannable, so it collapses to a count.
+ */
+export function nameLine(names: string[]): string {
+	if (names.length === 0) return '';
+	if (names.length <= 2) return names.join(', ');
+	return `${names[0]} + ${names.length - 1} more`;
 }
 
 class WalkStore {
@@ -77,7 +83,12 @@ class WalkStore {
 					...stop,
 					seq: i + 1,
 					legToNext: bucket.legs[i] ?? null,
-					people: (stop.cards ?? []).map(splitDetails)
+					names: [
+						...new Set(
+							(stop.cards ?? []).map(nameOf).filter((x) => x != null)
+						)
+					],
+					cardCount: (stop.cards ?? []).length
 				}
 			];
 		});
@@ -85,7 +96,7 @@ class WalkStore {
 
 	total = $derived(this.stops.length);
 	/** Cards, not doors — what you are actually carrying. */
-	totalCards = $derived(this.stops.reduce((n, s) => n + Math.max(s.people.length, 1), 0));
+	totalCards = $derived(this.stops.reduce((n, s) => n + Math.max(s.cardCount, 1), 0));
 	doneCount = $derived(this.stops.filter((s) => this.delivered.has(s.id)).length);
 
 	/**

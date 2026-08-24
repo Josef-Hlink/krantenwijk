@@ -11,7 +11,7 @@
 	 * walk past the second. Hence the settle window below — a second press
 	 * inside it is a slip, not an intent.
 	 */
-	import { walkStore, fmtM, type WalkStop } from './walk.svelte';
+	import { walkStore, fmtM, nameLine, type WalkStop } from './walk.svelte';
 	import { geo, haversineM } from './geolocation.svelte';
 	import { addressOf } from '$lib/rounds/types';
 
@@ -44,30 +44,20 @@
 	<div class="top">
 		<span class="seq">{stop.seq}<em>/{walkStore.total}</em></span>
 		<div class="who">
-			{#each stop.people as person, p (p)}
-				{#if person.name}<span class="name">{person.name}</span>{/if}
-			{/each}
 			<span class="addr">
 				{addressOf(stop)}
-				{#if stop.people.length > 1}
-					<em class="cards">{stop.people.length} cards</em>
+				{#if stop.cardCount > 1}
+					<em class="cards">{stop.cardCount} cards</em>
 				{/if}
 			</span>
+			{#if stop.names.length}
+				<span class="names">{nameLine(stop.names)}</span>
+			{/if}
 		</div>
 		{#if away != null}
 			<span class="away" class:live={geo.fix != null}>{fmtM(away)}</span>
 		{/if}
 	</div>
-
-	{#if stop.people.some((p) => p.rest.length)}
-		<div class="rest">
-			{#each stop.people as person, p (p)}
-				{#each person.rest as [label, value] (label)}
-					<span><em>{label}</em> {value}</span>
-				{/each}
-			{/each}
-		</div>
-	{/if}
 
 	<div class="actions">
 		{#if done}
@@ -117,16 +107,19 @@
 		flex-direction: column;
 	}
 
-	.name {
+	/* Address leads: it is what you match against the house in front of you.
+	   The names confirm it once you are at the letterbox. */
+	.addr {
 		font-family: var(--font-display);
 		font-weight: 640;
 		font-size: 1.35rem;
-		line-height: 1.15;
+		line-height: 1.2;
 	}
 
-	.addr {
-		font-size: 1.05rem;
+	.names {
+		font-size: 1rem;
 		color: var(--muted);
+		line-height: 1.25;
 	}
 
 	.cards {
@@ -147,20 +140,6 @@
 	/* A live GPS distance is a different claim from a planned leg — say so. */
 	.away.live {
 		color: var(--fg);
-	}
-
-	.rest {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.6rem;
-		margin-top: 0.3rem;
-		font-size: 0.8rem;
-		color: var(--muted);
-	}
-
-	.rest em {
-		font-style: normal;
-		opacity: 0.7;
 	}
 
 	.actions {
