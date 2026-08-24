@@ -33,14 +33,29 @@ def seed_buckets(
         raise ValueError("max_stops must be >= 1")
 
     coords = _project(points)
+    # Raising k can only ever separate points that sit somewhere different.
+    # A block of flats geocoded to one coordinate is many stops at one place,
+    # and no amount of k splits it — without this bound the loop escalates to
+    # k = len(points), shattering every other street into singletons, taking
+    # tens of seconds, and still not honouring capacity.
+    distinct = len(set(coords))
     k = max(n_carriers or 1, math.ceil(len(points) / max_stops))
-    k = min(k, len(points))
+    k = min(k, distinct)
 
     while True:
         km = KMeans(n_clusters=k, n_init=10, random_state=0)
         labels = km.fit_predict(coords)
         sizes = [int((labels == i).sum()) for i in range(k)]
-        if max(sizes) <= max_stops or k >= len(points):
+        oversized = [i for i in range(k) if sizes[i] > max_stops]
+        if not oversized or k >= distinct:
+            break
+        # If every oversized cluster is a single location, capacity is
+        # unreachable by construction: stop rather than spin. The caller sees
+        # an over-capacity bucket and the UI already warns about those.
+        if all(
+            len({coords[j] for j, lab in enumerate(labels) if lab == i}) == 1
+            for i in oversized
+        ):
             break
         k += 1
 
