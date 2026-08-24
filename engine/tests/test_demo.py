@@ -29,7 +29,39 @@ def test_sample_size_and_unique_ids():
 
 
 def test_sample_capped_at_pool():
-    assert len(make_round(fake_addresses(10), n=50, seed=7)) == 10
+    """n counts cards, so a small pool caps the doors, not the rows: every
+    address may still be called up more than once."""
+    result = make_round(fake_addresses(10), n=50, seed=7)
+    doors = {(r.street, r.house_number) for r in result}
+    assert len(doors) == 10
+    assert len(result) >= 10
+
+
+def test_some_doors_hold_more_than_one_card():
+    """A real round calls up two people in one household; the demo has to
+    contain the case or nothing downstream is exercised against it."""
+    result = make_round(fake_addresses(600), n=400, seed=7)
+    doors: dict[tuple[str, str], int] = {}
+    for r in result:
+        doors[(r.street, r.house_number)] = doors.get((r.street, r.house_number), 0) + 1
+    assert max(doors.values()) > 1
+    assert len(doors) < len(result)
+
+
+def test_cards_at_one_door_share_a_surname_and_a_coordinate():
+    result = make_round(fake_addresses(600), n=400, seed=7)
+    grouped: dict[tuple[str, str], list[AddressRecord]] = {}
+    for r in result:
+        grouped.setdefault((r.street, r.house_number), []).append(r)
+    multi = [rs for rs in grouped.values() if len(rs) > 1]
+    assert multi, "expected at least one multi-card door"
+    for rs in multi:
+        assert len({(r.lat, r.lon) for r in rs}) == 1
+        surnames = {synth_person(r.id, household=f"{r.street.lower()}|"
+                                 f"{r.house_number.lower()}")[0].split()[-1]
+                    for r in rs}
+        assert len(surnames) == 1, "one household, one surname"
+        assert len({r.id for r in rs}) == len(rs), "each card keeps its own id"
 
 
 def test_categories_assigned():

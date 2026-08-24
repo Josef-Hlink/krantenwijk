@@ -120,14 +120,27 @@ def make_bsn(rng: random.Random) -> str:
         return "".join(map(str, digits + [check]))
 
 
-def synth_person(record_id: str, seed: int = 7) -> tuple[str, str]:
+def synth_person(
+    record_id: str, seed: int = 7, household: str | None = None
+) -> tuple[str, str]:
     """Deterministic invented resident for a demo row: (naam, bsn).
 
     Seeded per record id, so the committed CSV can be re-derived or
-    augmented offline without reshuffling everyone."""
+    augmented offline without reshuffling everyone. When a household key is
+    given the surname is seeded from that instead, so the several cards at
+    one address read as one family — which is the whole point of having
+    them in the demo.
+    """
     rng = random.Random(f"{seed}:{record_id}")
-    naam = f"{rng.choice(FIRST_NAMES)} {rng.choice(SURNAMES)}"
+    first = rng.choice(FIRST_NAMES)
+    surname_rng = random.Random(f"{seed}:huis:{household}") if household else rng
+    naam = f"{first} {surname_rng.choice(SURNAMES)}"
     return naam, make_bsn(rng)
+
+
+def household_key(r: AddressRecord) -> str:
+    """The door a record belongs to — mirrors the app's grouping."""
+    return f"{r.street.strip().lower()}|{r.house_number.strip().lower()}"
 
 
 def fetch_addresses(place: str, bbox: str = DEFAULT_BBOX) -> list[AddressRecord]:
@@ -171,24 +184,44 @@ def fetch_addresses(place: str, bbox: str = DEFAULT_BBOX) -> list[AddressRecord]
     return records
 
 
+# Share of doors that call up more than one resident. A GP round really does
+# hit households twice — two parents, a couple — and the demo has to contain
+# the case or nothing downstream is ever exercised against it.
+CARD_COUNTS = [(1, 0.84), (2, 0.13), (3, 0.03)]
+
+
 def make_round(
     addresses: list[AddressRecord], n: int = 400, seed: int = 7
 ) -> list[AddressRecord]:
-    """Deterministically sample a fictional round from real addresses."""
+    """Deterministically sample a fictional round from real addresses.
+
+    ``n`` counts cards, not doors: some addresses get two or three, so the
+    round holds slightly fewer distinct addresses than rows.
+    """
     rng = random.Random(seed)
     pool = sorted(addresses, key=lambda r: (r.street, r.postcode or "", r.house_number))
     sample = rng.sample(pool, min(n, len(pool)))
-    return [
-        r.model_copy(
-            update={
-                "id": f"v-{i:04d}",
-                "category": rng.choices(
-                    [c for c, _ in CATEGORIES], weights=[w for _, w in CATEGORIES]
-                )[0],
-            }
-        )
-        for i, r in enumerate(sample)
-    ]
+
+    records: list[AddressRecord] = []
+    for address in sample:
+        if len(records) >= n:
+            break
+        cards = rng.choices(
+            [c for c, _ in CARD_COUNTS], weights=[w for _, w in CARD_COUNTS]
+        )[0]
+        for _ in range(min(cards, n - len(records))):
+            records.append(
+                address.model_copy(
+                    update={
+                        "id": f"v-{len(records):04d}",
+                        "category": rng.choices(
+                            [c for c, _ in CATEGORIES],
+                            weights=[w for _, w in CATEGORIES],
+                        )[0],
+                    }
+                )
+            )
+    return records
 
 
 def write_csv(records: list[AddressRecord], out: TextIO, seed: int = 7) -> None:
@@ -196,7 +229,7 @@ def write_csv(records: list[AddressRecord], out: TextIO, seed: int = 7) -> None:
     writer = csv.writer(out)
     writer.writerow(CSV_COLUMNS)
     for r in records:
-        naam, bsn = synth_person(r.id, seed=seed)
+        naam, bsn = synth_person(r.id, seed=seed, household=household_key(r))
         writer.writerow(
             [
                 r.id,

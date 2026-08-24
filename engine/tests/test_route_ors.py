@@ -128,7 +128,10 @@ def test_legs_fall_back_to_straight_lines_without_segments(backend, fake, small_
     # a self-hosted instance that omits segments still gets usable legs, one
     # per pair, rather than a list that doesn't line up with `order`
     assert len(result.legs) == len(result.order) - 1
-    assert all(leg.distance_m > 0 for leg in result.legs)
+    # zero is legitimate: the demo fixture holds households with two cards at
+    # one coordinate, and the walk between them is genuinely no distance
+    assert all(leg.distance_m >= 0 for leg in result.legs)
+    assert sum(leg.distance_m for leg in result.legs) > 0
 
 
 def test_mismatched_segment_count_is_not_trusted(backend, fake, small_points):
