@@ -16,9 +16,12 @@ import subprocess
 from pathlib import Path
 
 import pytest
+from fastapi.testclient import TestClient
 
-from krantenwijk import db
+from krantenwijk import api, auth, db
 from krantenwijk.models import AddressRecord, Point
+
+ACCOUNT = ("josef", "een lang genoeg wachtwoord")
 
 DEMO_CSV = Path(__file__).parents[2] / "web" / "static" / "sample" / "vlissingen.csv"
 
@@ -158,8 +161,33 @@ def store(postgres_url, monkeypatch):
     """Point the engine at the cluster, with every table empty."""
     monkeypatch.setenv("KRANTENWIJK_DATABASE_URL", postgres_url)
     with db.connection() as conn:  # creates the pool and applies the schema
-        conn.execute("truncate rounds cascade")
+        conn.execute("truncate rounds, users, sessions cascade")
     return postgres_url
+
+
+@pytest.fixture
+def account(store) -> auth.User:
+    """The one hand-made account the API tests sign in as."""
+    return auth.create_user(*ACCOUNT)
+
+
+@pytest.fixture
+def client(store) -> TestClient:
+    """A guest: the planner works, saved rounds do not.
+
+    Served over https because the session cookie is Secure — an http client
+    would drop it on the floor and every signed-in test would read as a 401.
+    """
+    return TestClient(api.create_app(), base_url="https://testserver")
+
+
+@pytest.fixture
+def signed_in(client, account) -> TestClient:
+    """A sibling with an account, holding a session cookie."""
+    username, password = ACCOUNT
+    r = client.post("/api/login", json={"username": username, "password": password})
+    assert r.status_code == 200, r.text
+    return client
 
 
 @pytest.fixture

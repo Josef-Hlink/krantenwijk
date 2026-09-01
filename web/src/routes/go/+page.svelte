@@ -7,6 +7,7 @@
 	 * big targets, few controls, and no gesture that a mis-tap makes expensive.
 	 */
 	import { onMount, tick } from 'svelte';
+	import { goto } from '$app/navigation';
 	import { listRounds, getRound, ApiError } from '$lib/api/client';
 	import type { Round, RoundSummary } from '$lib/rounds/types';
 	import { walkStore, fmtM, fmtMin, type WalkStop } from '$lib/go/walk.svelte';
@@ -50,6 +51,13 @@
 			summaries = await listRounds();
 			if (!summaries.length) error = 'No rounds saved yet — plan one on a desktop first.';
 		} catch (e) {
+			// 401 is not an error to read standing in the cold: it means the
+			// phone's session lapsed, and the only useful response is the login
+			// form with a way straight back here.
+			if (e instanceof ApiError && e.status === 401) {
+				await goto('/login?next=/go', { replaceState: true });
+				return;
+			}
 			error =
 				e instanceof ApiError && e.status === 404
 					? 'This instance does not store rounds.'

@@ -11,6 +11,7 @@ service runs as a ``DynamicUser`` named ``krantenwijk``, so postgres' ``local
 all all peer`` rule lets it in on a name match.
 """
 
+import atexit
 import os
 import threading
 from pathlib import Path
@@ -80,9 +81,15 @@ def connection():
 
 
 def reset() -> None:
-    """Drop the cached pool. For tests, and for nothing else."""
+    """Drop the cached pool. For tests, and at exit."""
     global _pool, _pool_url
     with _lock:
         if _pool is not None:
             _pool.close()
         _pool, _pool_url = None, None
+
+
+# The pool runs background worker threads that will not come down on their own.
+# A long-lived server never notices, but every CLI command would otherwise sit
+# for twenty seconds after its work is done, printing thread-shutdown warnings.
+atexit.register(reset)

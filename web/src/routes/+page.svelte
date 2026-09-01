@@ -104,6 +104,12 @@
 			<p class="walk">
 				Already planned one? <a href="/go">Walk a saved round →</a>
 			</p>
+		{:else if capability.accounts}
+			<!-- Quiet on purpose: the three people who need this know where it
+			     is, and everyone else came here for the planner. -->
+			<p class="walk">
+				<a href="/login">Sign in</a> to save rounds and walk them on a phone.
+			</p>
 		{/if}
 
 		{#if error}

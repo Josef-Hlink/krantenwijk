@@ -7,12 +7,13 @@ cannot hold them. Nothing is persisted, nothing is logged with payloads.
 import os
 from pathlib import Path
 
-from fastapi import Depends, FastAPI, HTTPException, Response
+from fastapi import Cookie, Depends, FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
-from . import cluster, estimate, rounds, route
+from . import auth, cluster, estimate, rounds, route
+from .auth import COOKIE_NAME, User
 from .models import Assignment, Point, RouteResult
 from .rounds import Round, RoundNotFound, RoundSummary
 
@@ -60,6 +61,24 @@ class EstimateResponse(BaseModel):
     per_stop_s: float
 
 
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+
+class Me(BaseModel):
+    username: str
+
+
+def current_user(
+    krantenwijk_session: str | None = Cookie(default=None),
+) -> User | None:
+    """Whoever is signed in, or ``None``. Never raises — /api/status asks too."""
+    if not rounds.enabled():
+        return None
+    return auth.resolve_session(krantenwijk_session)
+
+
 def get_routing_backend() -> route.RoutingBackend:
     return route.get_backend()
 
@@ -84,18 +103,64 @@ def create_app() -> FastAPI:
         }
 
     @app.get("/api/status")
-    def status() -> dict[str, object]:
+    def status(user: User | None = Depends(current_user)) -> dict[str, object]:
         backend = "ors" if os.environ.get("ORS_API_KEY") else "fallback"
         # `rounds` tells the app whether saving is available *to this caller*,
         # so it can hide the save control and keep its privacy copy honest. It
         # answers two questions at once — does this instance store anything,
         # and is whoever is asking signed in — because the app only ever needs
-        # the conjunction.
+        # the conjunction. `accounts` is the difference between the two: it is
+        # what tells a guest a login exists to be offered.
         return {
             "status": "ok",
             "routing": backend,
-            "rounds": rounds.enabled(),
+            "accounts": rounds.enabled(),
+            "rounds": user is not None,
+            "user": user.username if user else None,
         }
+
+    # ── accounts ────────────────────────────────────────────────────────
+    # Sign in and out. There is deliberately no endpoint that *creates* an
+    # account: they are made with `krantenwijk useradd` on the box.
+
+    @app.post("/api/login", response_model=Me)
+    def login(req: LoginRequest, response: Response) -> Me:
+        if not rounds.enabled():
+            raise HTTPException(404, "this instance does not store rounds")
+        user = auth.authenticate(req.username, req.password)
+        if user is None:
+            # One message for both halves: which of the two was wrong is not
+            # the caller's business.
+            raise HTTPException(401, "wrong username or password")
+        token, _expires_at = auth.start_session(user)
+        response.set_cookie(
+            COOKIE_NAME,
+            token,
+            max_age=int(auth.SESSION_TTL.total_seconds()),
+            httponly=True,
+            # Always set, even in dev: browsers treat localhost as a secure
+            # context, so a Secure cookie is stored there too and there is no
+            # switch that could silently ship insecure in production.
+            secure=True,
+            samesite="lax",
+            path="/",
+        )
+        return Me(username=user.username)
+
+    @app.post("/api/logout", status_code=204)
+    def logout(krantenwijk_session: str | None = Cookie(default=None)) -> Response:
+        if rounds.enabled():
+            auth.end_session(krantenwijk_session)
+        # Built here rather than through an injected Response: returning a
+        # Response object replaces the injected one, and the Set-Cookie that
+        # clears the session would go with it.
+        response = Response(status_code=204)
+        # The attributes have to match the ones it was set with, or some
+        # browsers keep the original cookie alongside the expired one.
+        response.delete_cookie(
+            COOKIE_NAME, path="/", httponly=True, secure=True, samesite="lax"
+        )
+        return response
 
     @app.post("/api/cluster", response_model=ClusterResponse)
     def cluster_points(req: ClusterRequest) -> ClusterResponse:
@@ -153,19 +218,25 @@ def create_app() -> FastAPI:
     # rounds.py). They exist only when KRANTENWIJK_DATABASE_URL is set; with
     # no database configured every one of them 404s and nothing is ever written.
 
-    def require_rounds() -> None:
+    def require_user(user: User | None = Depends(current_user)) -> User:
+        # Order matters. An instance that stores nothing says so — that is a
+        # fact about the deployment, not about the caller. Only once storage
+        # exists does the question "who are you" arise.
         if not rounds.enabled():
             raise HTTPException(
                 404,
                 "this instance does not store rounds",
             )
+        if user is None:
+            raise HTTPException(401, "sign in to reach saved rounds")
+        return user
 
     @app.get("/api/rounds", response_model=list[RoundSummary])
-    def list_rounds(_: None = Depends(require_rounds)) -> list[RoundSummary]:
+    def list_rounds(_: User = Depends(require_user)) -> list[RoundSummary]:
         return rounds.list_rounds()
 
     @app.post("/api/rounds", response_model=Round)
-    def create_round(req: Round, _: None = Depends(require_rounds)) -> Round:
+    def create_round(req: Round, _: User = Depends(require_user)) -> Round:
         # A new round always gets a fresh id, whatever the client sent.
         try:
             return rounds.write_round(req.model_copy(update={"id": ""}))
@@ -173,16 +244,14 @@ def create_app() -> FastAPI:
             raise HTTPException(422, str(e)) from e
 
     @app.get("/api/rounds/{round_id}", response_model=Round)
-    def get_round(round_id: str, _: None = Depends(require_rounds)) -> Round:
+    def get_round(round_id: str, _: User = Depends(require_user)) -> Round:
         try:
             return rounds.read_round(round_id)
         except RoundNotFound as e:
             raise HTTPException(404, str(e)) from e
 
     @app.put("/api/rounds/{round_id}", response_model=Round)
-    def put_round(
-        round_id: str, req: Round, _: None = Depends(require_rounds)
-    ) -> Round:
+    def put_round(round_id: str, req: Round, _: User = Depends(require_user)) -> Round:
         try:
             rounds.read_round(round_id)  # 404 rather than silently creating
             return rounds.write_round(req.model_copy(update={"id": round_id}))
@@ -192,7 +261,7 @@ def create_app() -> FastAPI:
             raise HTTPException(422, str(e)) from e
 
     @app.delete("/api/rounds/{round_id}", status_code=204)
-    def remove_round(round_id: str, _: None = Depends(require_rounds)) -> Response:
+    def remove_round(round_id: str, _: User = Depends(require_user)) -> Response:
         try:
             rounds.delete_round(round_id)
         except RoundNotFound as e:

@@ -16,3 +16,24 @@ create table if not exists rounds (
 );
 
 create index if not exists rounds_saved_at_idx on rounds (saved_at desc);
+
+-- Three accounts, made by hand with `krantenwijk useradd`. There is no
+-- registration endpoint anywhere in the router — absent, not disabled — so
+-- this table only ever grows when someone with a shell says so.
+create table if not exists users (
+  id            serial primary key,
+  username      text not null unique,
+  password_hash text not null,
+  created_at    timestamptz not null default now()
+);
+
+-- A session is the cookie's sha256, never the cookie itself: a stolen dump of
+-- this table cannot be replayed as a login.
+create table if not exists sessions (
+  token_hash bytea primary key,
+  user_id    integer not null references users (id) on delete cascade,
+  expires_at timestamptz not null,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists sessions_user_idx on sessions (user_id);

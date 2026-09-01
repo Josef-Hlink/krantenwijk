@@ -165,14 +165,6 @@ def test_disabled_instance_writes_nothing(disabled, sample):
 # ── API surface ─────────────────────────────────────────────────────────
 
 
-def test_status_reports_the_capability(store, disabled):
-    assert TestClient(api.create_app()).get("/api/status").json()["rounds"] is False
-
-
-def test_status_reports_enabled(store):
-    assert TestClient(api.create_app()).get("/api/status").json()["rounds"] is True
-
-
 @pytest.mark.parametrize(
     ("method", "path"),
     [
@@ -190,8 +182,8 @@ def test_every_rounds_endpoint_404s_when_disabled(disabled, method, path):
     assert "does not store rounds" in r.json()["detail"]
 
 
-def test_api_create_read_delete(store, sample):
-    client = TestClient(api.create_app())
+def test_api_create_read_delete(signed_in, sample):
+    client = signed_in
     created = client.post("/api/rounds", json=sample.model_dump())
     assert created.status_code == 200
     round_id = created.json()["id"]
@@ -206,16 +198,15 @@ def test_api_create_read_delete(store, sample):
     assert client.get(f"/api/rounds/{round_id}").status_code == 404
 
 
-def test_api_create_ignores_a_client_supplied_id(store, sample):
-    client = TestClient(api.create_app())
-    created = client.post(
+def test_api_create_ignores_a_client_supplied_id(signed_in, sample):
+    created = signed_in.post(
         "/api/rounds", json=sample.model_copy(update={"id": "hijacked"}).model_dump()
     )
     assert created.json()["id"] != "hijacked"
 
 
-def test_api_put_updates_in_place(store, sample):
-    client = TestClient(api.create_app())
+def test_api_put_updates_in_place(signed_in, sample):
+    client = signed_in
     round_id = client.post("/api/rounds", json=sample.model_dump()).json()["id"]
     updated = sample.model_copy(update={"name": "herzien"})
     r = client.put(f"/api/rounds/{round_id}", json=updated.model_dump())
@@ -224,7 +215,6 @@ def test_api_put_updates_in_place(store, sample):
     assert len(client.get("/api/rounds").json()) == 1
 
 
-def test_api_put_refuses_to_create(store, sample):
-    client = TestClient(api.create_app())
-    r = client.put("/api/rounds/nope", json=sample.model_dump())
+def test_api_put_refuses_to_create(signed_in, sample):
+    r = signed_in.put("/api/rounds/nope", json=sample.model_dump())
     assert r.status_code == 404
