@@ -86,12 +86,15 @@ def create_app() -> FastAPI:
     @app.get("/api/status")
     def status() -> dict[str, object]:
         backend = "ors" if os.environ.get("ORS_API_KEY") else "fallback"
-        # `rounds` tells the app whether this instance can save plans at all,
-        # so it can hide the save control and keep its privacy copy honest.
+        # `rounds` tells the app whether saving is available *to this caller*,
+        # so it can hide the save control and keep its privacy copy honest. It
+        # answers two questions at once — does this instance store anything,
+        # and is whoever is asking signed in — because the app only ever needs
+        # the conjunction.
         return {
             "status": "ok",
             "routing": backend,
-            "rounds": rounds.rounds_dir() is not None,
+            "rounds": rounds.enabled(),
         }
 
     @app.post("/api/cluster", response_model=ClusterResponse)
@@ -147,11 +150,11 @@ def create_app() -> FastAPI:
 
     # ── saved rounds ────────────────────────────────────────────────────
     # Unlike everything above, these carry addresses and names (see
-    # rounds.py). They exist only when KRANTENWIJK_ROUNDS_DIR is set; on the
-    # public instance every one of them 404s and nothing is ever written.
+    # rounds.py). They exist only when KRANTENWIJK_DATABASE_URL is set; with
+    # no database configured every one of them 404s and nothing is ever written.
 
     def require_rounds() -> None:
-        if rounds.rounds_dir() is None:
+        if not rounds.enabled():
             raise HTTPException(
                 404,
                 "this instance does not store rounds",
@@ -164,7 +167,10 @@ def create_app() -> FastAPI:
     @app.post("/api/rounds", response_model=Round)
     def create_round(req: Round, _: None = Depends(require_rounds)) -> Round:
         # A new round always gets a fresh id, whatever the client sent.
-        return rounds.write_round(req.model_copy(update={"id": ""}))
+        try:
+            return rounds.write_round(req.model_copy(update={"id": ""}))
+        except rounds.RoundTooLarge as e:
+            raise HTTPException(422, str(e)) from e
 
     @app.get("/api/rounds/{round_id}", response_model=Round)
     def get_round(round_id: str, _: None = Depends(require_rounds)) -> Round:
@@ -182,6 +188,8 @@ def create_app() -> FastAPI:
             return rounds.write_round(req.model_copy(update={"id": round_id}))
         except RoundNotFound as e:
             raise HTTPException(404, str(e)) from e
+        except rounds.RoundTooLarge as e:
+            raise HTTPException(422, str(e)) from e
 
     @app.delete("/api/rounds/{round_id}", status_code=204)
     def remove_round(round_id: str, _: None = Depends(require_rounds)) -> Response:

@@ -8,32 +8,39 @@ screen against the card in their hand.
 
 That exception is fenced in two ways:
 
-1. **Opt-in.** Storage exists only when ``KRANTENWIJK_ROUNDS_DIR`` is set. With
-   it unset — the public deployment — ``rounds_dir()`` returns ``None``, every
-   ``/api/rounds`` endpoint 404s, and the engine is exactly as stateless as it
-   has always been.
+1. **Opt-in.** Storage exists only when ``KRANTENWIJK_DATABASE_URL`` is set.
+   With it unset, ``enabled()`` is ``False``, every ``/api/rounds`` endpoint
+   404s, and the engine is exactly as stateless as it has always been.
 2. **Minimal payload.** The web app sends only the delivery essentials plus the
    detail columns the user explicitly ticked "show on map". Unshown passthrough
    columns from the upload never reach here; full-fidelity export stays a
    browser-side concern.
 
-A private instance running with this enabled must sit behind an access gate.
+Reaching a round additionally requires an account: these endpoints sit behind a
+session, so the public instance serves the planner to everyone and the stored
+rounds to nobody.
 """
 
-import os
 import re
 import secrets
 import unicodedata
 from datetime import UTC, datetime
-from pathlib import Path
 
+from psycopg.types.json import Jsonb
 from pydantic import BaseModel
 
-# A round id is used as a filename, so it is restricted to a shape that cannot
-# escape the directory: no dots, no slashes, no traversal.
+from . import db
+from .db import StorageDisabled
+
+# A round id is a primary key and a URL segment, so it is restricted to a shape
+# that can be neither confused nor smuggled: lowercase, no dots, no slashes.
 ID_RE = re.compile(r"^[a-z0-9][a-z0-9-]{0,63}$")
 
 MAX_ROUND_BYTES = 8 * 1024 * 1024
+
+# Kept under its old name: callers care that *rounds* are unavailable, not that
+# a database is. See db.StorageDisabled.
+RoundsDisabled = StorageDisabled
 
 
 class RoundStop(BaseModel):
@@ -95,39 +102,21 @@ class RoundSummary(BaseModel):
     n_buckets: int
 
 
-class RoundsDisabled(RuntimeError):
-    """No rounds directory is configured; this instance does not store plans."""
-
-
 class RoundNotFound(LookupError):
     """No round by that id."""
 
 
-def rounds_dir() -> Path | None:
-    """Where rounds live, or ``None`` when this instance stores nothing."""
-    configured = os.environ.get("KRANTENWIJK_ROUNDS_DIR", "").strip()
-    return Path(configured).expanduser() if configured else None
+class RoundTooLarge(ValueError):
+    """A payload no plausible round would reach."""
 
 
-def _dir() -> Path:
-    path = rounds_dir()
-    if path is None:
-        raise RoundsDisabled(
-            "this instance does not store rounds — set KRANTENWIJK_ROUNDS_DIR "
-            "to enable saving (private deployments only)"
-        )
-    path.mkdir(parents=True, exist_ok=True)
-    return path
-
-
-def _path(round_id: str) -> Path:
-    if not ID_RE.match(round_id):
-        raise RoundNotFound(f"invalid round id {round_id!r}")
-    return _dir() / f"{round_id}.json"
+def enabled() -> bool:
+    """Whether this instance stores rounds at all."""
+    return db.configured()
 
 
 def slugify(name: str) -> str:
-    """A filename-safe stem from a user-supplied round name."""
+    """A readable, URL-safe stem from a user-supplied round name."""
     folded = unicodedata.normalize("NFKD", name)
     ascii_only = folded.encode("ascii", "ignore").decode("ascii").lower()
     slug = re.sub(r"[^a-z0-9]+", "-", ascii_only).strip("-")[:48]
@@ -147,50 +136,78 @@ def write_round(round_: Round) -> Round:
             "saved_at": datetime.now(UTC).isoformat(timespec="seconds"),
         }
     )
-    path = _path(stored.id)
-    payload = stored.model_dump_json(indent=1)
-    # Write beside the target and rename: a reader never sees a half-written
-    # round, and a crash mid-write leaves the previous version intact.
-    tmp = path.with_suffix(f".{secrets.token_hex(4)}.tmp")
-    try:
-        tmp.write_text(payload, encoding="utf-8")
-        os.replace(tmp, path)
-    finally:
-        tmp.unlink(missing_ok=True)
+    payload = stored.model_dump(mode="json")
+    size = len(stored.model_dump_json().encode("utf-8"))
+    if size > MAX_ROUND_BYTES:
+        raise RoundTooLarge(f"round is {size} bytes; the limit is {MAX_ROUND_BYTES}")
+    with db.connection() as conn:
+        conn.execute(
+            """
+            insert into rounds (id, name, saved_at, payload)
+            values (%s, %s, %s, %s)
+            on conflict (id) do update
+               set name = excluded.name,
+                   saved_at = excluded.saved_at,
+                   payload = excluded.payload
+            """,
+            (
+                stored.id,
+                stored.name,
+                datetime.fromisoformat(stored.saved_at),
+                Jsonb(payload),
+            ),
+        )
     return stored
 
 
 def read_round(round_id: str) -> Round:
-    path = _path(round_id)
-    if not path.is_file():
+    if not ID_RE.match(round_id):
+        raise RoundNotFound(f"invalid round id {round_id!r}")
+    with db.connection() as conn:
+        row = conn.execute(
+            "select payload from rounds where id = %s", (round_id,)
+        ).fetchone()
+    if row is None:
         raise RoundNotFound(f"no round {round_id!r}")
-    if path.stat().st_size > MAX_ROUND_BYTES:
-        raise RoundNotFound(f"round {round_id!r} is implausibly large")
-    return Round.model_validate_json(path.read_text(encoding="utf-8"))
+    return Round.model_validate(row[0])
 
 
 def delete_round(round_id: str) -> None:
-    path = _path(round_id)
-    if not path.is_file():
+    if not ID_RE.match(round_id):
+        raise RoundNotFound(f"invalid round id {round_id!r}")
+    with db.connection() as conn:
+        deleted = conn.execute("delete from rounds where id = %s", (round_id,)).rowcount
+    if not deleted:
         raise RoundNotFound(f"no round {round_id!r}")
-    path.unlink()
 
 
 def list_rounds() -> list[RoundSummary]:
-    """Every stored round, newest first. Unreadable files are skipped, not fatal."""
-    summaries = []
-    for path in _dir().glob("*.json"):
-        try:
-            r = Round.model_validate_json(path.read_text(encoding="utf-8"))
-        except (OSError, ValueError):
-            continue  # a stray or corrupt file shouldn't break the picker
-        summaries.append(
-            RoundSummary(
-                id=r.id or path.stem,
-                name=r.name,
-                saved_at=r.saved_at,
-                n_stops=len(r.stops),
-                n_buckets=len(r.buckets),
-            )
+    """Every stored round, newest first.
+
+    The counts come out of the jsonb rather than from parsing each payload, so
+    the picker costs one query and stays fast — and a round whose payload no
+    longer validates against the current model still lists, instead of taking
+    the whole picker down with it.
+    """
+    with db.connection() as conn:
+        rows = conn.execute(
+            """
+            select id,
+                   name,
+                   saved_at,
+                   coalesce(jsonb_array_length(payload -> 'stops'), 0),
+                   coalesce(jsonb_array_length(payload -> 'buckets'), 0)
+            from rounds
+            order by saved_at desc, id
+            """
+        ).fetchall()
+    return [
+        RoundSummary(
+            id=id_,
+            name=name,
+            saved_at=saved_at.astimezone(UTC).isoformat(timespec="seconds"),
+            n_stops=n_stops,
+            n_buckets=n_buckets,
         )
-    return sorted(summaries, key=lambda s: s.saved_at, reverse=True)
+        for id_, name, saved_at, n_stops, n_buckets in rows
+    ]

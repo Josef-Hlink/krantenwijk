@@ -1,27 +1,25 @@
 """Saved rounds: the storage layer, and the opt-in that fences it off.
 
 The privacy-relevant assertions here are the ones about a *disabled* instance —
-with no directory configured nothing is written and every endpoint 404s.
+with no database configured nothing is written and every endpoint 404s.
+
+`store` and `disabled` are the two deployment profiles, as fixtures; both live
+in conftest.py, and `store` hands back a real postgres with empty tables.
 """
 
 import json
 
 import pytest
 from fastapi.testclient import TestClient
+from psycopg.types.json import Jsonb
 
-from krantenwijk import api, rounds
+from krantenwijk import api, db, rounds
 from krantenwijk.rounds import Round, RoundBucket, RoundNotFound, RoundStop
 
 
-@pytest.fixture
-def store(tmp_path, monkeypatch):
-    monkeypatch.setenv("KRANTENWIJK_ROUNDS_DIR", str(tmp_path / "rounds"))
-    return tmp_path / "rounds"
-
-
-@pytest.fixture
-def disabled(monkeypatch):
-    monkeypatch.delenv("KRANTENWIJK_ROUNDS_DIR", raising=False)
+def count_rounds() -> int:
+    with db.connection() as conn:
+        return conn.execute("select count(*) from rounds").fetchone()[0]
 
 
 @pytest.fixture
@@ -84,7 +82,7 @@ def test_same_name_twice_does_not_collide(store, sample):
     a = rounds.write_round(sample)
     b = rounds.write_round(sample)
     assert a.id != b.id
-    assert len(list(store.glob("*.json"))) == 2
+    assert count_rounds() == 2
 
 
 def test_listing_is_newest_first_and_carries_no_pii(store, sample):
@@ -108,11 +106,24 @@ def test_a_door_may_carry_several_cards(store, sample):
     assert back.buckets[0].order == ["a1", "a2"], "one entry per door, not per card"
 
 
-def test_corrupt_file_is_skipped_not_fatal(store, sample):
+def test_listing_does_not_parse_payloads(store, sample):
+    """A round the current model can no longer validate must still list.
+
+    The picker asks postgres for the counts rather than loading and validating
+    every payload, so a round written by an older shape of the model shows up
+    to be picked (or deleted) instead of taking the whole picker down.
+    """
     rounds.write_round(sample)
-    store.mkdir(parents=True, exist_ok=True)
-    (store / "junk.json").write_text("not json at all", encoding="utf-8")
-    assert len(rounds.list_rounds()) == 1
+    with db.connection() as conn:
+        conn.execute(
+            "insert into rounds (id, name, saved_at, payload) "
+            "values (%s, %s, now(), %s)",
+            ("van-vroeger-abc123", "van vroeger", Jsonb({"shape": "long gone"})),
+        )
+    summaries = rounds.list_rounds()
+    assert len(summaries) == 2
+    stale = next(s for s in summaries if s.id == "van-vroeger-abc123")
+    assert (stale.n_stops, stale.n_buckets) == (0, 0)
 
 
 def test_delete(store, sample):
@@ -125,20 +136,30 @@ def test_delete(store, sample):
 @pytest.mark.parametrize(
     "bad", ["../secrets", "..", "a/b", "with.dot", "UPPER", "", "-leading"]
 )
-def test_ids_that_could_escape_the_directory_are_refused(store, bad):
+def test_ids_outside_the_permitted_shape_are_refused(store, bad):
+    """Never reaches the database: an id is validated before it is a parameter."""
     with pytest.raises(RoundNotFound):
         rounds.read_round(bad)
+    with pytest.raises(RoundNotFound):
+        rounds.delete_round(bad)
 
 
-def test_no_temp_files_left_behind(store, sample):
-    rounds.write_round(sample)
-    assert list(store.glob("*.tmp")) == []
+def test_rewriting_an_id_replaces_rather_than_duplicates(store, sample):
+    first = rounds.write_round(sample)
+    again = rounds.write_round(
+        sample.model_copy(update={"id": first.id, "name": "herzien"})
+    )
+    assert again.id == first.id
+    assert count_rounds() == 1
+    assert rounds.read_round(first.id).name == "herzien"
 
 
 def test_disabled_instance_writes_nothing(disabled, sample):
-    assert rounds.rounds_dir() is None
+    assert rounds.enabled() is False
     with pytest.raises(rounds.RoundsDisabled):
         rounds.write_round(sample)
+    with pytest.raises(rounds.RoundsDisabled):
+        rounds.list_rounds()
 
 
 # ── API surface ─────────────────────────────────────────────────────────
