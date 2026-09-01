@@ -16,7 +16,7 @@ Out of the box krant points at the shared self-hosted tile service:
 `tiles.hlink.dev` is a single **Europe** archive (+ glyphs + sprites) served
 from the `esther` homelab box: a static vhost with HTTP Range support, open
 CORS, and TLS/caching at the Cloudflare edge. It's shared by every hlink.dev
-map front-end (krant, okai, klym) — no per-app tile copy, no third-party
+map front-end (krant, forj, klym) — no per-app tile copy, no third-party
 basemap, no tokens. Europe is a superset of the Netherlands, so krant only ever
 requests tiles inside its viewport; pointing at the Europe file costs nothing
 and looks identical.

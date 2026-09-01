@@ -1,5 +1,5 @@
 /**
- * Shared MapLibre + Protomaps basemap loader (pattern borrowed from okai).
+ * Shared MapLibre + Protomaps basemap loader (pattern borrowed from forj).
  *
  * Vector tiles, glyphs, and sprites come from the shared self-hosted tile
  * service (tiles.hlink.dev — a static vhost with Range support + open CORS,
