@@ -12,8 +12,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
-from . import auth, cluster, estimate, rounds, route
+from . import auth, cluster, deliveries, estimate, rounds, route
 from .auth import COOKIE_NAME, User
+from .deliveries import Delivery, Mark
 from .models import Assignment, Point, RouteResult
 from .rounds import Round, RoundNotFound, RoundSummary
 
@@ -59,6 +60,10 @@ class EstimateRequest(BaseModel):
 class EstimateResponse(BaseModel):
     total_s: float
     per_stop_s: float
+
+
+class MarksRequest(BaseModel):
+    marks: list[Mark] = []
 
 
 class LoginRequest(BaseModel):
@@ -259,6 +264,40 @@ def create_app() -> FastAPI:
             raise HTTPException(404, str(e)) from e
         except rounds.RoundTooLarge as e:
             raise HTTPException(422, str(e)) from e
+
+    # ── delivery marks ──────────────────────────────────────────────────
+    # Which doors have had their card. Rows keyed by the door, so two carriers
+    # on different buckets write disjoint sets and never contend; see
+    # deliveries.py for why that removes the need for any lock.
+
+    def _existing_round(round_id: str) -> str:
+        try:
+            rounds.read_round(round_id)
+        except RoundNotFound as e:
+            raise HTTPException(404, str(e)) from e
+        return round_id
+
+    @app.get("/api/rounds/{round_id}/deliveries", response_model=list[Delivery])
+    def get_deliveries(
+        round_id: str, _: User = Depends(require_user)
+    ) -> list[Delivery]:
+        return deliveries.list_for_round(_existing_round(round_id))
+
+    @app.post("/api/rounds/{round_id}/deliveries", response_model=list[Delivery])
+    def post_deliveries(
+        round_id: str, req: MarksRequest, user: User = Depends(require_user)
+    ) -> list[Delivery]:
+        # Returns the whole round's state, not just what was sent: the phone
+        # that just drained its outbox also wants to know where everyone else
+        # got to, and that costs one query either way.
+        return deliveries.record(_existing_round(round_id), req.marks, user.id)
+
+    @app.delete("/api/rounds/{round_id}/deliveries", status_code=204)
+    def clear_deliveries(
+        round_id: str, bucket_id: str, _: User = Depends(require_user)
+    ) -> Response:
+        deliveries.clear_bucket(_existing_round(round_id), bucket_id)
+        return Response(status_code=204)
 
     @app.delete("/api/rounds/{round_id}", status_code=204)
     def remove_round(round_id: str, _: User = Depends(require_user)) -> Response:

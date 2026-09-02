@@ -37,3 +37,27 @@ create table if not exists sessions (
 );
 
 create index if not exists sessions_user_idx on sessions (user_id);
+
+-- Delivery marks: one row per door, which is the whole point.
+--
+-- Three phones walk one round at the same time. If progress lived inside the
+-- round's payload they would read-modify-write a shared blob and silently
+-- erase each other; as rows keyed by the door, carrier A on bucket 3 and
+-- carrier B on bucket 4 touch disjoint sets and never contend at all.
+--
+-- `delivered` is a column rather than the row's existence because undo is
+-- real, and `marked_at` (the client's clock) decides who wins: a phone that
+-- has been out of signal can replay its whole queue blindly without
+-- resurrecting a door someone deliberately cleared.
+create table if not exists deliveries (
+  round_id  text not null references rounds (id) on delete cascade,
+  stop_id   text not null,
+  bucket_id text not null,
+  delivered boolean not null,
+  marked_at timestamptz not null,
+  synced_at timestamptz not null default now(),
+  by_user   integer references users (id) on delete set null,
+  primary key (round_id, stop_id)
+);
+
+create index if not exists deliveries_bucket_idx on deliveries (round_id, bucket_id);
