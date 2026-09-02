@@ -4,6 +4,8 @@
  */
 
 import { groupStops, type Stop } from './stops';
+// Type-only, so the cycle with mapping.svelte.ts is erased at compile time.
+import type { Role } from '$lib/csv/mapping.svelte';
 
 export type GeocodeState = 'n/a' | 'pending' | 'ok' | 'failed';
 
@@ -31,12 +33,25 @@ export interface Detail {
 	show: boolean;
 }
 
+/**
+ * The uploaded file's own shape: its column headers, in their original order,
+ * and which of them the user mapped onto each role.
+ *
+ * Kept so the file can be handed back as *theirs* — `straat` staying `straat`
+ * — rather than reissued under our canonical names. See $lib/export/geocoded.
+ */
+export interface Source {
+	columns: string[];
+	roles: Partial<Record<Role, string>>;
+}
+
 export type Bounds = [[number, number], [number, number]]; // [[w,s],[e,n]]
 
 
 class RecordsStore {
 	records = $state<Rec[]>([]);
 	details = $state<Detail[]>([]);
+	source = $state<Source | null>(null);
 
 	located = $derived(this.records.filter((r) => r.lat != null && r.lon != null));
 	needGeocode = $derived(
@@ -122,14 +137,16 @@ class RecordsStore {
 		];
 	});
 
-	load(records: Rec[], details: Detail[] = []) {
+	load(records: Rec[], details: Detail[] = [], source: Source | null = null) {
 		this.records = records;
 		this.details = details;
+		this.source = source;
 	}
 
 	clear() {
 		this.records = [];
 		this.details = [];
+		this.source = null;
 	}
 }
 

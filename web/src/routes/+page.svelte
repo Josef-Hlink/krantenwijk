@@ -2,7 +2,12 @@
 	import { goto } from '$app/navigation';
 	import { parseCsv, type ParsedCsv } from '$lib/csv/parse';
 	import ColumnMapper from '$lib/csv/ColumnMapper.svelte';
-	import { recordsStore, type Rec, type Detail } from '$lib/records/records.svelte';
+	import {
+		recordsStore,
+		type Rec,
+		type Detail,
+		type Source
+	} from '$lib/records/records.svelte';
 	import { capability } from '$lib/rounds/capability.svelte';
 
 	// Which deployment profile this is decides what we can honestly promise.
@@ -40,8 +45,8 @@
 		if (file) handleFile(file);
 	}
 
-	function onReady(records: Rec[], details: Detail[]) {
-		recordsStore.load(records, details);
+	function onReady(records: Rec[], details: Detail[], source: Source) {
+		recordsStore.load(records, details, source);
 		goto('/plan');
 	}
 </script>

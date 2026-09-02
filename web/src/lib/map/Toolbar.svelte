@@ -6,6 +6,7 @@
 	import { UNASSIGNED_COLOR } from '$lib/buckets/palette';
 	import { cluster, createRound, ApiError } from '$lib/api/client';
 	import { downloadExport } from '$lib/export/sorted';
+	import { downloadGeocodedCsv, hasNewCoordinates } from '$lib/export/geocoded';
 	import { buildRound } from '$lib/rounds/serialize';
 	import { capability } from '$lib/rounds/capability.svelte';
 
@@ -244,6 +245,16 @@
 		>
 			export csv
 		</button>
+		{#if hasNewCoordinates()}
+			<!-- Only once we have actually resolved something: offering to hand
+			     back a file identical to the one just uploaded is noise. -->
+			<button
+				title="Save your CSV with the geocoded lat/lon filled in — upload that next time and nothing leaves the browser"
+				onclick={downloadGeocodedCsv}
+			>
+				save csv + coords
+			</button>
+		{/if}
 		{#if capability.rounds}
 			<button
 				disabled={bucketsStore.assignment.size === 0 || saveState === 'saving'}

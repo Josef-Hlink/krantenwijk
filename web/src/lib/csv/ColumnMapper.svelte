@@ -11,12 +11,15 @@
 		mappingStatus,
 		applyMapping
 	} from './mapping.svelte';
-	import type { Rec, Detail } from '$lib/records/records.svelte';
+	import type { Rec, Detail, Source } from '$lib/records/records.svelte';
 
 	let {
 		parsed,
 		onready
-	}: { parsed: ParsedCsv; onready: (records: Rec[], details: Detail[]) => void } = $props();
+	}: {
+		parsed: ParsedCsv;
+		onready: (records: Rec[], details: Detail[], source: Source) => void;
+	} = $props();
 
 	// The component is keyed on `parsed` by its parent, so reading the prop's
 	// initial value here is deliberate.
@@ -66,7 +69,12 @@
 
 	function continueToMap() {
 		saveMapping(parsed.columns, { roles, details });
-		onready(applyMapping(parsed.rows, parsed.columns, roles), details);
+		// The source shape rides along so the file can later be handed back with
+		// coordinates filled in, under its own column names.
+		onready(applyMapping(parsed.rows, parsed.columns, roles), details, {
+			columns: parsed.columns,
+			roles
+		});
 	}
 </script>
 
