@@ -170,6 +170,16 @@ class RecordsStore {
 		];
 	});
 
+	/**
+	 * Replace records by id — how a corrected address gets back in. Records
+	 * are plain objects in a state array, so a fresh array is what makes the
+	 * derived views notice.
+	 */
+	replace(updated: Rec[]) {
+		const byId = new Map(updated.map((r) => [r.id, r]));
+		this.records = this.records.map((r) => byId.get(r.id) ?? r);
+	}
+
 	load(records: Rec[], details: Detail[] = [], source: Source | null = null) {
 		this.records = records;
 		this.details = details;

@@ -1,9 +1,12 @@
 <script lang="ts">
 	import { recordsStore } from '$lib/records/records.svelte';
 	import { geocodeAll, uncachedCount, type GeocodeProgress } from './nominatim';
+	import FixAddresses from './FixAddresses.svelte';
 
-	type Stage = 'consent' | 'running' | 'done';
-	let stage = $state<Stage>('consent');
+	// Only "running" is a stage of its own: any other time there are pending
+	// rows, the consent panel shows — including after a fix puts rows back.
+	let running = $state(false);
+	let fixing = $state(false);
 	let progress = $state<GeocodeProgress>({ done: 0, total: 0, failed: 0 });
 	let controller: AbortController | undefined;
 
@@ -11,27 +14,27 @@
 	const fresh = $derived(uncachedCount(pending));
 
 	async function start() {
-		stage = 'running';
+		running = true;
 		controller = new AbortController();
 		const batch = pending;
 		progress = { done: 0, total: batch.length, failed: 0 };
 		await geocodeAll(batch, (p) => (progress = p), controller.signal);
 		// reassign to trigger derived state on mutated records
 		recordsStore.records = [...recordsStore.records];
-		stage = 'done';
+		running = false;
 	}
 
 	function cancel() {
 		controller?.abort();
-		stage = 'done';
+		running = false;
 	}
 
 	const eta = $derived(Math.ceil(((progress.total - progress.done) * 1.1) / 60));
 </script>
 
-{#if pending.length > 0 || stage === 'running'}
+{#if pending.length > 0 || running}
 	<div class="panel">
-		{#if stage === 'consent'}
+		{#if !running}
 			<p>
 				<strong>{pending.length}</strong> addresses have no coordinates. Look them up
 				via <strong>OpenStreetMap Nominatim</strong> (a public third-party service)?
@@ -44,7 +47,7 @@
 			<div class="actions">
 				<button class="primary" onclick={start}>Geocode {pending.length} addresses</button>
 			</div>
-		{:else if stage === 'running'}
+		{:else}
 			<p>
 				Geocoding <span class="mono">{progress.done}/{progress.total}</span>
 				{#if progress.failed > 0}
@@ -75,7 +78,14 @@
 				<li>… and {recordsStore.failed.length - 8} more</li>
 			{/if}
 		</ul>
+		<div class="actions">
+			<button onclick={() => (fixing = true)}>fix these addresses</button>
+		</div>
 	</div>
+{/if}
+
+{#if fixing}
+	<FixAddresses onclose={() => (fixing = false)} />
 {/if}
 
 <style>
