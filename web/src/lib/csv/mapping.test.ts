@@ -19,12 +19,17 @@ const row = (patientnr: string, bron: string, huisnr = '1') => ({
 const merged = [row('100', 'griep'), row('101', 'griep'), row('100', 'pneumo'), row('102', 'pneumo')];
 
 describe('identity', () => {
-	it('counts rows that share their id under the chosen columns', () => {
-		expect(identity(merged, ['patientnr'])).toEqual({ rows: 4, blank: 0, duplicates: 1 });
+	it('says how many distinct ids the chosen columns spell for the rows', () => {
+		expect(identity(merged, ['patientnr'])).toEqual({
+			rows: 4,
+			unique: 3,
+			blank: 0,
+			duplicates: 1
+		});
 	});
 
 	it('is satisfied once the combination is unique', () => {
-		expect(identity(merged, ['patientnr', 'Bron']).duplicates).toBe(0);
+		expect(identity(merged, ['patientnr', 'Bron'])).toMatchObject({ unique: 4, duplicates: 0 });
 	});
 
 	it('counts every extra copy, not every row involved', () => {
@@ -34,11 +39,16 @@ describe('identity', () => {
 
 	it('treats a row with all id columns empty as blank, not as a duplicate', () => {
 		const rows = [row('', ''), row('', ''), row('7', 'griep')];
-		expect(identity(rows, ['patientnr', 'Bron'])).toEqual({ rows: 3, blank: 2, duplicates: 0 });
+		expect(identity(rows, ['patientnr', 'Bron'])).toEqual({
+			rows: 3,
+			unique: 1,
+			blank: 2,
+			duplicates: 0
+		});
 	});
 
 	it('is all blank when no id column is chosen', () => {
-		expect(identity(merged, [])).toEqual({ rows: 4, blank: 4, duplicates: 0 });
+		expect(identity(merged, [])).toEqual({ rows: 4, unique: 0, blank: 4, duplicates: 0 });
 	});
 });
 

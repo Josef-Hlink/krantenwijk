@@ -163,13 +163,16 @@
 		{:else if ident.duplicates}
 			<li class="warn">
 				<span class="tick mono">!</span>
-				id — {ident.duplicates} of {ident.rows} rows share their id with another row. Add a
-				column that tells them apart; otherwise they are numbered #2, #3… in the export.
+				<span>
+					id — {idColumns.join(' + ')}: <strong>{ident.unique} unique ids for {ident.rows} rows</strong>.
+					Add a column that tells the other {ident.duplicates} apart; otherwise they are
+					numbered #2, #3… in the export.
+				</span>
 			</li>
 		{:else}
 			<li class="ok">
 				<span class="tick mono">✓</span>
-				id — {idColumns.join(' + ')}, unique for every row{#if ident.blank}
+				id — {idColumns.join(' + ')}: {ident.unique} unique ids for {ident.rows} rows{#if ident.blank}
 					({ident.blank} without one get a generated id){/if}
 			</li>
 		{/if}

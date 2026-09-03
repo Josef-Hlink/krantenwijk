@@ -130,16 +130,18 @@ export function mappingStatus(roles: Partial<Record<Role, string>>): MappingStat
 }
 
 /**
- * What the chosen id columns make of the rows: how many rows have no id at
- * all, and how many share theirs with another row. Shown live in the mapper,
- * so a collision is something the user is told about, not something they
- * discover later by counting dots.
+ * Whether the chosen id columns cover the rows: how many distinct ids they
+ * spell against how many rows there are. Shown live in the mapper as
+ * "203 unique ids for 294 rows", so a collision is something the user is
+ * told about, not something they discover later by counting dots.
  */
 export interface Identity {
 	rows: number;
+	/** Distinct ids among the rows that have one. */
+	unique: number;
 	/** Rows whose id columns are all empty. They get a generated id. */
 	blank: number;
-	/** Rows that would collide: rows with an id minus distinct ids. */
+	/** Rows that would collide: rows with an id minus `unique`. */
 	duplicates: number;
 }
 
@@ -159,7 +161,12 @@ export function identity(rows: Record<string, string>[], idColumns: string[]): I
 		if (key == null) blank++;
 		else seen.add(key);
 	}
-	return { rows: rows.length, blank, duplicates: rows.length - blank - seen.size };
+	return {
+		rows: rows.length,
+		unique: seen.size,
+		blank,
+		duplicates: rows.length - blank - seen.size
+	};
 }
 
 /** A fresh id for a row that has none. Falls back when not in a secure context. */
