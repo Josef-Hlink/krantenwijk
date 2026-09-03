@@ -45,8 +45,8 @@
 		if (file) handleFile(file);
 	}
 
-	function onReady(records: Rec[], details: Detail[], source: Source) {
-		recordsStore.load(records, details, source);
+	function onReady(records: Rec[], details: Detail[], source: Source, skipped: string[]) {
+		recordsStore.load(records, details, source, skipped);
 		goto('/plan');
 	}
 </script>

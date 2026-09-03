@@ -5,7 +5,7 @@
  * records with the same id whatever the columns say.
  */
 import { describe, expect, it } from 'vitest';
-import { applyMapping, guessMapping, identity, uniqueCounts } from './mapping.svelte';
+import { applyMapping, guessMapping, identity, isSkipped, uniqueCounts } from './mapping.svelte';
 
 const columns = ['patientnr', 'Bron', 'straat', 'huisnr'];
 const row = (patientnr: string, bron: string, huisnr = '1') => ({
@@ -109,5 +109,15 @@ describe('uniqueCounts', () => {
 			Bron: 2,
 			straat: 1
 		});
+	});
+});
+
+describe('the skip column', () => {
+	it('reads anything but an obvious no as skipped', () => {
+		expect(isSkipped('1')).toBe(true);
+		expect(isSkipped('ja')).toBe(true);
+		expect(isSkipped('')).toBe(false);
+		expect(isSkipped('0')).toBe(false);
+		expect(isSkipped('nee')).toBe(false);
 	});
 });

@@ -200,11 +200,16 @@ class RecordsStore {
 		this.records = this.records.map((r) => byId.get(r.id) ?? r);
 	}
 
-	load(records: Rec[], details: Detail[] = [], source: Source | null = null) {
+	load(
+		records: Rec[],
+		details: Detail[] = [],
+		source: Source | null = null,
+		skipped: Iterable<string> = []
+	) {
 		this.records = records;
 		this.details = details;
 		this.source = source;
-		this.deactivated = new SvelteSet();
+		this.deactivated = new SvelteSet(skipped);
 	}
 
 	clear() {

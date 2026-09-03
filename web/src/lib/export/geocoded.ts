@@ -11,12 +11,13 @@
  * Deliberately *not* the sorted export (./sorted.ts). That one is the plan's
  * output: reordered, with bucket, carrier and visit_order prepended. This one
  * is the input, unchanged — same rows, same order, same column names — plus
- * two columns. `straat` stays `straat`.
+ * three columns: lat, lon, and skip for the doors taken out of the round, so
+ * that survives the year too. `straat` stays `straat`.
  */
 import Papa from 'papaparse';
 import type { Rec } from '$lib/records/records.svelte';
 import { recordsStore } from '$lib/records/records.svelte';
-import type { Role } from '$lib/csv/mapping.svelte';
+import { SKIP_MARK, type Role } from '$lib/csv/mapping.svelte';
 
 /** Six decimals is about 10 cm — far past what a letterbox needs. */
 function coord(n: number | undefined): string {
@@ -37,6 +38,8 @@ function roleValue(r: Rec, role: Role): string {
 			return coord(r.lat);
 		case 'lon':
 			return coord(r.lon);
+		case 'skip':
+			return recordsStore.deactivated.has(r.id) ? SKIP_MARK : '';
 	}
 }
 
@@ -49,13 +52,19 @@ function freeName(base: string, taken: Set<string>): string {
 	}
 }
 
-/** Whether there is anything worth saving: coordinates this file did not arrive with. */
-export function hasNewCoordinates(): boolean {
+/**
+ * Whether there is anything worth saving: coordinates this file did not
+ * arrive with, or doors taken out of the round.
+ */
+export function hasChangesToSave(): boolean {
 	const source = recordsStore.source;
 	if (!source) return false;
 	// Coordinates in the upload were already the user's; only ones we resolved
 	// here are worth handing back.
-	return recordsStore.records.some((r) => r.geocode === 'ok' || r.geocode === 'manual');
+	return (
+		recordsStore.deactivated.size > 0 ||
+		recordsStore.records.some((r) => r.geocode === 'ok' || r.geocode === 'manual')
+	);
 }
 
 export function buildGeocodedCsv(): string {
@@ -66,10 +75,13 @@ export function buildGeocodedCsv(): string {
 	const latCol = source.roles.lat ?? freeName('lat', taken);
 	taken.add(latCol);
 	const lonCol = source.roles.lon ?? freeName('lon', taken);
+	taken.add(lonCol);
+	const skipCol = source.roles.skip ?? freeName('skip', taken);
 
 	const columns = [...source.columns];
 	if (!source.roles.lat) columns.push(latCol);
 	if (!source.roles.lon) columns.push(lonCol);
+	if (!source.roles.skip) columns.push(skipCol);
 
 	// Row order is upload order, untouched: this is their file, not our plan.
 	const data = recordsStore.records.map((r) => {
@@ -79,6 +91,7 @@ export function buildGeocodedCsv(): string {
 		}
 		row[latCol] = coord(r.lat);
 		row[lonCol] = coord(r.lon);
+		row[skipCol] = recordsStore.deactivated.has(r.id) ? SKIP_MARK : '';
 		return columns.map((c) => row[c] ?? '');
 	});
 

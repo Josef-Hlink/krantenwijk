@@ -6,7 +6,7 @@
 	import { UNASSIGNED_COLOR } from '$lib/buckets/palette';
 	import { cluster, createRound, ApiError } from '$lib/api/client';
 	import { downloadExport } from '$lib/export/sorted';
-	import { downloadGeocodedCsv, hasNewCoordinates } from '$lib/export/geocoded';
+	import { downloadGeocodedCsv, hasChangesToSave } from '$lib/export/geocoded';
 	import { buildRound } from '$lib/rounds/serialize';
 	import { capability } from '$lib/rounds/capability.svelte';
 
@@ -251,11 +251,11 @@
 		>
 			export csv
 		</button>
-		{#if hasNewCoordinates()}
-			<!-- Only once we have actually resolved something: offering to hand
+		{#if hasChangesToSave()}
+			<!-- Only once we have actually changed something: offering to hand
 			     back a file identical to the one just uploaded is noise. -->
 			<button
-				title="Save your CSV with the geocoded lat/lon filled in — upload that next time and nothing leaves the browser"
+				title="Save your CSV with lat/lon filled in and skipped doors marked — upload that next time and it starts where this left off"
 				onclick={downloadGeocodedCsv}
 			>
 				save csv + coords

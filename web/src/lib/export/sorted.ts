@@ -8,9 +8,10 @@ import type { Rec } from '$lib/records/records.svelte';
 import { recordsStore } from '$lib/records/records.svelte';
 import { bucketsStore } from '$lib/buckets/buckets.svelte';
 import { routesStore } from '$lib/routes/routes.svelte';
+import { SKIP_MARK } from '$lib/csv/mapping.svelte';
 
 function baseColumns(records: Rec[]): string[] {
-	const cols = ['id', 'bucket', 'carrier', 'visit_order'];
+	const cols = ['id', 'bucket', 'carrier', 'visit_order', 'skip'];
 	const has = (k: keyof Rec) => records.some((r) => r[k] != null);
 	if (has('street')) cols.push('street');
 	if (has('houseNumber')) cols.push('house_number');
@@ -57,6 +58,7 @@ export function buildExport(): string {
 			bucket: bucket?.name ?? '',
 			carrier: bucket?.carrier ?? '',
 			visit_order: visitOrder.get(r.id) ?? '',
+			skip: recordsStore.deactivated.has(r.id) ? SKIP_MARK : '',
 			street: r.street ?? '',
 			house_number: r.houseNumber ?? '',
 			postcode: r.postcode ?? '',

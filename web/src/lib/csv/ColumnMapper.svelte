@@ -11,7 +11,8 @@
 		mappingStatus,
 		identity,
 		uniqueCounts,
-		applyMapping
+		applyMapping,
+		skippedIds
 	} from './mapping.svelte';
 	import type { Rec, Detail, Source } from '$lib/records/records.svelte';
 
@@ -20,7 +21,7 @@
 		onready
 	}: {
 		parsed: ParsedCsv;
-		onready: (records: Rec[], details: Detail[], source: Source) => void;
+		onready: (records: Rec[], details: Detail[], source: Source, skipped: string[]) => void;
 	} = $props();
 
 	// The component is keyed on `parsed` by its parent, so reading the prop's
@@ -90,11 +91,13 @@
 		saveMapping(parsed.columns, { roles, idColumns, details });
 		// The source shape rides along so the file can later be handed back with
 		// coordinates filled in, under its own column names.
-		onready(applyMapping(parsed.rows, parsed.columns, { roles, idColumns }), details, {
-			columns: parsed.columns,
-			roles,
-			idColumns
-		});
+		const records = applyMapping(parsed.rows, parsed.columns, { roles, idColumns });
+		onready(
+			records,
+			details,
+			{ columns: parsed.columns, roles, idColumns },
+			skippedIds(parsed.rows, records, roles)
+		);
 	}
 </script>
 

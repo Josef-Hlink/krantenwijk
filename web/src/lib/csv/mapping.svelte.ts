@@ -14,7 +14,7 @@
  */
 import type { Rec, Detail } from '$lib/records/records.svelte';
 
-export const ROLES = ['street', 'house_number', 'postcode', 'city', 'lat', 'lon'] as const;
+export const ROLES = ['street', 'house_number', 'postcode', 'city', 'lat', 'lon', 'skip'] as const;
 
 export type Role = (typeof ROLES)[number];
 
@@ -24,7 +24,8 @@ export const ROLE_LABELS: Record<Role, string> = {
 	postcode: 'postcode',
 	city: 'city',
 	lat: 'latitude',
-	lon: 'longitude'
+	lon: 'longitude',
+	skip: 'skip (not in the round)'
 };
 
 /** Case-insensitive aliases used to guess a mapping from column names. */
@@ -34,8 +35,18 @@ const ALIASES: Record<Role, string[]> = {
 	postcode: ['postcode', 'postal_code', 'zip', 'zipcode', 'pc'],
 	city: ['city', 'plaats', 'woonplaats', 'stad', 'town', 'gemeente'],
 	lat: ['lat', 'latitude', 'breedtegraad', 'y'],
-	lon: ['lon', 'lng', 'longitude', 'lengtegraad', 'x']
+	lon: ['lon', 'lng', 'longitude', 'lengtegraad', 'x'],
+	skip: ['skip', 'overslaan', 'inactive', 'deactivated']
 };
+
+/** A skip cell that means "yes". Anything non-empty counts, bar the obvious noes. */
+export function isSkipped(value: string | undefined): boolean {
+	const v = (value ?? '').trim().toLowerCase();
+	return v !== '' && !['0', 'no', 'nee', 'false', 'n'].includes(v);
+}
+
+/** What the saved CSV writes in the skip column for a door taken out. */
+export const SKIP_MARK = '1';
 
 const ID_ALIASES = ['id', 'nr', 'key', 'code'];
 
@@ -187,6 +198,21 @@ export function identity(rows: Record<string, string>[], idColumns: string[]): I
 		blank,
 		duplicates: rows.length - blank - seen.size
 	};
+}
+
+/**
+ * The ids of rows the skip column marks — deactivated doors from an earlier
+ * session, saved into the CSV so next year's upload starts where this one
+ * left off. Index-aligned with `applyMapping`'s output.
+ */
+export function skippedIds(
+	rows: Record<string, string>[],
+	records: Rec[],
+	roles: Partial<Record<Role, string>>
+): string[] {
+	const col = roles.skip;
+	if (!col) return [];
+	return records.filter((r, i) => isSkipped(rows[i][col])).map((r) => r.id);
 }
 
 /** A fresh id for a row that has none. Falls back when not in a secure context. */
