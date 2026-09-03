@@ -3,6 +3,7 @@
  * nothing is persisted anywhere, by design (close the tab, it's gone).
  */
 
+import { SvelteSet } from 'svelte/reactivity';
 import { groupStops, type Stop } from './stops';
 // Type-only, so the cycle with mapping.svelte.ts is erased at compile time.
 import type { Role } from '$lib/csv/mapping.svelte';
@@ -54,6 +55,13 @@ class RecordsStore {
 	records = $state<Rec[]>([]);
 	details = $state<Detail[]>([]);
 	source = $state<Source | null>(null);
+	/**
+	 * Cards taken out of the round without being deleted: a door that moved
+	 * away, a card that came back, an entry you are not walking this year.
+	 * They stay on the map, greyed, so a slip is visible and undoable — a dot
+	 * that vanishes is a dot you cannot get back. Always whole doors.
+	 */
+	deactivated = $state(new SvelteSet<string>());
 
 	located = $derived(this.records.filter((r) => r.lat != null && r.lon != null));
 	needGeocode = $derived(
@@ -63,22 +71,40 @@ class RecordsStore {
 
 	shownDetails = $derived(this.details.filter((d) => d.show));
 
-	/**
-	 * The located records grouped into doors. This — not `located` — is the
-	 * unit the plan works in: what gets bucketed, clustered, routed, walked
-	 * and counted against capacity. Records stay one-per-card so export can
-	 * still emit every uploaded row.
-	 */
-	stops = $derived(groupStops(this.located));
+	/** Every located door, whether or not it is in the round. */
+	allStops = $derived(groupStops(this.located));
 
-	/** recordId → the key of the door it belongs to. */
+	/**
+	 * The doors in the round. This — not `located` — is the unit the plan
+	 * works in: what gets bucketed, clustered, routed, walked and counted
+	 * against capacity. Records stay one-per-card so export can still emit
+	 * every uploaded row. A deactivated door is not here, so nothing
+	 * downstream can seed, bucket or route it.
+	 */
+	stops = $derived(this.allStops.filter((s) => !this.isDeactivated(s)));
+
+	/** The doors taken out — drawn grey, still clickable to bring back. */
+	deactivatedStops = $derived(this.allStops.filter((s) => this.isDeactivated(s)));
+
+	/** recordId → the key of the door it belongs to, live doors only. */
 	stopOf = $derived.by(() => {
 		const m = new Map<string, string>();
 		for (const s of this.stops) for (const id of s.recIds) m.set(id, s.key);
 		return m;
 	});
 
-	byKey = $derived(new Map(this.stops.map((s) => [s.key, s])));
+	/** recordId → door key, every door. For looking a dot up, not for acting on it. */
+	private doorKey = $derived.by(() => {
+		const m = new Map<string, string>();
+		for (const s of this.allStops) for (const id of s.recIds) m.set(id, s.key);
+		return m;
+	});
+
+	byKey = $derived(new Map(this.allStops.map((s) => [s.key, s])));
+
+	private isDeactivated(s: Stop): boolean {
+		return s.recIds.some((id) => this.deactivated.has(id));
+	}
 
 	/** Doors holding more than one card — worth surfacing, easy to miss. */
 	multiCard = $derived(this.stops.filter((s) => s.recIds.length > 1));
@@ -113,10 +139,15 @@ class RecordsStore {
 			.map((s) => ({ id: s.recIds[0], lat: s.lat, lon: s.lon }));
 	}
 
-	/** The door a record represents, given a representative card's id. */
+	/** The door a record belongs to, in the round or not. */
 	doorOf(recId: string): Stop | undefined {
-		const key = this.stopOf.get(recId);
+		const key = this.doorKey.get(recId);
 		return key ? this.byKey.get(key) : undefined;
+	}
+
+	/** Every card at a record's door, in the round or not. */
+	cardsAt(recId: string): string[] {
+		return this.doorOf(recId)?.recIds ?? [recId];
 	}
 
 	/** Bounding box of located records, for map.fitBounds. */
@@ -143,12 +174,14 @@ class RecordsStore {
 		this.records = records;
 		this.details = details;
 		this.source = source;
+		this.deactivated = new SvelteSet();
 	}
 
 	clear() {
 		this.records = [];
 		this.details = [];
 		this.source = null;
+		this.deactivated = new SvelteSet();
 	}
 }
 

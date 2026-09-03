@@ -176,6 +176,22 @@ class BucketsStore {
 		};
 	}
 
+	/** Flip a door in or out of the round; the caller passes every card at it. */
+	private deactivateCommand(label: string, recordIds: string[], out: boolean): Command {
+		const ids = recordIds.filter((id) => recordsStore.deactivated.has(id) !== out);
+		const set = (deactivated: boolean) => {
+			for (const id of ids) {
+				if (deactivated) recordsStore.deactivated.add(id);
+				else recordsStore.deactivated.delete(id);
+			}
+		};
+		return {
+			label,
+			apply: () => set(out),
+			revert: () => set(!out)
+		};
+	}
+
 	private freshBucket(name?: string): Bucket {
 		return {
 			id: crypto.randomUUID(),
@@ -252,6 +268,26 @@ class BucketsStore {
 			]);
 		}
 		return update;
+	}
+
+	/**
+	 * Take a door out of the round: it leaves its bucket and stops counting,
+	 * but stays on the map greyed out. One undo step brings it all back.
+	 */
+	deactivate(recordIds: string[]): void {
+		if (!recordIds.length) return;
+		this.history.run(
+			new CompositeCommand('deactivate door', [
+				this.assignCommand('unassign', recordIds, null),
+				this.deactivateCommand('deactivate', recordIds, true)
+			])
+		);
+	}
+
+	/** Bring a door back into the round, unassigned. */
+	reactivate(recordIds: string[]): void {
+		if (!recordIds.length) return;
+		this.history.run(this.deactivateCommand('reactivate door', recordIds, false));
 	}
 
 	/** Merge several buckets into the first: one undo step. */

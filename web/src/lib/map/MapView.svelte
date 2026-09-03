@@ -7,7 +7,7 @@
 	import { recordsStore, type Rec } from '$lib/records/records.svelte';
 	import { bucketsStore } from '$lib/buckets/buckets.svelte';
 	import { routesStore } from '$lib/routes/routes.svelte';
-	import { UNASSIGNED_COLOR } from '$lib/buckets/palette';
+	import { UNASSIGNED_COLOR, DEACTIVATED_COLOR } from '$lib/buckets/palette';
 	import { pointInPolygon } from '$lib/geometry/pointInPolygon';
 	import { ui } from '$lib/ui.svelte';
 	import 'maplibre-gl/dist/maplibre-gl.css';
@@ -24,24 +24,40 @@
 
 	// One dot per door, not per card: a household called up twice is one
 	// place you walk to. `id` is the door's first card, which is also how it
-	// is represented to the engine.
+	// is represented to the engine. Deactivated doors are drawn too — grey,
+	// so a slip is something you see rather than something that vanished.
 	const dotsData = $derived.by<FeatureCollection<Point>>(() => ({
 		type: 'FeatureCollection',
-		features: recordsStore.stops.map((stop) => {
-			const bucketId = bucketsStore.assignment.get(stop.recIds[0]);
-			const bucket = bucketId ? bucketsStore.buckets.get(bucketId) : undefined;
-			return {
-				type: 'Feature',
-				geometry: { type: 'Point', coordinates: [stop.lon, stop.lat] },
+		features: [
+			...recordsStore.stops.map((stop) => {
+				const bucketId = bucketsStore.assignment.get(stop.recIds[0]);
+				const bucket = bucketId ? bucketsStore.buckets.get(bucketId) : undefined;
+				return {
+					type: 'Feature' as const,
+					geometry: { type: 'Point' as const, coordinates: [stop.lon, stop.lat] },
+					properties: {
+						id: stop.recIds[0],
+						cards: stop.recIds.length,
+						color: bucket?.color ?? UNASSIGNED_COLOR,
+						active: bucketId != null && bucketId === bucketsStore.activeId,
+						assigned: bucket != null,
+						deactivated: false
+					}
+				};
+			}),
+			...recordsStore.deactivatedStops.map((stop) => ({
+				type: 'Feature' as const,
+				geometry: { type: 'Point' as const, coordinates: [stop.lon, stop.lat] },
 				properties: {
 					id: stop.recIds[0],
 					cards: stop.recIds.length,
-					color: bucket?.color ?? UNASSIGNED_COLOR,
-					active: bucketId != null && bucketId === bucketsStore.activeId,
-					assigned: bucket != null
+					color: DEACTIVATED_COLOR,
+					active: false,
+					assigned: false,
+					deactivated: true
 				}
-			};
-		})
+			}))
+		]
 	}));
 
 	const markersData = $derived.by<FeatureCollection<Point>>(() => {
@@ -124,18 +140,27 @@
 					16,
 					['*', ['case', ['>', ['get', 'cards'], 1], 1.35, 1], ['case', ['get', 'active'], 9.5, 8]]
 				],
-				'circle-color': ['get', 'color'],
+				// A deactivated door is a hollow ring: still a place on the map,
+				// visibly nothing to carry there.
+				'circle-color': ['case', ['get', 'deactivated'], halo, ['get', 'color']],
 				'circle-opacity': ['case', ['get', 'assigned'], 1, 0.8],
 				'circle-stroke-width': [
 					'interpolate',
 					['linear'],
 					['zoom'],
 					10,
-					['case', ['get', 'active'], 1, 0.5],
+					['case', ['get', 'active'], 1, ['get', 'deactivated'], 0.8, 0.5],
 					16,
-					['case', ['get', 'active'], 3, 1.5]
+					['case', ['get', 'active'], 3, ['get', 'deactivated'], 2, 1.5]
 				],
-				'circle-stroke-color': ['case', ['get', 'active'], cssColor('--fg', '#1a1b1e'), halo]
+				'circle-stroke-color': [
+					'case',
+					['get', 'active'],
+					cssColor('--fg', '#1a1b1e'),
+					['get', 'deactivated'],
+					DEACTIVATED_COLOR,
+					halo
+				]
 			}
 		});
 
@@ -249,10 +274,18 @@
 
 		// Every card at this door, not just the one that happens to represent
 		// it — otherwise a household of three looks like a single delivery.
-		const door = recordsStore.doorOf(r.id);
-		const cards = (door?.recIds ?? [r.id])
+		const cardIds = recordsStore.cardsAt(r.id);
+		const cards = cardIds
 			.map((id) => recordsStore.records.find((rec) => rec.id === id))
 			.filter((rec) => rec != null);
+		const deactivated = recordsStore.deactivated.has(r.id);
+
+		if (deactivated) {
+			const note = document.createElement('div');
+			note.className = 'dcount';
+			note.textContent = 'deactivated — not in the round';
+			root.appendChild(note);
+		}
 
 		if (cards.length > 1) {
 			const count = document.createElement('div');
@@ -285,9 +318,13 @@
 			row.querySelector('.dval')?.prepend(chip);
 			if (bucket.carrier) detailRow('carrier', bucket.carrier);
 
-			if (interactive) {
-				const actions = document.createElement('div');
-				actions.className = 'dactions';
+		}
+
+		if (interactive) {
+			const actions = document.createElement('div');
+			actions.className = 'dactions';
+			const refresh = () => pinnedPopup?.setDOMContent(popupContent(r, true));
+			if (bucket) {
 				for (const [role, key] of [
 					['start', 'startId'],
 					['end', 'endId']
@@ -298,12 +335,23 @@
 					btn.onclick = () => {
 						const set = role === 'start' ? 'setStart' : 'setEnd';
 						bucketsStore[set](bucket.id, isSet ? undefined : r.id);
-						pinnedPopup?.setDOMContent(popupContent(r, true));
+						refresh();
 					};
 					actions.appendChild(btn);
 				}
-				root.appendChild(actions);
 			}
+			// Out of the round, not out of the file: the door greys out and
+			// stops being seeded, bucketed or routed, and one click undoes it.
+			const flip = document.createElement('button');
+			flip.className = 'ddeactivate';
+			flip.textContent = deactivated ? 'reactivate' : 'deactivate';
+			flip.onclick = () => {
+				if (deactivated) bucketsStore.reactivate(cardIds);
+				else bucketsStore.deactivate(cardIds);
+				refresh();
+			};
+			actions.appendChild(flip);
+			root.appendChild(actions);
 		}
 		return root;
 	}
@@ -352,6 +400,9 @@
 			pinnedPopup?.remove(); // click on empty map dismisses the pinned card
 			return;
 		}
+		// A deactivated door only answers to the select tool: it can be
+		// inspected and brought back, never toggled or marked into a bucket.
+		if (ui.tool !== 'select' && recordsStore.deactivated.has(recordId)) return;
 		switch (ui.tool) {
 			case 'select': {
 				const bucketId = bucketsStore.assignment.get(recordId);
@@ -562,5 +613,10 @@
 	.map :global(.dot-popup .dactions button) {
 		font-size: 0.72rem;
 		padding: 0.15rem 0.5rem;
+	}
+
+	.map :global(.dot-popup .ddeactivate) {
+		margin-left: auto;
+		color: var(--muted);
 	}
 </style>

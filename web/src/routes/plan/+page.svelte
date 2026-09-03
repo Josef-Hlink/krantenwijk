@@ -37,6 +37,11 @@
 				{#if recordsStore.needGeocode.length > 0}
 					· <span class="mono">{recordsStore.needGeocode.length}</span> to geocode
 				{/if}
+				{#if recordsStore.deactivatedStops.length > 0}
+					· <span class="muted"
+						><span class="mono">{recordsStore.deactivatedStops.length}</span> deactivated</span
+					>
+				{/if}
 			</p>
 		</div>
 		<hr class="rule-double" />
@@ -76,6 +81,10 @@
 	.stat {
 		margin: 0.3rem 0 0;
 		font-size: 0.9rem;
+	}
+
+	.muted {
+		color: var(--muted);
 	}
 
 	.main {
