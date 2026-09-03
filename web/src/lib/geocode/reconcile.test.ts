@@ -53,21 +53,34 @@ describe('what goes back to the geocoder', () => {
 		expect(changed(edited, originals)).toEqual([]);
 	});
 
-	it('drops the coordinates and queues the record again', () => {
-		const rec: Rec = {
-			id: 'a',
-			street: 'Boulevard de Ruijter',
-			houseNumber: '30',
-			city: 'Vlissingen',
-			extra: { naam: 'X' },
-			geocode: 'failed'
-		};
+	const rec: Rec = {
+		id: 'a',
+		street: 'Boulevard de Ruijter',
+		houseNumber: '30',
+		city: 'Vlissingen',
+		extra: { naam: 'X' },
+		geocode: 'failed'
+	};
+
+	it('becomes the lookup address, leaving the file’s own address alone', () => {
 		const out = applyDraft(rec, { ...toDraft(rec), street: 'Boulevard de Ruyter', postcode: ' ' });
 		expect(out).toMatchObject({
-			street: 'Boulevard de Ruyter',
-			postcode: undefined,
+			street: 'Boulevard de Ruijter',
+			lookup: { street: 'Boulevard de Ruyter', houseNumber: '30', postcode: undefined },
 			geocode: 'pending',
 			extra: { naam: 'X' }
 		});
+		expect(out.lat).toBeUndefined();
+	});
+
+	it('shows an earlier correction when the row is opened again', () => {
+		const once = applyDraft(rec, { ...toDraft(rec), houseNumber: '30A' });
+		expect(toDraft(once).houseNumber).toBe('30A');
+	});
+
+	it('clears the lookup when edited back to the file’s own address', () => {
+		const once = applyDraft(rec, { ...toDraft(rec), houseNumber: '30A' });
+		const back = applyDraft(once, { ...toDraft(once), houseNumber: '30' });
+		expect(back.lookup).toBeUndefined();
 	});
 });

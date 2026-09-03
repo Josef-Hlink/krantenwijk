@@ -4,7 +4,7 @@
  * results cached in localStorage so re-uploads don't re-ask. The consent
  * dialog (GeocodePanel) must run before the first uncached request.
  */
-import type { Rec } from '$lib/records/records.svelte';
+import type { Address, Rec } from '$lib/records/records.svelte';
 
 const ENDPOINT = 'https://nominatim.openstreetmap.org/search';
 const SPACING_MS = 1100;
@@ -28,8 +28,14 @@ function saveCache(cache: Record<string, Coords | null>) {
 	}
 }
 
+/** What actually gets looked up: the user's correction if there is one. */
+export function lookupAddress(r: Rec): Address {
+	return r.lookup ?? r;
+}
+
 export function cacheKey(r: Rec): string {
-	return [r.street, r.houseNumber, r.postcode, r.city]
+	const a = lookupAddress(r);
+	return [a.street, a.houseNumber, a.postcode, a.city]
 		.map((s) => (s ?? '').trim().toLowerCase())
 		.join('|');
 }
@@ -90,11 +96,12 @@ export async function geocodeAll(
 }
 
 async function geocodeOne(rec: Rec, signal: AbortSignal): Promise<Coords | null> {
+	const a = lookupAddress(rec);
 	const params = new URLSearchParams({ format: 'jsonv2', limit: '1' });
 	// Structured query — much better hit rate than free-text.
-	params.set('street', [rec.houseNumber, rec.street].filter(Boolean).join(' '));
-	if (rec.postcode) params.set('postalcode', rec.postcode);
-	if (rec.city) params.set('city', rec.city);
+	params.set('street', [a.houseNumber, a.street].filter(Boolean).join(' '));
+	if (a.postcode) params.set('postalcode', a.postcode);
+	if (a.city) params.set('city', a.city);
 	params.set('countrycodes', 'nl');
 
 	try {

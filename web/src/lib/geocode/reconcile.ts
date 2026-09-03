@@ -8,8 +8,13 @@
  * so twenty slips are one gesture. Only the rows you actually changed go
  * back to the geocoder; the rest stay marked failed rather than being asked
  * again with the same answer.
+ *
+ * An edit is a *lookup* address, not a correction of the file. `90-022`
+ * stays `90-022` on the record, in the export and on the card; only the
+ * query to the geocoder says `90`. The file is theirs; we are only trying
+ * to find the door.
  */
-import type { Rec } from '$lib/records/records.svelte';
+import type { Address, Rec } from '$lib/records/records.svelte';
 
 export const ADDRESS_FIELDS = ['street', 'houseNumber', 'postcode', 'city'] as const;
 export type AddressField = (typeof ADDRESS_FIELDS)[number];
@@ -24,13 +29,15 @@ export const FIELD_LABELS: Record<AddressField, string> = {
 /** One editable row. Fields are plain strings here; blank means unset. */
 export type Draft = { id: string } & Record<AddressField, string>;
 
+/** The row as it will be looked up: an earlier correction if there is one. */
 export function toDraft(r: Rec): Draft {
+	const a: Address = r.lookup ?? r;
 	return {
 		id: r.id,
-		street: r.street ?? '',
-		houseNumber: r.houseNumber ?? '',
-		postcode: r.postcode ?? '',
-		city: r.city ?? ''
+		street: a.street ?? '',
+		houseNumber: a.houseNumber ?? '',
+		postcode: a.postcode ?? '',
+		city: a.city ?? ''
 	};
 }
 
@@ -62,15 +69,24 @@ export function changed(drafts: Draft[], originals: Map<string, Draft>): Draft[]
 	});
 }
 
-/** A draft back onto a record: blank → unset, coordinates dropped, queued for lookup. */
+/**
+ * A draft back onto a record as its lookup address, coordinates dropped and
+ * the record queued again. The record's own fields are not touched. A draft
+ * that matches the file's own address again just clears the lookup.
+ */
 export function applyDraft(r: Rec, d: Draft): Rec {
 	const v = (s: string) => (s.trim() === '' ? undefined : s.trim());
-	return {
-		...r,
+	const lookup: Address = {
 		street: v(d.street),
 		houseNumber: v(d.houseNumber),
 		postcode: v(d.postcode),
-		city: v(d.city),
+		city: v(d.city)
+	};
+	const own = ADDRESS_FIELDS.every((f) => lookup[f] === r[f]);
+	const { lookup: _, ...rest } = r;
+	return {
+		...rest,
+		...(own ? {} : { lookup }),
 		lat: undefined,
 		lon: undefined,
 		geocode: 'pending'

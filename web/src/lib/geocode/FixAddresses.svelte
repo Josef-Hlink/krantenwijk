@@ -55,7 +55,8 @@
 		<h2>fix {drafts.length} {drafts.length === 1 ? 'address' : 'addresses'}</h2>
 		<p class="hint">
 			These are the rows the map could not find — usually a spelling it does not know.
-			Edit them here; only the rows you change are looked up again.
+			What you type here is only used to look the door up: your file keeps its own
+			address in the export and on the card. Only the rows you change are looked up again.
 		</p>
 
 		<form class="replace" onsubmit={(e) => (e.preventDefault(), applyReplace())}>

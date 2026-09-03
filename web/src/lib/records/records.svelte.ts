@@ -10,14 +10,25 @@ import type { Role } from '$lib/csv/mapping.svelte';
 
 export type GeocodeState = 'n/a' | 'pending' | 'ok' | 'failed';
 
-export interface Rec {
-	id: string;
+/** The address fields of a record, as a unit. */
+export interface Address {
 	street?: string;
 	houseNumber?: string;
 	postcode?: string;
 	city?: string;
+}
+
+export interface Rec extends Address {
+	id: string;
 	lat?: number;
 	lon?: number;
+	/**
+	 * The address to look up instead of the record's own, when the file's
+	 * spelling is one the map does not know. The record's own fields stay
+	 * what the file said — that is what the export hands back and what the
+	 * carrier reads off the card — this only steers the geocoder.
+	 */
+	lookup?: Address;
 	/** Non-essential upload columns, preserved verbatim for export. */
 	extra: Record<string, string>;
 	geocode: GeocodeState;
