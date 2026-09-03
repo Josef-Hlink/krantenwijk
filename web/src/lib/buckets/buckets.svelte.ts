@@ -302,17 +302,29 @@ class BucketsStore {
 		this.history.run(new CompositeCommand(`merge ${bucketIds.length} buckets`, commands));
 	}
 
-	/** Auto-seed: server assignments become buckets + one atomic assignment. */
+	/**
+	 * Auto-seed: server assignments become buckets + one atomic assignment.
+	 * Seeding steals every seeded point, so any bucket it empties — an
+	 * earlier seed's, typically — goes with it, or a second run leaves a
+	 * rail full of zeros above the real buckets. One undo step, all of it.
+	 */
 	applySeed(assignments: { id: string; bucket: string }[]): void {
 		const labels = [...new Set(assignments.map((a) => a.bucket))];
 		const byLabel = new Map<string, Bucket>(
 			labels.map((label) => [label, this.freshBucket(label)])
+		);
+		const seeded = new Set(assignments.map((a) => a.id));
+		const emptied = this.list.filter((b) =>
+			this.memberIds(b.id).every((id) => seeded.has(id))
 		);
 		const commands: Command[] = [...byLabel.values()].map((b) => this.createCommand(b));
 		for (const [label, bucket] of byLabel) {
 			const ids = assignments.filter((a) => a.bucket === label).map((a) => a.id);
 			commands.push(this.assignCommand('assign', ids, bucket.id));
 		}
+		// Reverse, so an undo (which reverts in reverse) puts them back in
+		// the order the rail had them.
+		for (const b of [...emptied].reverse()) commands.push(this.deleteCommand(b.id));
 		this.history.run(
 			new CompositeCommand(`auto-seed ${labels.length} buckets`, commands)
 		);
