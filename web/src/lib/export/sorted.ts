@@ -58,7 +58,7 @@ export function buildExport(): string {
 			bucket: bucket?.name ?? '',
 			carrier: bucket?.carrier ?? '',
 			visit_order: visitOrder.get(r.id) ?? '',
-			skip: recordsStore.deactivated.has(r.id) ? SKIP_MARK : '',
+			skip: recordsStore.skipped.has(r.id) ? SKIP_MARK : '',
 			street: r.street ?? '',
 			house_number: r.houseNumber ?? '',
 			postcode: r.postcode ?? '',

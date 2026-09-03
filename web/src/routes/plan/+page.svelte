@@ -37,9 +37,9 @@
 				{#if recordsStore.needGeocode.length > 0}
 					· <span class="mono">{recordsStore.needGeocode.length}</span> to geocode
 				{/if}
-				{#if recordsStore.deactivatedStops.length > 0}
+				{#if recordsStore.skippedStops.length > 0}
 					· <span class="muted"
-						><span class="mono">{recordsStore.deactivatedStops.length}</span> deactivated</span
+						><span class="mono">{recordsStore.skippedStops.length}</span> skipped</span
 					>
 				{/if}
 			</p>

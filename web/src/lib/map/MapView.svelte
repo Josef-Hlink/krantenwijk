@@ -7,7 +7,7 @@
 	import { recordsStore, type Rec } from '$lib/records/records.svelte';
 	import { bucketsStore } from '$lib/buckets/buckets.svelte';
 	import { routesStore } from '$lib/routes/routes.svelte';
-	import { UNASSIGNED_COLOR, DEACTIVATED_COLOR } from '$lib/buckets/palette';
+	import { UNASSIGNED_COLOR, SKIPPED_COLOR } from '$lib/buckets/palette';
 	import { pointInPolygon } from '$lib/geometry/pointInPolygon';
 	import { ui } from '$lib/ui.svelte';
 	import 'maplibre-gl/dist/maplibre-gl.css';
@@ -41,20 +41,20 @@
 						color: bucket?.color ?? UNASSIGNED_COLOR,
 						active: bucketId != null && bucketId === bucketsStore.activeId,
 						assigned: bucket != null,
-						deactivated: false
+						skipped: false
 					}
 				};
 			}),
-			...recordsStore.deactivatedStops.map((stop) => ({
+			...recordsStore.skippedStops.map((stop) => ({
 				type: 'Feature' as const,
 				geometry: { type: 'Point' as const, coordinates: [stop.lon, stop.lat] },
 				properties: {
 					id: stop.recIds[0],
 					cards: stop.recIds.length,
-					color: DEACTIVATED_COLOR,
+					color: SKIPPED_COLOR,
 					active: false,
 					assigned: false,
-					deactivated: true
+					skipped: true
 				}
 			}))
 		]
@@ -140,25 +140,25 @@
 					16,
 					['*', ['case', ['>', ['get', 'cards'], 1], 1.35, 1], ['case', ['get', 'active'], 9.5, 8]]
 				],
-				// A deactivated door is a hollow ring: still a place on the map,
+				// A skipped door is a hollow ring: still a place on the map,
 				// visibly nothing to carry there.
-				'circle-color': ['case', ['get', 'deactivated'], halo, ['get', 'color']],
+				'circle-color': ['case', ['get', 'skipped'], halo, ['get', 'color']],
 				'circle-opacity': ['case', ['get', 'assigned'], 1, 0.8],
 				'circle-stroke-width': [
 					'interpolate',
 					['linear'],
 					['zoom'],
 					10,
-					['case', ['get', 'active'], 1, ['get', 'deactivated'], 0.8, 0.5],
+					['case', ['get', 'active'], 1, ['get', 'skipped'], 0.8, 0.5],
 					16,
-					['case', ['get', 'active'], 3, ['get', 'deactivated'], 2, 1.5]
+					['case', ['get', 'active'], 3, ['get', 'skipped'], 2, 1.5]
 				],
 				'circle-stroke-color': [
 					'case',
 					['get', 'active'],
 					cssColor('--fg', '#1a1b1e'),
-					['get', 'deactivated'],
-					DEACTIVATED_COLOR,
+					['get', 'skipped'],
+					SKIPPED_COLOR,
 					halo
 				]
 			}
@@ -281,12 +281,12 @@
 		const cards = cardIds
 			.map((id) => recordsStore.records.find((rec) => rec.id === id))
 			.filter((rec) => rec != null);
-		const deactivated = recordsStore.deactivated.has(r.id);
+		const skipped = recordsStore.skipped.has(r.id);
 
-		if (deactivated) {
+		if (skipped) {
 			const note = document.createElement('div');
 			note.className = 'dcount';
-			note.textContent = 'deactivated — not in the round';
+			note.textContent = 'skipped — not in the round';
 			root.appendChild(note);
 		}
 
@@ -357,11 +357,11 @@
 			// Out of the round, not out of the file: the door greys out and
 			// stops being seeded, bucketed or routed, and one click undoes it.
 			const flip = document.createElement('button');
-			flip.className = 'ddeactivate';
-			flip.textContent = deactivated ? 'reactivate' : 'deactivate';
+			flip.className = 'dskip';
+			flip.textContent = skipped ? 'unskip' : 'skip';
 			flip.onclick = () => {
-				if (deactivated) bucketsStore.reactivate(cardIds);
-				else bucketsStore.deactivate(cardIds);
+				if (skipped) bucketsStore.unskip(cardIds);
+				else bucketsStore.skip(cardIds);
 				refresh();
 			};
 			actions.appendChild(flip);
@@ -421,9 +421,9 @@
 			pinnedPopup?.remove(); // click on empty map dismisses the pinned card
 			return;
 		}
-		// A deactivated door only answers to the select tool: it can be
+		// A skipped door only answers to the select tool: it can be
 		// inspected and brought back, never toggled or marked into a bucket.
-		if (ui.tool !== 'select' && recordsStore.deactivated.has(recordId)) return;
+		if (ui.tool !== 'select' && recordsStore.skipped.has(recordId)) return;
 		switch (ui.tool) {
 			case 'select': {
 				const bucketId = bucketsStore.assignment.get(recordId);
@@ -636,7 +636,7 @@
 		padding: 0.15rem 0.5rem;
 	}
 
-	.map :global(.dot-popup .ddeactivate) {
+	.map :global(.dot-popup .dskip) {
 		margin-left: auto;
 		color: var(--muted);
 	}

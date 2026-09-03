@@ -39,7 +39,7 @@ function roleValue(r: Rec, role: Role): string {
 		case 'lon':
 			return coord(r.lon);
 		case 'skip':
-			return recordsStore.deactivated.has(r.id) ? SKIP_MARK : '';
+			return recordsStore.skipped.has(r.id) ? SKIP_MARK : '';
 	}
 }
 
@@ -62,7 +62,7 @@ export function hasChangesToSave(): boolean {
 	// Coordinates in the upload were already the user's; only ones we resolved
 	// here are worth handing back.
 	return (
-		recordsStore.deactivated.size > 0 ||
+		recordsStore.skipped.size > 0 ||
 		recordsStore.records.some((r) => r.geocode === 'ok' || r.geocode === 'manual')
 	);
 }
@@ -91,7 +91,7 @@ export function buildGeocodedCsv(): string {
 		}
 		row[latCol] = coord(r.lat);
 		row[lonCol] = coord(r.lon);
-		row[skipCol] = recordsStore.deactivated.has(r.id) ? SKIP_MARK : '';
+		row[skipCol] = recordsStore.skipped.has(r.id) ? SKIP_MARK : '';
 		return columns.map((c) => row[c] ?? '');
 	});
 

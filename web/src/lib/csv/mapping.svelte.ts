@@ -201,7 +201,7 @@ export function identity(rows: Record<string, string>[], idColumns: string[]): I
 }
 
 /**
- * The ids of rows the skip column marks — deactivated doors from an earlier
+ * The ids of rows the skip column marks — skipped doors from an earlier
  * session, saved into the CSV so next year's upload starts where this one
  * left off. Index-aligned with `applyMapping`'s output.
  */

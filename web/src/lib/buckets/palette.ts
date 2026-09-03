@@ -20,7 +20,7 @@ export const BUCKET_COLORS = [
 export const UNASSIGNED_COLOR = '#9a9890';
 
 /** Ring of a door taken out of the round: still there, visibly not in play. */
-export const DEACTIVATED_COLOR = '#9a9890';
+export const SKIPPED_COLOR = '#9a9890';
 
 export function bucketColor(index: number): string {
 	return BUCKET_COLORS[index % BUCKET_COLORS.length];

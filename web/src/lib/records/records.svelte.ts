@@ -73,7 +73,7 @@ class RecordsStore {
 	 * They stay on the map, greyed, so a slip is visible and undoable — a dot
 	 * that vanishes is a dot you cannot get back. Always whole doors.
 	 */
-	deactivated = $state(new SvelteSet<string>());
+	skipped = $state(new SvelteSet<string>());
 
 	located = $derived(this.records.filter((r) => r.lat != null && r.lon != null));
 	needGeocode = $derived(
@@ -90,13 +90,13 @@ class RecordsStore {
 	 * The doors in the round. This — not `located` — is the unit the plan
 	 * works in: what gets bucketed, clustered, routed, walked and counted
 	 * against capacity. Records stay one-per-card so export can still emit
-	 * every uploaded row. A deactivated door is not here, so nothing
+	 * every uploaded row. A skipped door is not here, so nothing
 	 * downstream can seed, bucket or route it.
 	 */
-	stops = $derived(this.allStops.filter((s) => !this.isDeactivated(s)));
+	stops = $derived(this.allStops.filter((s) => !this.isSkippedDoor(s)));
 
 	/** The doors taken out — drawn grey, still clickable to bring back. */
-	deactivatedStops = $derived(this.allStops.filter((s) => this.isDeactivated(s)));
+	skippedStops = $derived(this.allStops.filter((s) => this.isSkippedDoor(s)));
 
 	/** recordId → the key of the door it belongs to, live doors only. */
 	stopOf = $derived.by(() => {
@@ -114,8 +114,8 @@ class RecordsStore {
 
 	byKey = $derived(new Map(this.allStops.map((s) => [s.key, s])));
 
-	private isDeactivated(s: Stop): boolean {
-		return s.recIds.some((id) => this.deactivated.has(id));
+	private isSkippedDoor(s: Stop): boolean {
+		return s.recIds.some((id) => this.skipped.has(id));
 	}
 
 	/** Doors holding more than one card — worth surfacing, easy to miss. */
@@ -209,14 +209,14 @@ class RecordsStore {
 		this.records = records;
 		this.details = details;
 		this.source = source;
-		this.deactivated = new SvelteSet(skipped);
+		this.skipped = new SvelteSet(skipped);
 	}
 
 	clear() {
 		this.records = [];
 		this.details = [];
 		this.source = null;
-		this.deactivated = new SvelteSet();
+		this.skipped = new SvelteSet();
 	}
 }
 

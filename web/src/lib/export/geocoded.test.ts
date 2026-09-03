@@ -172,7 +172,7 @@ describe('saving the file back', () => {
 });
 
 describe('doors taken out of the round', () => {
-	it('are marked in a skip column and come back deactivated on re-import', () => {
+	it('are marked in a skip column and come back skipped on re-import', () => {
 		const { source, records } = dutchUpload();
 		recordsStore.load(records, [], source, ['a2']);
 		const { columns, rows } = parseBack(buildGeocodedCsv());

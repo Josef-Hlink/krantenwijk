@@ -177,12 +177,12 @@ class BucketsStore {
 	}
 
 	/** Flip a door in or out of the round; the caller passes every card at it. */
-	private deactivateCommand(label: string, recordIds: string[], out: boolean): Command {
-		const ids = recordIds.filter((id) => recordsStore.deactivated.has(id) !== out);
-		const set = (deactivated: boolean) => {
+	private skipCommand(label: string, recordIds: string[], out: boolean): Command {
+		const ids = recordIds.filter((id) => recordsStore.skipped.has(id) !== out);
+		const set = (skipped: boolean) => {
 			for (const id of ids) {
-				if (deactivated) recordsStore.deactivated.add(id);
-				else recordsStore.deactivated.delete(id);
+				if (skipped) recordsStore.skipped.add(id);
+				else recordsStore.skipped.delete(id);
 			}
 		};
 		return {
@@ -274,20 +274,20 @@ class BucketsStore {
 	 * Take a door out of the round: it leaves its bucket and stops counting,
 	 * but stays on the map greyed out. One undo step brings it all back.
 	 */
-	deactivate(recordIds: string[]): void {
+	skip(recordIds: string[]): void {
 		if (!recordIds.length) return;
 		this.history.run(
-			new CompositeCommand('deactivate door', [
+			new CompositeCommand('skip door', [
 				this.assignCommand('unassign', recordIds, null),
-				this.deactivateCommand('deactivate', recordIds, true)
+				this.skipCommand('skip', recordIds, true)
 			])
 		);
 	}
 
 	/** Bring a door back into the round, unassigned. */
-	reactivate(recordIds: string[]): void {
+	unskip(recordIds: string[]): void {
 		if (!recordIds.length) return;
-		this.history.run(this.deactivateCommand('reactivate door', recordIds, false));
+		this.history.run(this.skipCommand('unskip door', recordIds, false));
 	}
 
 	/** Merge several buckets into the first: one undo step. */
