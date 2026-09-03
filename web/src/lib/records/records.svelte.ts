@@ -43,6 +43,8 @@ export interface Detail {
 export interface Source {
 	columns: string[];
 	roles: Partial<Record<Role, string>>;
+	/** The columns that together identify a row; empty when ids were generated. */
+	idColumns: string[];
 }
 
 export type Bounds = [[number, number], [number, number]]; // [[w,s],[e,n]]

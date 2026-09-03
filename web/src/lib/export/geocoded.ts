@@ -25,8 +25,6 @@ function coord(n: number | undefined): string {
 
 function roleValue(r: Rec, role: Role): string {
 	switch (role) {
-		case 'id':
-			return r.id;
 		case 'street':
 			return r.street ?? '';
 		case 'house_number':

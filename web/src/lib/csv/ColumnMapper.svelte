@@ -9,6 +9,7 @@
 		savedMapping,
 		saveMapping,
 		mappingStatus,
+		identity,
 		applyMapping
 	} from './mapping.svelte';
 	import type { Rec, Detail, Source } from '$lib/records/records.svelte';
@@ -26,7 +27,9 @@
 	// svelte-ignore state_referenced_locally
 	const saved = savedMapping(parsed.columns);
 	// svelte-ignore state_referenced_locally
-	let roles = $state<Partial<Record<Role, string>>>(saved?.roles ?? guessMapping(parsed.columns));
+	const initial = saved ?? guessMapping(parsed.columns);
+	let roles = $state<Partial<Record<Role, string>>>(initial.roles);
+	let idColumns = $state<string[]>(initial.idColumns);
 	// Per-column detail preferences, kept for every column so flipping a
 	// column between role and detail doesn't lose its name/show settings.
 	// svelte-ignore state_referenced_locally
@@ -41,22 +44,35 @@
 	);
 
 	const status = $derived(mappingStatus(roles));
-	const roleCols = $derived(new Set(Object.values(roles).filter(Boolean) as string[]));
+	const ident = $derived(identity(parsed.rows, idColumns));
+	const roleCols = $derived(
+		new Set([...idColumns, ...(Object.values(roles).filter(Boolean) as string[])])
+	);
 	const details = $derived<Detail[]>(
 		parsed.columns.filter((c) => !roleCols.has(c)).map((c) => ({ column: c, ...detailPrefs[c] }))
 	);
 
-	function columnRole(col: string): Role | '' {
+	type Use = Role | 'id' | '';
+
+	function columnRole(col: string): Use {
+		if (idColumns.includes(col)) return 'id';
 		for (const role of ROLES) if (roles[role] === col) return role;
 		return '';
 	}
 
-	function setRole(col: string, role: Role | '') {
+	function setRole(col: string, use: Use) {
 		const next = { ...roles };
-		// a column holds at most one role; a role points at one column
+		// a column holds at most one role; a role points at one column — except
+		// the id, which any number of columns can make up together
 		for (const r of ROLES) if (next[r] === col) delete next[r];
-		if (role) next[role] = col;
+		let ids = idColumns.filter((c) => c !== col);
+		if (use === 'id') {
+			ids = parsed.columns.filter((c) => c === col || ids.includes(c));
+		} else if (use) {
+			next[use] = col;
+		}
 		roles = next;
+		idColumns = ids;
 	}
 
 	function samples(col: string): string {
@@ -68,12 +84,13 @@
 	}
 
 	function continueToMap() {
-		saveMapping(parsed.columns, { roles, details });
+		saveMapping(parsed.columns, { roles, idColumns, details });
 		// The source shape rides along so the file can later be handed back with
 		// coordinates filled in, under its own column names.
-		onready(applyMapping(parsed.rows, parsed.columns, roles), details, {
+		onready(applyMapping(parsed.rows, parsed.columns, { roles, idColumns }), details, {
 			columns: parsed.columns,
-			roles
+			roles,
+			idColumns
 		});
 	}
 </script>
@@ -81,9 +98,10 @@
 <div class="mapper">
 	<h2>map your columns</h2>
 	<p class="hint">
-		Two things are needed: an <strong>id</strong> and a <strong>location</strong>. Every
-		other column is an extra detail — tick it to show it when you point at a dot on the
-		map, and rename it if the header is cryptic. All columns come back in the export,
+		One thing is needed: a <strong>location</strong>. An <strong>id</strong> keeps your own
+		key in the export — pick several columns if it takes more than one to tell rows apart.
+		Every other column is an extra detail — tick it to show it when you point at a dot on
+		the map, and rename it if the header is cryptic. All columns come back in the export,
 		and this mapping is remembered for files with the same columns.
 	</p>
 
@@ -100,9 +118,10 @@
 					<td>
 						<select
 							value={role}
-							onchange={(e) => setRole(col, e.currentTarget.value as Role | '')}
+							onchange={(e) => setRole(col, e.currentTarget.value as Use)}
 						>
 							<option value="">extra detail</option>
+							<option value="id">id</option>
 							{#each ROLES as r (r)}
 								<option value={r}>{ROLE_LABELS[r]}</option>
 							{/each}
@@ -135,14 +154,25 @@
 	</table>
 
 	<ul class="checklist">
-		<li class={status.idOk ? 'ok' : 'todo'}>
-			<span class="tick mono">{status.idOk ? '✓' : '—'}</span>
-			{#if status.idOk}
-				id — rows keep their key in the export
-			{:else}
-				map an id column — the export is keyed by it
-			{/if}
-		</li>
+		{#if !idColumns.length}
+			<li class="todo">
+				<span class="tick mono">—</span>
+				no id — every row gets a generated one; pick a column to keep your own key in the
+				export
+			</li>
+		{:else if ident.duplicates}
+			<li class="warn">
+				<span class="tick mono">!</span>
+				id — {ident.duplicates} of {ident.rows} rows share their id with another row. Add a
+				column that tells them apart; otherwise they are numbered #2, #3… in the export.
+			</li>
+		{:else}
+			<li class="ok">
+				<span class="tick mono">✓</span>
+				id — {idColumns.join(' + ')}, unique for every row{#if ident.blank}
+					({ident.blank} without one get a generated id){/if}
+			</li>
+		{/if}
 		<li class={status.location === 'coords' || status.location === 'address' ? 'ok' : 'todo'}>
 			<span class="tick mono"
 				>{status.location === 'coords' || status.location === 'address' ? '✓' : '—'}</span
@@ -275,6 +305,11 @@
 	}
 
 	.checklist li.todo .tick {
+		color: var(--warn);
+	}
+
+	.checklist li.warn,
+	.checklist li.warn .tick {
 		color: var(--warn);
 	}
 

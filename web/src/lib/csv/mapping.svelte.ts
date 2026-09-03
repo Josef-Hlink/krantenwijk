@@ -1,27 +1,24 @@
 /**
  * Column→role mapping. krantenwijk never assumes a schema: the user maps
- * their CSV's columns onto the essential roles (an id plus a location —
- * either street + house number or coordinates); every other column is a
- * "detail" they can name and surface in the map popup. Mappings are
- * remembered per column-set fingerprint in localStorage so next year's
- * identical export maps itself.
+ * their CSV's columns onto the essential roles (a location — either street +
+ * house number or coordinates) and, separately, onto the record's identity;
+ * every other column is a "detail" they can name and surface in the map
+ * popup. Mappings are remembered per column-set fingerprint in localStorage
+ * so next year's identical export maps itself.
+ *
+ * Identity is its own thing rather than a role because it is not one column.
+ * A merged export can reuse the same patient number across two lists with
+ * only a source column telling them apart, so the id is whatever set of
+ * columns the user says makes a row unique — and if they pick nothing, every
+ * row gets a generated one rather than a collision.
  */
 import type { Rec, Detail } from '$lib/records/records.svelte';
 
-export const ROLES = [
-	'id',
-	'street',
-	'house_number',
-	'postcode',
-	'city',
-	'lat',
-	'lon'
-] as const;
+export const ROLES = ['street', 'house_number', 'postcode', 'city', 'lat', 'lon'] as const;
 
 export type Role = (typeof ROLES)[number];
 
 export const ROLE_LABELS: Record<Role, string> = {
-	id: 'id',
 	street: 'street',
 	house_number: 'house number',
 	postcode: 'postcode',
@@ -32,7 +29,6 @@ export const ROLE_LABELS: Record<Role, string> = {
 
 /** Case-insensitive aliases used to guess a mapping from column names. */
 const ALIASES: Record<Role, string[]> = {
-	id: ['id', 'nr', 'key', 'code'],
 	street: ['street', 'straat', 'straatnaam', 'adres', 'address'],
 	house_number: ['house_number', 'housenumber', 'huisnr', 'huisnummer', 'nummer', 'no'],
 	postcode: ['postcode', 'postal_code', 'zip', 'zipcode', 'pc'],
@@ -41,28 +37,39 @@ const ALIASES: Record<Role, string[]> = {
 	lon: ['lon', 'lng', 'longitude', 'lengtegraad', 'x']
 };
 
+const ID_ALIASES = ['id', 'nr', 'key', 'code'];
+
 /** Detail columns that look like a person's name start out shown. */
 export const NAMEISH = ['naam', 'name', 'ontvanger', 'bewoner', 'recipient'];
 
-const STORAGE_PREFIX = 'krantenwijk.mapping.v2.';
+const STORAGE_PREFIX = 'krantenwijk.mapping.v3.';
+
+/** Which columns play which role, and which together identify a row. */
+export interface Mapping {
+	roles: Partial<Record<Role, string>>;
+	/** In file order. Empty means every row gets a generated id. */
+	idColumns: string[];
+}
 
 export function fingerprint(columns: string[]): string {
 	return [...columns].sort().join(' ');
 }
 
-export function guessMapping(columns: string[]): Partial<Record<Role, string>> {
-	const mapping: Partial<Record<Role, string>> = {};
+export function guessMapping(columns: string[]): Mapping {
+	const roles: Partial<Record<Role, string>> = {};
 	const taken = new Set<string>();
+	const idHit = columns.find((c) => ID_ALIASES.includes(c.trim().toLowerCase()));
+	if (idHit) taken.add(idHit);
 	for (const role of ROLES) {
 		const hit = columns.find(
 			(c) => !taken.has(c) && ALIASES[role].includes(c.trim().toLowerCase())
 		);
 		if (hit) {
-			mapping[role] = hit;
+			roles[role] = hit;
 			taken.add(hit);
 		}
 	}
-	return mapping;
+	return { roles, idColumns: idHit ? [idHit] : [] };
 }
 
 export function defaultDetail(column: string): Detail {
@@ -73,8 +80,7 @@ export function defaultDetail(column: string): Detail {
 	};
 }
 
-export interface SavedMapping {
-	roles: Partial<Record<Role, string>>;
+export interface SavedMapping extends Mapping {
 	details: Detail[];
 }
 
@@ -84,7 +90,11 @@ export function savedMapping(columns: string[]): SavedMapping | null {
 		if (!raw) return null;
 		const parsed = JSON.parse(raw);
 		if (!parsed || typeof parsed !== 'object' || !parsed.roles) return null;
-		return { roles: parsed.roles, details: Array.isArray(parsed.details) ? parsed.details : [] };
+		return {
+			roles: parsed.roles,
+			idColumns: Array.isArray(parsed.idColumns) ? parsed.idColumns : [],
+			details: Array.isArray(parsed.details) ? parsed.details : []
+		};
 	} catch {
 		return null;
 	}
@@ -101,13 +111,11 @@ export function saveMapping(columns: string[], saved: SavedMapping) {
 export type LocationStatus = 'coords' | 'address' | 'partial' | 'missing';
 
 export interface MappingStatus {
-	idOk: boolean;
 	location: LocationStatus;
 	ok: boolean;
 }
 
 export function mappingStatus(roles: Partial<Record<Role, string>>): MappingStatus {
-	const idOk = !!roles.id;
 	const hasCoords = !!(roles.lat && roles.lon);
 	const hasAddress = !!(roles.street && roles.house_number);
 	const anyLocation = !!(roles.lat || roles.lon || roles.street || roles.house_number);
@@ -118,15 +126,66 @@ export function mappingStatus(roles: Partial<Record<Role, string>>): MappingStat
 			: anyLocation
 				? 'partial'
 				: 'missing';
-	return { idOk, location, ok: idOk && (hasCoords || hasAddress) };
+	return { location, ok: hasCoords || hasAddress };
 }
 
-/** Apply a role mapping to parsed rows, producing records. */
+/**
+ * What the chosen id columns make of the rows: how many rows have no id at
+ * all, and how many share theirs with another row. Shown live in the mapper,
+ * so a collision is something the user is told about, not something they
+ * discover later by counting dots.
+ */
+export interface Identity {
+	rows: number;
+	/** Rows whose id columns are all empty. They get a generated id. */
+	blank: number;
+	/** Rows that would collide: rows with an id minus distinct ids. */
+	duplicates: number;
+}
+
+/** The id a row's chosen columns spell, or undefined when they are all empty. */
+function keyOf(row: Record<string, string>, idColumns: string[]): string | undefined {
+	if (!idColumns.length) return undefined;
+	const parts = idColumns.map((c) => row[c]?.trim() ?? '');
+	if (parts.every((p) => p === '')) return undefined;
+	return parts.join('|');
+}
+
+export function identity(rows: Record<string, string>[], idColumns: string[]): Identity {
+	let blank = 0;
+	const seen = new Set<string>();
+	for (const row of rows) {
+		const key = keyOf(row, idColumns);
+		if (key == null) blank++;
+		else seen.add(key);
+	}
+	return { rows: rows.length, blank, duplicates: rows.length - blank - seen.size };
+}
+
+/** A fresh id for a row that has none. Falls back when not in a secure context. */
+function generatedId(): string {
+	if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+	return Array.from({ length: 4 }, () =>
+		Math.floor(Math.random() * 0x10000)
+			.toString(16)
+			.padStart(4, '0')
+	).join('-');
+}
+
+/**
+ * Apply a mapping to parsed rows, producing records.
+ *
+ * Every record ends up with a distinct id: a blank one is generated, and a
+ * repeated one is numbered `#2`, `#3`… rather than swallowing the row. The
+ * id columns themselves stay in `extra` untouched, so whatever the export is
+ * joined on, the original values are in it.
+ */
 export function applyMapping(
 	rows: Record<string, string>[],
 	columns: string[],
-	roles: Partial<Record<Role, string>>
+	mapping: Mapping
 ): Rec[] {
+	const { roles, idColumns } = mapping;
 	const roleCols = new Set(Object.values(roles).filter(Boolean) as string[]);
 	const extraCols = columns.filter((c) => !roleCols.has(c));
 	const get = (row: Record<string, string>, role: Role): string | undefined => {
@@ -135,14 +194,23 @@ export function applyMapping(
 		return v === '' ? undefined : v;
 	};
 
-	return rows.map((row, i) => {
+	const seen = new Map<string, number>();
+	const uniqueId = (row: Record<string, string>): string => {
+		const key = keyOf(row, idColumns);
+		if (key == null) return generatedId();
+		const n = (seen.get(key) ?? 0) + 1;
+		seen.set(key, n);
+		return n === 1 ? key : `${key}#${n}`;
+	};
+
+	return rows.map((row) => {
 		const latRaw = get(row, 'lat');
 		const lonRaw = get(row, 'lon');
 		const lat = latRaw != null ? Number(latRaw.replace(',', '.')) : undefined;
 		const lon = lonRaw != null ? Number(lonRaw.replace(',', '.')) : undefined;
 		const located = lat != null && lon != null && isFinite(lat) && isFinite(lon);
 		return {
-			id: get(row, 'id') ?? `row-${i}`,
+			id: uniqueId(row),
 			street: get(row, 'street'),
 			houseNumber: get(row, 'house_number'),
 			postcode: get(row, 'postcode'),

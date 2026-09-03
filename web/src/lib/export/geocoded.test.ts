@@ -13,7 +13,8 @@ import { buildGeocodedCsv, hasNewCoordinates } from './geocoded';
 function dutchUpload() {
 	const source: Source = {
 		columns: ['nr', 'straat', 'huisnr', 'plaats', 'naam'],
-		roles: { id: 'nr', street: 'straat', house_number: 'huisnr', city: 'plaats' }
+		roles: { street: 'straat', house_number: 'huisnr', city: 'plaats' },
+		idColumns: ['nr']
 	};
 	const records: Rec[] = [
 		{
@@ -23,7 +24,7 @@ function dutchUpload() {
 			city: 'Vlissingen',
 			lat: 51.4426123456,
 			lon: 3.5736987654,
-			extra: { naam: 'J. de Vries' },
+			extra: { nr: 'a1', naam: 'J. de Vries' },
 			geocode: 'ok'
 		},
 		{
@@ -33,7 +34,7 @@ function dutchUpload() {
 			city: 'Vlissingen',
 			lat: 51.4428,
 			lon: 3.5739,
-			extra: { naam: 'M. Jansen' },
+			extra: { nr: 'a2', naam: 'M. Jansen' },
 			geocode: 'ok'
 		}
 	];
@@ -98,12 +99,12 @@ describe('saving the file back', () => {
 		const source: Source = {
 			columns: ['id', 'straat', 'huisnr', 'breedtegraad', 'lengtegraad'],
 			roles: {
-				id: 'id',
 				street: 'straat',
 				house_number: 'huisnr',
 				lat: 'breedtegraad',
 				lon: 'lengtegraad'
-			}
+			},
+			idColumns: ['id']
 		};
 		recordsStore.load(
 			[
@@ -113,7 +114,7 @@ describe('saving the file back', () => {
 					houseNumber: '12',
 					lat: 51.4426,
 					lon: 3.5736,
-					extra: {},
+					extra: { id: 'a1' },
 					geocode: 'ok'
 				}
 			],
@@ -128,7 +129,8 @@ describe('saving the file back', () => {
 	it('does not collide with a column that is already called lat', () => {
 		const source: Source = {
 			columns: ['id', 'straat', 'huisnr', 'lat'],
-			roles: { id: 'id', street: 'straat', house_number: 'huisnr' }
+			roles: { street: 'straat', house_number: 'huisnr' },
+			idColumns: ['id']
 		};
 		recordsStore.load(
 			[
@@ -138,7 +140,7 @@ describe('saving the file back', () => {
 					houseNumber: '12',
 					lat: 51.4426,
 					lon: 3.5736,
-					extra: { lat: 'iets anders' },
+					extra: { id: 'a1', lat: 'iets anders' },
 					geocode: 'ok'
 				}
 			],
@@ -157,7 +159,7 @@ describe('saving the file back', () => {
 			id: 'a3',
 			street: 'Nergensstraat',
 			houseNumber: '1',
-			extra: { naam: 'P. Pietersen' },
+			extra: { nr: 'a3', naam: 'P. Pietersen' },
 			geocode: 'failed'
 		});
 		recordsStore.load(records, [], source);
