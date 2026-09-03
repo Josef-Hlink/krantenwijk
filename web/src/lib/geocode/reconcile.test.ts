@@ -1,6 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import type { Rec } from '$lib/records/records.svelte';
-import { applyDraft, changed, matching, replaceIn, toDraft, type Draft } from './reconcile';
+import {
+	applyDraft,
+	changed,
+	googleMapsUrl,
+	matching,
+	replaceIn,
+	splitPair,
+	toDraft,
+	type Draft
+} from './reconcile';
 
 const draft = (id: string, street: string, houseNumber = '1'): Draft => ({
 	id,
@@ -101,5 +110,24 @@ describe('what goes back to the geocoder', () => {
 		const once = applyDraft(rec, { ...toDraft(rec), houseNumber: '30A' });
 		const back = applyDraft(once, { ...toDraft(once), houseNumber: '30' });
 		expect(back.lookup).toBeUndefined();
+	});
+});
+
+describe('coordinates by eye', () => {
+	it('splits what Google Maps copies on a right-click', () => {
+		expect(splitPair('51.4459718828098, 3.581524284657911')).toEqual([
+			'51.4459718828098',
+			'3.581524284657911'
+		]);
+	});
+
+	it('leaves a decimal comma alone', () => {
+		expect(splitPair('51,4459')).toBeNull();
+	});
+
+	it('links the row’s address in Google Maps', () => {
+		expect(googleMapsUrl(draft('a', 'Zeilmaker', '22'))).toBe(
+			'https://www.google.com/maps/place/Zeilmaker+22%2C+Vlissingen'
+		);
 	});
 });

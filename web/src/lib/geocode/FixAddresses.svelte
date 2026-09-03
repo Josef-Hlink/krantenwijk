@@ -12,6 +12,8 @@
 		replaceIn,
 		changed,
 		hasCoords,
+		splitPair,
+		googleMapsUrl,
 		applyDraft
 	} from './reconcile';
 
@@ -60,6 +62,12 @@
 		if (r) ui.placing = { recIds: [r.id], label: stopAddress(r) };
 	}
 
+	// A "lat, lon" pair pasted into either coordinate field fills both.
+	function onCoordInput(i: number, d: Draft, c: 'lat' | 'lon', value: string) {
+		const pair = splitPair(value);
+		drafts[i] = pair ? { ...d, lat: pair[0], lon: pair[1] } : { ...d, [c]: value };
+	}
+
 	const queued = $derived(dirty.filter((d) => !hasCoords(d)).length);
 	const placed = $derived(dirty.length - queued);
 </script>
@@ -71,8 +79,9 @@
 			These are the rows the map could not find — usually a spelling it does not know.
 			What you type here is only used to look the door up: your file keeps its own
 			address in the export and on the card. Only the rows you change are looked up again.
-			For a street too new for the map, place the door yourself: type its coordinates, or
-			click it on the map.
+			For a street too new for the map, place the door yourself: click it on the map, or
+			open it in Google Maps, right-click the pin to copy its coordinates, and paste them
+			here.
 		</p>
 
 		<form class="replace" onsubmit={(e) => (e.preventDefault(), applyReplace())}>
@@ -139,11 +148,19 @@
 										inputmode="decimal"
 										placeholder={c === 'lat' ? '51.44…' : '3.57…'}
 										value={d[c]}
-										oninput={(e) => (drafts[i] = { ...d, [c]: e.currentTarget.value })}
+										oninput={(e) => onCoordInput(i, d, c, e.currentTarget.value)}
 									/>
 								</td>
 							{/each}
-							<td>
+							<td class="how">
+								<a
+									href={googleMapsUrl(d)}
+									target="_blank"
+									rel="noopener noreferrer"
+									title="Open this address in Google Maps (sends it to Google)"
+								>
+									google maps ↗
+								</a>
 								<button class="place" title="Click the map where this door is" onclick={() => placeOnMap(d)}>
 									place on map
 								</button>
@@ -176,7 +193,7 @@
 		border: 1px solid var(--fg);
 		border-radius: 6px;
 		padding: 0;
-		width: min(56rem, calc(100vw - 2rem));
+		width: min(68rem, calc(100vw - 2rem));
 		max-height: calc(100vh - 2rem);
 	}
 
@@ -274,7 +291,17 @@
 	}
 
 	td.coord input {
-		width: 5.5rem;
+		width: 7rem;
+	}
+
+	.how {
+		white-space: nowrap;
+	}
+
+	.how a {
+		font-size: 0.72rem;
+		color: var(--muted);
+		margin-right: 0.4rem;
 	}
 
 	.place {

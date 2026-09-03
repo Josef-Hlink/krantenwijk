@@ -54,6 +54,30 @@ function coord(s: string): number | undefined {
 	return isFinite(n) ? n : undefined;
 }
 
+/**
+ * A pasted "51.4459718828098, 3.581524284657911" — what Google Maps puts
+ * on the clipboard when you right-click a pin — split into its two halves.
+ * A lone "51,44" is a decimal comma, not a pair, and is left alone.
+ */
+export function splitPair(s: string): [string, string] | null {
+	const t = s.trim();
+	// Two decimals with points, or two numbers with a space after the comma:
+	// either is unmistakably a pair. "51,4459" is neither.
+	const m =
+		t.match(/^(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)$/) ??
+		t.match(/^(-?\d+(?:\.\d+)?),\s+(-?\d+(?:\.\d+)?)$/);
+	return m ? [m[1], m[2]] : null;
+}
+
+/** Where to look the door up by eye. Sends the address to Google — the user's click, not ours. */
+export function googleMapsUrl(d: Draft): string {
+	const q = [[d.street, d.houseNumber].filter(Boolean).join(' '), d.postcode, d.city]
+		.map((s) => s.trim())
+		.filter(Boolean)
+		.join(', ');
+	return `https://www.google.com/maps/place/${encodeURIComponent(q).replace(/%20/g, '+')}`;
+}
+
 /** Whether a draft carries a usable coordinate pair. */
 export function hasCoords(d: Draft): boolean {
 	return coord(d.lat) != null && coord(d.lon) != null;
