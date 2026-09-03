@@ -26,8 +26,11 @@ export const FIELD_LABELS: Record<AddressField, string> = {
 	city: 'city'
 };
 
-/** One editable row. Fields are plain strings here; blank means unset. */
-export type Draft = { id: string } & Record<AddressField, string>;
+/**
+ * One editable row. Fields are plain strings here; blank means unset. A
+ * lat/lon typed in wins over the address: that row is placed, not looked up.
+ */
+export type Draft = { id: string; lat: string; lon: string } & Record<AddressField, string>;
 
 /** The row as it will be looked up: an earlier correction if there is one. */
 export function toDraft(r: Rec): Draft {
@@ -37,8 +40,23 @@ export function toDraft(r: Rec): Draft {
 		street: a.street ?? '',
 		houseNumber: a.houseNumber ?? '',
 		postcode: a.postcode ?? '',
-		city: a.city ?? ''
+		city: a.city ?? '',
+		lat: '',
+		lon: ''
 	};
+}
+
+/** A coordinate as typed, `51,44` included; undefined when it isn't one. */
+function coord(s: string): number | undefined {
+	const t = s.trim().replace(',', '.');
+	if (!t) return undefined;
+	const n = Number(t);
+	return isFinite(n) ? n : undefined;
+}
+
+/** Whether a draft carries a usable coordinate pair. */
+export function hasCoords(d: Draft): boolean {
+	return coord(d.lat) != null && coord(d.lon) != null;
 }
 
 /** Rows where `find` occurs in `field`. Literal, case-sensitive: what you typed is what changes. */
@@ -59,7 +77,8 @@ export function replaceIn(
 	);
 }
 
-const same = (a: Draft, b: Draft) => ADDRESS_FIELDS.every((f) => a[f].trim() === b[f].trim());
+const same = (a: Draft, b: Draft) =>
+	ADDRESS_FIELDS.every((f) => a[f].trim() === b[f].trim()) && !hasCoords(a);
 
 /** The drafts that differ from what they started as. */
 export function changed(drafts: Draft[], originals: Map<string, Draft>): Draft[] {
@@ -70,11 +89,16 @@ export function changed(drafts: Draft[], originals: Map<string, Draft>): Draft[]
 }
 
 /**
- * A draft back onto a record as its lookup address, coordinates dropped and
- * the record queued again. The record's own fields are not touched. A draft
- * that matches the file's own address again just clears the lookup.
+ * A draft back onto a record. With a coordinate pair typed in, the record is
+ * simply placed there. Otherwise the draft becomes the record's lookup
+ * address, coordinates dropped and the record queued again. The record's own
+ * fields are never touched; a draft that matches the file's own address
+ * again just clears the lookup.
  */
 export function applyDraft(r: Rec, d: Draft): Rec {
+	if (hasCoords(d)) {
+		return { ...r, lat: coord(d.lat), lon: coord(d.lon), geocode: 'manual' };
+	}
 	const v = (s: string) => (s.trim() === '' ? undefined : s.trim());
 	const lookup: Address = {
 		street: v(d.street),

@@ -7,7 +7,9 @@ const draft = (id: string, street: string, houseNumber = '1'): Draft => ({
 	street,
 	houseNumber,
 	postcode: '',
-	city: 'Vlissingen'
+	city: 'Vlissingen',
+	lat: '',
+	lon: ''
 });
 
 const failed = [
@@ -76,6 +78,23 @@ describe('what goes back to the geocoder', () => {
 	it('shows an earlier correction when the row is opened again', () => {
 		const once = applyDraft(rec, { ...toDraft(rec), houseNumber: '30A' });
 		expect(toDraft(once).houseNumber).toBe('30A');
+	});
+
+	it('places the record outright when a coordinate pair is typed', () => {
+		const out = applyDraft(rec, { ...toDraft(rec), lat: '51,4405', lon: ' 3.5721' });
+		expect(out).toMatchObject({ lat: 51.4405, lon: 3.5721, geocode: 'manual' });
+		expect(out.lookup).toBeUndefined();
+		expect(out.street).toBe('Boulevard de Ruijter');
+	});
+
+	it('counts a typed coordinate as a change', () => {
+		const withCoords = failed.map((d, i) => (i === 2 ? { ...d, lat: '51.44', lon: '3.57' } : d));
+		expect(changed(withCoords, originals).map((d) => d.id)).toEqual(['c']);
+	});
+
+	it('ignores half a coordinate', () => {
+		const half = failed.map((d, i) => (i === 2 ? { ...d, lat: '51.44' } : d));
+		expect(changed(half, originals)).toEqual([]);
 	});
 
 	it('clears the lookup when edited back to the file’s own address', () => {

@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { recordsStore } from '$lib/records/records.svelte';
+	import { stopAddress } from '$lib/records/stops';
+	import { ui } from '$lib/ui.svelte';
 	import {
 		ADDRESS_FIELDS,
 		FIELD_LABELS,
@@ -9,6 +11,7 @@
 		matching,
 		replaceIn,
 		changed,
+		hasCoords,
 		applyDraft
 	} from './reconcile';
 
@@ -48,6 +51,17 @@
 		);
 		onclose();
 	}
+
+	// Any pending edits are saved first, so arming the map for one row does
+	// not throw away corrections typed for the others.
+	function placeOnMap(d: Draft) {
+		const r = recordsStore.failed.find((x) => x.id === d.id);
+		submit();
+		if (r) ui.placing = { recIds: [r.id], label: stopAddress(r) };
+	}
+
+	const queued = $derived(dirty.filter((d) => !hasCoords(d)).length);
+	const placed = $derived(dirty.length - queued);
 </script>
 
 <dialog bind:this={dialog} onclose={onclose} onclick={(e) => e.target === dialog && onclose()}>
@@ -57,6 +71,8 @@
 			These are the rows the map could not find — usually a spelling it does not know.
 			What you type here is only used to look the door up: your file keeps its own
 			address in the export and on the card. Only the rows you change are looked up again.
+			For a street too new for the map, place the door yourself: type its coordinates, or
+			click it on the map.
 		</p>
 
 		<form class="replace" onsubmit={(e) => (e.preventDefault(), applyReplace())}>
@@ -93,6 +109,9 @@
 						{#each ADDRESS_FIELDS as f (f)}
 							<th>{FIELD_LABELS[f]}</th>
 						{/each}
+						<th>lat</th>
+						<th>lon</th>
+						<th></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -112,6 +131,23 @@
 									/>
 								</td>
 							{/each}
+							{#each ['lat', 'lon'] as const as c (c)}
+								<td class="coord">
+									<input
+										type="text"
+										class="mono"
+										inputmode="decimal"
+										placeholder={c === 'lat' ? '51.44…' : '3.57…'}
+										value={d[c]}
+										oninput={(e) => (drafts[i] = { ...d, [c]: e.currentTarget.value })}
+									/>
+								</td>
+							{/each}
+							<td>
+								<button class="place" title="Click the map where this door is" onclick={() => placeOnMap(d)}>
+									place on map
+								</button>
+							</td>
 						</tr>
 					{/each}
 				</tbody>
@@ -121,7 +157,13 @@
 		<div class="actions">
 			<button onclick={onclose}>cancel</button>
 			<button class="primary" disabled={!dirty.length} onclick={submit}>
-				geocode {dirty.length} changed {dirty.length === 1 ? 'address' : 'addresses'} again
+				{#if placed && queued}
+					place {placed}, look up {queued} again
+				{:else if placed}
+					place {placed} {placed === 1 ? 'address' : 'addresses'}
+				{:else}
+					look up {queued} changed {queued === 1 ? 'address' : 'addresses'} again
+				{/if}
 			</button>
 		</div>
 	</div>
@@ -229,6 +271,16 @@
 
 	td input.hit {
 		border-color: var(--warn);
+	}
+
+	td.coord input {
+		width: 5.5rem;
+	}
+
+	.place {
+		font-size: 0.72rem;
+		padding: 0.15rem 0.45rem;
+		white-space: nowrap;
 	}
 
 	tr.dirty td.id {

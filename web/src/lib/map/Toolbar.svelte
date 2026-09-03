@@ -93,7 +93,13 @@
 			seedBusy = false;
 		}
 	}
+
+	function onKeydown(e: KeyboardEvent) {
+		if (e.key === 'Escape' && ui.placing) ui.placing = null;
+	}
 </script>
+
+<svelte:window onkeydown={onKeydown} />
 
 {#snippet icon(id: Tool | DrawShape)}
 	<svg class="icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -266,7 +272,13 @@
 		{/if}
 	</div>
 </div>
-{#if seedError}
+{#if ui.placing}
+	<p class="placing">
+		click the map where <strong class="mono">{ui.placing.label}</strong> is
+		<button onclick={() => (ui.placing = null)}>cancel</button>
+		<span class="fine">(or press Esc)</span>
+	</p>
+{:else if seedError}
 	<p class="error">{seedError}</p>
 {/if}
 
@@ -331,5 +343,28 @@
 		font-size: 0.85rem;
 		padding: 0.3rem 0.9rem;
 		margin: 0;
+	}
+
+	/* An armed map action, like a drawing tool: postal orange. */
+	.placing {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		background: var(--postal);
+		color: #fff;
+		font-size: 0.85rem;
+		padding: 0.3rem 0.9rem;
+		margin: 0;
+	}
+
+	.placing button {
+		background: transparent;
+		border-color: rgba(255, 255, 255, 0.7);
+		color: #fff;
+	}
+
+	.placing .fine {
+		opacity: 0.8;
+		font-size: 0.78rem;
 	}
 </style>

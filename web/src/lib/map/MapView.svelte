@@ -208,18 +208,21 @@
 	// Each tool announces itself at the pointer: a pencil while drawing, a
 	// cell cross while toggling, a crosshair while picking start/end.
 	const toolCursor = $derived(
-		ui.drawing
-			? PENCIL_CURSOR
-			: ui.tool === 'toggle'
-				? 'cell'
-				: ui.tool === 'pick-start' || ui.tool === 'pick-end'
-					? 'crosshair'
-					: ''
+		ui.placing
+			? 'crosshair'
+			: ui.drawing
+				? PENCIL_CURSOR
+				: ui.tool === 'toggle'
+					? 'cell'
+					: ui.tool === 'pick-start' || ui.tool === 'pick-end'
+						? 'crosshair'
+						: ''
 	);
 
 	// The armed tool decides whether terra-draw is live and the cursor shape.
+	// Placing a door suspends drawing so the click reaches us, not terra-draw.
 	$effect(() => {
-		drawManager?.setShape(ui.drawing ? ui.drawShape : null);
+		drawManager?.setShape(ui.drawing && !ui.placing ? ui.drawShape : null);
 		if (map) map.getCanvas().style.cursor = toolCursor;
 	});
 
@@ -340,6 +343,17 @@
 					actions.appendChild(btn);
 				}
 			}
+			// The geocoder can be wrong by a street; the next map click says
+			// where this door really is.
+			const move = document.createElement('button');
+			move.textContent = 'move';
+			move.title = 'Click the map where this door really is';
+			move.onclick = () => {
+				ui.placing = { recIds: cardIds, label: title.textContent ?? r.id };
+				pinnedPopup?.remove();
+			};
+			actions.appendChild(move);
+
 			// Out of the round, not out of the file: the door greys out and
 			// stops being seeded, bucketed or routed, and one click undoes it.
 			const flip = document.createElement('button');
@@ -357,6 +371,7 @@
 	}
 
 	function onHover(m: MlMap, e: MapMouseEvent) {
+		if (ui.placing) return; // the crosshair stays; no peeking while aiming
 		if (ui.drawing) {
 			// terra-draw owns the pointer, but it occasionally unsets the
 			// cursor (letting maplibre's grab hand through) — restore the
@@ -394,6 +409,12 @@
 	}
 
 	function onClick(m: MlMap, e: MapMouseEvent) {
+		if (ui.placing) {
+			const { recIds } = ui.placing;
+			recordsStore.place(recIds, e.lngLat.lat, e.lngLat.lng);
+			ui.placing = null;
+			return;
+		}
 		if (ui.drawing) return; // terra-draw owns the pointer
 		const recordId = clickedRecordId(m, e);
 		if (!recordId) {

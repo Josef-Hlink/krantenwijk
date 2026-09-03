@@ -8,7 +8,8 @@ import { groupStops, type Stop } from './stops';
 // Type-only, so the cycle with mapping.svelte.ts is erased at compile time.
 import type { Role } from '$lib/csv/mapping.svelte';
 
-export type GeocodeState = 'n/a' | 'pending' | 'ok' | 'failed';
+/** `manual`: put on the map by hand — a street too new for the geocoder. */
+export type GeocodeState = 'n/a' | 'pending' | 'ok' | 'failed' | 'manual';
 
 /** The address fields of a record, as a unit. */
 export interface Address {
@@ -180,6 +181,14 @@ class RecordsStore {
 			[e, n]
 		];
 	});
+
+	/** Put cards at a point by hand. Every card at a door moves together. */
+	place(recIds: string[], lat: number, lon: number) {
+		const ids = new Set(recIds);
+		this.records = this.records.map((r) =>
+			ids.has(r.id) ? { ...r, lat, lon, geocode: 'manual' as const } : r
+		);
+	}
 
 	/**
 	 * Replace records by id — how a corrected address gets back in. Records

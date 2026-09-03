@@ -55,7 +55,7 @@ export function hasNewCoordinates(): boolean {
 	if (!source) return false;
 	// Coordinates in the upload were already the user's; only ones we resolved
 	// here are worth handing back.
-	return recordsStore.records.some((r) => r.geocode === 'ok');
+	return recordsStore.records.some((r) => r.geocode === 'ok' || r.geocode === 'manual');
 }
 
 export function buildGeocodedCsv(): string {
