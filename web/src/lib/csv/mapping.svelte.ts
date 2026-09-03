@@ -145,6 +145,26 @@ export interface Identity {
 	duplicates: number;
 }
 
+/**
+ * Distinct non-blank values per column. Shown beside every column in the
+ * mapper so you can see which ones could identify a row before picking:
+ * a column with 294 unique values in 294 rows covers it, one with 203
+ * does not.
+ */
+export function uniqueCounts(
+	rows: Record<string, string>[],
+	columns: string[]
+): Record<string, number> {
+	const sets = new Map(columns.map((c) => [c, new Set<string>()]));
+	for (const row of rows) {
+		for (const c of columns) {
+			const v = row[c]?.trim();
+			if (v) sets.get(c)!.add(v);
+		}
+	}
+	return Object.fromEntries([...sets].map(([c, set]) => [c, set.size]));
+}
+
 /** The id a row's chosen columns spell, or undefined when they are all empty. */
 function keyOf(row: Record<string, string>, idColumns: string[]): string | undefined {
 	if (!idColumns.length) return undefined;

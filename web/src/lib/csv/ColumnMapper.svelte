@@ -10,6 +10,7 @@
 		saveMapping,
 		mappingStatus,
 		identity,
+		uniqueCounts,
 		applyMapping
 	} from './mapping.svelte';
 	import type { Rec, Detail, Source } from '$lib/records/records.svelte';
@@ -43,6 +44,8 @@
 		)
 	);
 
+	// svelte-ignore state_referenced_locally
+	const unique = uniqueCounts(parsed.rows, parsed.columns);
 	const status = $derived(mappingStatus(roles));
 	const ident = $derived(identity(parsed.rows, idColumns));
 	const roleCols = $derived(
@@ -107,7 +110,13 @@
 
 	<table>
 		<thead>
-			<tr><th>column</th><th>sample values</th><th>used as</th><th>on the map</th></tr>
+			<tr>
+				<th>column</th>
+				<th>sample values</th>
+				<th class="num" title="distinct values in this column">unique</th>
+				<th>used as</th>
+				<th>on the map</th>
+			</tr>
 		</thead>
 		<tbody>
 			{#each parsed.columns as col (col)}
@@ -115,6 +124,9 @@
 				<tr>
 					<td class="mono">{col}</td>
 					<td class="samples mono">{samples(col)}</td>
+					<td class="num mono" class:covers={unique[col] === parsed.rows.length}>
+						{unique[col]}
+					</td>
 					<td>
 						<select
 							value={role}
@@ -253,6 +265,18 @@
 
 	.onmap {
 		white-space: nowrap;
+	}
+
+	.num {
+		text-align: right;
+		padding-right: 1.2rem;
+		color: var(--muted);
+		font-size: 0.78rem;
+	}
+
+	/* every row has its own value — this column alone could be the id */
+	td.covers {
+		color: var(--accent);
 	}
 
 	.show {

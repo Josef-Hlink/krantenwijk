@@ -5,7 +5,7 @@
  * records with the same id whatever the columns say.
  */
 import { describe, expect, it } from 'vitest';
-import { applyMapping, guessMapping, identity } from './mapping.svelte';
+import { applyMapping, guessMapping, identity, uniqueCounts } from './mapping.svelte';
 
 const columns = ['patientnr', 'Bron', 'straat', 'huisnr'];
 const row = (patientnr: string, bron: string, huisnr = '1') => ({
@@ -98,5 +98,16 @@ describe('guessMapping', () => {
 
 	it('leaves the id empty when nothing looks like one', () => {
 		expect(guessMapping(['patientnr', 'straat', 'huisnr']).idColumns).toEqual([]);
+	});
+});
+
+describe('uniqueCounts', () => {
+	it('counts distinct non-blank values per column', () => {
+		const rows = [row('1', 'griep'), row('2', 'griep'), row('', 'pneumo')];
+		expect(uniqueCounts(rows, ['patientnr', 'Bron', 'straat'])).toEqual({
+			patientnr: 2,
+			Bron: 2,
+			straat: 1
+		});
 	});
 });
