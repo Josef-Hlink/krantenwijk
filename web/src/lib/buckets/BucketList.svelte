@@ -1,8 +1,23 @@
 <script lang="ts">
 	import { bucketsStore } from './buckets.svelte';
 	import { routesStore } from '$lib/routes/routes.svelte';
+	import { BUCKET_COLORS } from './palette';
 
 	let mergeSelection = $state<Set<string>>(new Set());
+
+	// Click a chip to pick another color; a swatch another bucket wears is
+	// greyed out, so two buckets never look the same on the map.
+	let pickerId = $state<string | null>(null);
+	let colorOwner = $derived(new Map(bucketsStore.list.map((b) => [b.color, b])));
+
+	function pick(bucketId: string, color: string) {
+		bucketsStore.setColor(bucketId, color);
+		pickerId = null;
+	}
+
+	function closePicker(e: MouseEvent) {
+		if (pickerId && !(e.target as Element).closest('.colorwrap')) pickerId = null;
+	}
 
 	// Drag a bucket by its grip to another card; it takes that card's slot.
 	let dragId = $state<string | null>(null);
@@ -57,6 +72,8 @@
 		return `${(m / 1000).toFixed(1)} km`;
 	}
 </script>
+
+<svelte:window onclick={closePicker} />
 
 <div class="buckets">
 	<div class="head">
@@ -116,7 +133,36 @@
 						toggleMerge(bucket.id);
 					}}
 				/>
-				<span class="chip" style:background={bucket.color}></span>
+				<span class="colorwrap">
+					<button
+						class="chip"
+						style:background={bucket.color}
+						title="Change color"
+						aria-label="Change color"
+						onclick={(e) => {
+							e.stopPropagation();
+							pickerId = pickerId === bucket.id ? null : bucket.id;
+						}}
+					></button>
+					{#if pickerId === bucket.id}
+						<div class="picker">
+							{#each BUCKET_COLORS as color (color)}
+								{@const owner = colorOwner.get(color)}
+								{@const taken = owner != null && owner.id !== bucket.id}
+								<button
+									class="swatch"
+									class:current={color === bucket.color}
+									class:taken
+									style:background={color}
+									disabled={taken}
+									title={taken ? `used by ${owner.name}` : color}
+									aria-label={taken ? `${color}, used by ${owner.name}` : color}
+									onclick={() => pick(bucket.id, color)}
+								></button>
+							{/each}
+						</div>
+					{/if}
+				</span>
 				<input
 					class="name"
 					value={bucket.name}
@@ -248,11 +294,53 @@
 		margin-top: 0.25rem;
 	}
 
+	.colorwrap {
+		position: relative;
+		display: flex;
+		flex-shrink: 0;
+	}
+
 	.chip {
 		width: 0.85rem;
 		height: 0.85rem;
 		border-radius: 3px;
-		flex-shrink: 0;
+		border: none;
+		padding: 0;
+		cursor: pointer;
+	}
+
+	.picker {
+		position: absolute;
+		top: calc(100% + 0.35rem);
+		left: -0.35rem;
+		z-index: 10;
+		display: grid;
+		grid-template-columns: repeat(6, 1.1rem);
+		gap: 0.3rem;
+		padding: 0.35rem;
+		background: var(--panel);
+		border: 1px solid var(--border);
+		border-radius: 6px;
+		box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+	}
+
+	.swatch {
+		width: 1.1rem;
+		height: 1.1rem;
+		border-radius: 3px;
+		border: none;
+		padding: 0;
+		cursor: pointer;
+	}
+
+	.swatch.current {
+		box-shadow: 0 0 0 2px var(--panel), 0 0 0 3.5px var(--fg);
+	}
+
+	.swatch.taken {
+		opacity: 0.25;
+		filter: grayscale(0.8);
+		cursor: not-allowed;
 	}
 
 	.name {

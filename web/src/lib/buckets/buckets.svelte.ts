@@ -267,6 +267,10 @@ class BucketsStore {
 		this.history.run(this.updateCommand('rename bucket', bucketId, { name }));
 	}
 
+	setColor(bucketId: string, color: string): void {
+		this.history.run(this.updateCommand('recolor bucket', bucketId, { color }));
+	}
+
 	setCarrier(bucketId: string, carrier: string | undefined): void {
 		this.history.run(this.updateCommand('set carrier', bucketId, { carrier }));
 	}
