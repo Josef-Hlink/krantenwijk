@@ -14,7 +14,20 @@
  */
 import type { Rec, Detail } from '$lib/records/records.svelte';
 
-export const ROLES = ['street', 'house_number', 'postcode', 'city', 'lat', 'lon', 'skip'] as const;
+export const ROLES = [
+	'street',
+	'house_number',
+	'postcode',
+	'city',
+	'lat',
+	'lon',
+	'skip',
+	'bucket',
+	'carrier',
+	'color',
+	'mark',
+	'visit_order'
+] as const;
 
 export type Role = (typeof ROLES)[number];
 
@@ -25,7 +38,12 @@ export const ROLE_LABELS: Record<Role, string> = {
 	city: 'city',
 	lat: 'latitude',
 	lon: 'longitude',
-	skip: 'skip (not in the round)'
+	skip: 'skip (not in the round)',
+	bucket: 'bucket (earlier plan)',
+	carrier: 'carrier (earlier plan)',
+	color: 'bucket color (earlier plan)',
+	mark: 'start / end (earlier plan)',
+	visit_order: 'walk order (earlier plan)'
 };
 
 /** Case-insensitive aliases used to guess a mapping from column names. */
@@ -36,7 +54,12 @@ const ALIASES: Record<Role, string[]> = {
 	city: ['city', 'plaats', 'woonplaats', 'stad', 'town', 'gemeente'],
 	lat: ['lat', 'latitude', 'breedtegraad', 'y'],
 	lon: ['lon', 'lng', 'longitude', 'lengtegraad', 'x'],
-	skip: ['skip', 'overslaan', 'inactive', 'deactivated']
+	skip: ['skip', 'overslaan', 'inactive', 'deactivated'],
+	bucket: ['bucket', 'wijk', 'cluster'],
+	carrier: ['carrier', 'loper', 'bezorger'],
+	color: ['color', 'colour', 'kleur'],
+	mark: ['mark', 'start_end'],
+	visit_order: ['visit_order', 'walk_order', 'volgorde']
 };
 
 /** A skip cell that means "yes". Anything non-empty counts, bar the obvious noes. */
@@ -213,6 +236,67 @@ export function skippedIds(
 	const col = roles.skip;
 	if (!col) return [];
 	return records.filter((r, i) => isSkipped(rows[i][col])).map((r) => r.id);
+}
+
+/**
+ * The plan a saved CSV carries: the buckets it names, in order of first
+ * appearance (which is the rail order the file was written in), and which
+ * row went in which. Carrier and color ride along per bucket when the file
+ * has them. A skipped row's bucket cell is ignored — a door is in the round
+ * or out of it, never both.
+ */
+export interface PlanBucket {
+	name: string;
+	carrier?: string;
+	color?: string;
+	startId?: string;
+	endId?: string;
+}
+
+export interface Plan {
+	buckets: PlanBucket[];
+	assignments: { id: string; bucket: string }[];
+}
+
+/** What the saved CSV writes in the mark column: S, E, or both, for a bucket's ends. */
+export function markOf(start: boolean, end: boolean): string {
+	return (start ? 'S' : '') + (end ? 'E' : '');
+}
+
+const HEX_COLOR = /^#[0-9a-f]{6}$/i;
+
+export function planFromRows(
+	rows: Record<string, string>[],
+	records: Rec[],
+	roles: Partial<Record<Role, string>>,
+	skipped: Iterable<string> = []
+): Plan {
+	const col = roles.bucket;
+	const plan: Plan = { buckets: [], assignments: [] };
+	if (!col) return plan;
+	const out = new Set(skipped);
+	const seen = new Map<string, PlanBucket>();
+	records.forEach((r, i) => {
+		const row = rows[i];
+		const name = row[col]?.trim();
+		if (!name || out.has(r.id)) return;
+		let bucket = seen.get(name);
+		const mark = (roles.mark ? row[roles.mark] : '')?.trim().toUpperCase() ?? '';
+		if (!bucket) {
+			bucket = { name };
+			const carrier = roles.carrier ? row[roles.carrier]?.trim() : '';
+			const color = roles.color ? row[roles.color]?.trim() : '';
+			if (carrier) bucket.carrier = carrier;
+			if (color && HEX_COLOR.test(color)) bucket.color = color.toLowerCase();
+			seen.set(name, bucket);
+			plan.buckets.push(bucket);
+		}
+		// First one wins: a file with two starts is a file with one start.
+		if (mark.includes('S') && !bucket.startId) bucket.startId = r.id;
+		if (mark.includes('E') && !bucket.endId) bucket.endId = r.id;
+		plan.assignments.push({ id: r.id, bucket: name });
+	});
+	return plan;
 }
 
 /** A fresh id for a row that has none. Falls back when not in a secure context. */

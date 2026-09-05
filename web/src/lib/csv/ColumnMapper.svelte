@@ -12,7 +12,9 @@
 		identity,
 		uniqueCounts,
 		applyMapping,
-		skippedIds
+		skippedIds,
+		planFromRows,
+		type Plan
 	} from './mapping.svelte';
 	import type { Rec, Detail, Source } from '$lib/records/records.svelte';
 
@@ -21,7 +23,13 @@
 		onready
 	}: {
 		parsed: ParsedCsv;
-		onready: (records: Rec[], details: Detail[], source: Source, skipped: string[]) => void;
+		onready: (
+			records: Rec[],
+			details: Detail[],
+			source: Source,
+			skipped: string[],
+			plan: Plan
+		) => void;
 	} = $props();
 
 	// The component is keyed on `parsed` by its parent, so reading the prop's
@@ -92,11 +100,13 @@
 		// The source shape rides along so the file can later be handed back with
 		// coordinates filled in, under its own column names.
 		const records = applyMapping(parsed.rows, parsed.columns, { roles, idColumns });
+		const skipped = skippedIds(parsed.rows, records, roles);
 		onready(
 			records,
 			details,
 			{ columns: parsed.columns, roles, idColumns },
-			skippedIds(parsed.rows, records, roles)
+			skipped,
+			planFromRows(parsed.rows, records, roles, skipped)
 		);
 	}
 </script>
@@ -108,7 +118,8 @@
 		key in the export — pick several columns if it takes more than one to tell rows apart.
 		Every other column is an extra detail — tick it to show it when you point at a dot on
 		the map, and rename it if the header is cryptic. All columns come back in the export,
-		and this mapping is remembered for files with the same columns.
+		and this mapping is remembered for files with the same columns. A file saved from an
+		earlier plan brings its buckets back with it.
 	</p>
 
 	<table>

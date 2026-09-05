@@ -368,6 +368,39 @@ class BucketsStore {
 		);
 	}
 
+	/**
+	 * Start from a plan a CSV carried: buckets in the file's order, wearing
+	 * their saved carrier and color, every named row in its bucket. This is
+	 * load-time state, not an edit, so it replaces everything and leaves no
+	 * undo step — there is nothing before it to go back to.
+	 */
+	restore(plan: {
+		buckets: {
+			name: string;
+			carrier?: string;
+			color?: string;
+			startId?: string;
+			endId?: string;
+		}[];
+		assignments: { id: string; bucket: string }[];
+	}): void {
+		this.clear();
+		const byName = new Map<string, Bucket>();
+		for (const p of plan.buckets) {
+			const b = this.freshBucket(p.name);
+			if (p.carrier) b.carrier = p.carrier;
+			if (p.color) b.color = p.color;
+			if (p.startId) b.startId = p.startId;
+			if (p.endId) b.endId = p.endId;
+			byName.set(p.name, b);
+			this.buckets.set(b.id, b);
+		}
+		for (const a of plan.assignments) {
+			const b = byName.get(a.bucket);
+			if (b) this.assignment.set(a.id, b.id);
+		}
+	}
+
 	undo() {
 		return this.history.undo();
 	}

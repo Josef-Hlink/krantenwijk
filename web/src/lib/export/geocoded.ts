@@ -17,14 +17,21 @@
 import Papa from 'papaparse';
 import type { Rec } from '$lib/records/records.svelte';
 import { recordsStore } from '$lib/records/records.svelte';
-import { SKIP_MARK, type Role } from '$lib/csv/mapping.svelte';
+import { bucketsStore } from '$lib/buckets/buckets.svelte';
+import { SKIP_MARK, markOf, type Role } from '$lib/csv/mapping.svelte';
+import { visitOrders } from './sorted';
 
 /** Six decimals is about 10 cm — far past what a letterbox needs. */
 function coord(n: number | undefined): string {
 	return n == null ? '' : String(Number(n.toFixed(6)));
 }
 
-function roleValue(r: Rec, role: Role): string {
+function bucketOf(r: Rec) {
+	const id = bucketsStore.assignment.get(r.id);
+	return id ? bucketsStore.buckets.get(id) : undefined;
+}
+
+function roleValue(r: Rec, role: Role, visitOrder: Map<string, number>): string {
 	switch (role) {
 		case 'street':
 			return r.street ?? '';
@@ -40,6 +47,21 @@ function roleValue(r: Rec, role: Role): string {
 			return coord(r.lon);
 		case 'skip':
 			return recordsStore.skipped.has(r.id) ? SKIP_MARK : '';
+		// A file that arrived as an earlier plan leaves as the current one.
+		case 'bucket':
+			return bucketOf(r)?.name ?? '';
+		case 'carrier':
+			return bucketOf(r)?.carrier ?? '';
+		case 'color':
+			return bucketOf(r)?.color ?? '';
+		case 'mark': {
+			const b = bucketOf(r);
+			return markOf(b?.startId === r.id, b?.endId === r.id);
+		}
+		case 'visit_order': {
+			const n = visitOrder.get(r.id);
+			return n == null ? '' : String(n);
+		}
 	}
 }
 
@@ -84,10 +106,11 @@ export function buildGeocodedCsv(): string {
 	if (!source.roles.skip) columns.push(skipCol);
 
 	// Row order is upload order, untouched: this is their file, not our plan.
+	const visitOrder = visitOrders();
 	const data = recordsStore.records.map((r) => {
 		const row: Record<string, string> = { ...r.extra };
 		for (const [role, column] of Object.entries(source.roles)) {
-			if (column) row[column] = roleValue(r, role as Role);
+			if (column) row[column] = roleValue(r, role as Role, visitOrder);
 		}
 		row[latCol] = coord(r.lat);
 		row[lonCol] = coord(r.lon);

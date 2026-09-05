@@ -9,6 +9,9 @@
 		type Source
 	} from '$lib/records/records.svelte';
 	import { capability } from '$lib/rounds/capability.svelte';
+	import { bucketsStore } from '$lib/buckets/buckets.svelte';
+	import { routesStore } from '$lib/routes/routes.svelte';
+	import type { Plan } from '$lib/csv/mapping.svelte';
 
 	// Which deployment profile this is decides what we can honestly promise.
 	capability.ensure();
@@ -45,8 +48,17 @@
 		if (file) handleFile(file);
 	}
 
-	function onReady(records: Rec[], details: Detail[], source: Source, skipped: string[]) {
+	function onReady(
+		records: Rec[],
+		details: Detail[],
+		source: Source,
+		skipped: string[],
+		plan: Plan
+	) {
+		// A new file is a new plan: nothing from the last one may linger.
+		routesStore.clear();
 		recordsStore.load(records, details, source, skipped);
+		bucketsStore.restore(plan);
 		goto('/plan');
 	}
 </script>

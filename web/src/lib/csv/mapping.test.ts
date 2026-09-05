@@ -5,7 +5,14 @@
  * records with the same id whatever the columns say.
  */
 import { describe, expect, it } from 'vitest';
-import { applyMapping, guessMapping, identity, isSkipped, uniqueCounts } from './mapping.svelte';
+import {
+	applyMapping,
+	guessMapping,
+	identity,
+	isSkipped,
+	planFromRows,
+	uniqueCounts
+} from './mapping.svelte';
 
 const columns = ['patientnr', 'Bron', 'straat', 'huisnr'];
 const row = (patientnr: string, bron: string, huisnr = '1') => ({
@@ -119,5 +126,42 @@ describe('the skip column', () => {
 		expect(isSkipped('')).toBe(false);
 		expect(isSkipped('0')).toBe(false);
 		expect(isSkipped('nee')).toBe(false);
+	});
+});
+
+describe('the plan a saved file carries', () => {
+	const roles = { bucket: 'bucket', carrier: 'carrier', color: 'color', mark: 'mark' } as const;
+	const rows = [
+		{ bucket: 'centrum', carrier: 'anna', color: '#d6409f', mark: 'E' },
+		{ bucket: 'boulevard', carrier: '', color: 'reddish', mark: '' },
+		{ bucket: 'centrum', carrier: 'anna', color: '#d6409f', mark: 'S' },
+		{ bucket: '', carrier: '', color: '', mark: '' },
+		{ bucket: 'oud-west', carrier: 'josef', color: '', mark: 'SE' }
+	];
+	const records = rows.map((_, i) => ({ id: `r${i}`, extra: {}, geocode: 'n/a' as const }));
+
+	it('lists buckets in order of first appearance, each with its carrier and color', () => {
+		const plan = planFromRows(rows, records, roles);
+		expect(plan.buckets).toEqual([
+			{ name: 'centrum', carrier: 'anna', color: '#d6409f', startId: 'r2', endId: 'r0' },
+			{ name: 'boulevard' },
+			{ name: 'oud-west', carrier: 'josef', startId: 'r4', endId: 'r4' }
+		]);
+		expect(plan.assignments).toEqual([
+			{ id: 'r0', bucket: 'centrum' },
+			{ id: 'r1', bucket: 'boulevard' },
+			{ id: 'r2', bucket: 'centrum' },
+			{ id: 'r4', bucket: 'oud-west' }
+		]);
+	});
+
+	it('leaves a skipped row out of its bucket', () => {
+		const plan = planFromRows(rows, records, roles, ['r4']);
+		expect(plan.buckets.map((b) => b.name)).toEqual(['centrum', 'boulevard']);
+		expect(plan.assignments.some((a) => a.id === 'r4')).toBe(false);
+	});
+
+	it('is empty when no column is the bucket', () => {
+		expect(planFromRows(rows, records, {})).toEqual({ buckets: [], assignments: [] });
 	});
 });

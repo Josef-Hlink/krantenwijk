@@ -8,10 +8,10 @@ import type { Rec } from '$lib/records/records.svelte';
 import { recordsStore } from '$lib/records/records.svelte';
 import { bucketsStore } from '$lib/buckets/buckets.svelte';
 import { routesStore } from '$lib/routes/routes.svelte';
-import { SKIP_MARK } from '$lib/csv/mapping.svelte';
+import { SKIP_MARK, markOf } from '$lib/csv/mapping.svelte';
 
 function baseColumns(records: Rec[]): string[] {
-	const cols = ['id', 'bucket', 'carrier', 'visit_order', 'skip'];
+	const cols = ['id', 'bucket', 'carrier', 'color', 'mark', 'visit_order', 'skip'];
 	const has = (k: keyof Rec) => records.some((r) => r[k] != null);
 	if (has('street')) cols.push('street');
 	if (has('houseNumber')) cols.push('house_number');
@@ -21,15 +21,13 @@ function baseColumns(records: Rec[]): string[] {
 	return cols;
 }
 
-export function buildExport(): string {
-	const records = recordsStore.records;
-	const extraCols = [...new Set(records.flatMap((r) => Object.keys(r.extra)))];
-	const columns = [...baseColumns(records), ...extraCols];
-
-	// visit order per record: bucket routes first, in visit order
+/**
+ * Visit order per record, 1-based within its bucket, for every routed bucket.
+ * `order` holds one id per door; every card behind it shares that place in
+ * the walk, so the printed list keeps a household together.
+ */
+export function visitOrders(): Map<string, number> {
 	const visitOrder = new Map<string, number>();
-	// `order` holds one id per door; every card behind it shares that place in
-	// the walk, so the printed list keeps a household together.
 	for (const [bucketId, result] of routesStore.results) {
 		if (!bucketsStore.buckets.has(bucketId)) continue;
 		result.order.forEach((id, i) => {
@@ -38,6 +36,19 @@ export function buildExport(): string {
 			}
 		});
 	}
+	return visitOrder;
+}
+
+export function buildExport(): string {
+	const records = recordsStore.records;
+	const base = baseColumns(records);
+	// A re-uploaded export keeps its own `id` column as a detail; the base
+	// column already says the same thing, and a header must not repeat.
+	const extraCols = [...new Set(records.flatMap((r) => Object.keys(r.extra)))].filter(
+		(c) => !base.includes(c)
+	);
+	const columns = [...base, ...extraCols];
+	const visitOrder = visitOrders();
 
 	const bucketRank = new Map(bucketsStore.list.map((b, i) => [b.id, i]));
 	const rows = [...records].sort((a, b) => {
@@ -57,6 +68,8 @@ export function buildExport(): string {
 			id: r.id,
 			bucket: bucket?.name ?? '',
 			carrier: bucket?.carrier ?? '',
+			color: bucket?.color ?? '',
+			mark: markOf(bucket?.startId === r.id, bucket?.endId === r.id),
 			visit_order: visitOrder.get(r.id) ?? '',
 			skip: recordsStore.skipped.has(r.id) ? SKIP_MARK : '',
 			street: r.street ?? '',
