@@ -106,6 +106,26 @@ export function guessMapping(columns: string[]): Mapping {
 	return { roles, idColumns: idHit ? [idHit] : [] };
 }
 
+/**
+ * A remembered mapping, topped up with guesses for roles it leaves open. A
+ * mapping saved before a role existed would otherwise pin that role's column
+ * to "extra detail" forever — the plan columns of last week's export, say.
+ * Columns the saved mapping already uses stay as they are.
+ */
+export function withNewRoles<M extends Mapping>(saved: M, columns: string[]): M {
+	const guess = guessMapping(columns);
+	const taken = new Set([...saved.idColumns, ...Object.values(saved.roles).filter(Boolean)]);
+	const roles = { ...saved.roles };
+	for (const role of ROLES) {
+		const col = guess.roles[role];
+		if (!roles[role] && col && !taken.has(col)) {
+			roles[role] = col;
+			taken.add(col);
+		}
+	}
+	return { ...saved, roles };
+}
+
 export function defaultDetail(column: string): Detail {
 	return {
 		column,

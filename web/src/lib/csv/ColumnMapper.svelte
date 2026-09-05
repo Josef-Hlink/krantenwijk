@@ -5,6 +5,7 @@
 		ROLE_LABELS,
 		type Role,
 		guessMapping,
+		withNewRoles,
 		defaultDetail,
 		savedMapping,
 		saveMapping,
@@ -37,7 +38,7 @@
 	// svelte-ignore state_referenced_locally
 	const saved = savedMapping(parsed.columns);
 	// svelte-ignore state_referenced_locally
-	const initial = saved ?? guessMapping(parsed.columns);
+	const initial = saved ? withNewRoles(saved, parsed.columns) : guessMapping(parsed.columns);
 	let roles = $state<Partial<Record<Role, string>>>(initial.roles);
 	let idColumns = $state<string[]>(initial.idColumns);
 	// Per-column detail preferences, kept for every column so flipping a

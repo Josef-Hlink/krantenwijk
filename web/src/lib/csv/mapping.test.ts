@@ -11,7 +11,9 @@ import {
 	identity,
 	isSkipped,
 	planFromRows,
-	uniqueCounts
+	uniqueCounts,
+	withNewRoles,
+	type Mapping
 } from './mapping.svelte';
 
 const columns = ['patientnr', 'Bron', 'straat', 'huisnr'];
@@ -163,5 +165,29 @@ describe('the plan a saved file carries', () => {
 
 	it('is empty when no column is the bucket', () => {
 		expect(planFromRows(rows, records, {})).toEqual({ buckets: [], assignments: [] });
+	});
+});
+
+describe('a remembered mapping', () => {
+	const columns = ['id', 'bucket', 'carrier', 'street', 'house_number', 'lat', 'lon'];
+
+	it('picks up roles that did not exist when it was saved', () => {
+		const saved = {
+			roles: { street: 'street', house_number: 'house_number', lat: 'lat', lon: 'lon' },
+			idColumns: ['id']
+		};
+		expect(withNewRoles(saved, columns).roles).toMatchObject({
+			bucket: 'bucket',
+			carrier: 'carrier'
+		});
+	});
+
+	it('never overrides a column the user already placed', () => {
+		const saved: Mapping = { roles: { street: 'street', city: 'bucket' }, idColumns: ['carrier'] };
+		const { roles, idColumns } = withNewRoles(saved, columns);
+		expect(roles.city).toBe('bucket');
+		expect(roles.bucket).toBeUndefined();
+		expect(roles.carrier).toBeUndefined();
+		expect(idColumns).toEqual(['carrier']);
 	});
 });
