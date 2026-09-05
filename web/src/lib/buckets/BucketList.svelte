@@ -5,10 +5,9 @@
 
 	let mergeSelection = $state<Set<string>>(new Set());
 
-	// Click a chip to pick another color; a swatch another bucket wears is
-	// greyed out, so two buckets never look the same on the map.
+	// Click a chip to pick another color. Any color goes: with a big round
+	// the palette repeats anyway, and only neighbours need to differ.
 	let pickerId = $state<string | null>(null);
-	let colorOwner = $derived(new Map(bucketsStore.list.map((b) => [b.color, b])));
 
 	function pick(bucketId: string, color: string) {
 		bucketsStore.setColor(bucketId, color);
@@ -147,16 +146,12 @@
 					{#if pickerId === bucket.id}
 						<div class="picker">
 							{#each BUCKET_COLORS as color (color)}
-								{@const owner = colorOwner.get(color)}
-								{@const taken = owner != null && owner.id !== bucket.id}
 								<button
 									class="swatch"
 									class:current={color === bucket.color}
-									class:taken
 									style:background={color}
-									disabled={taken}
-									title={taken ? `used by ${owner.name}` : color}
-									aria-label={taken ? `${color}, used by ${owner.name}` : color}
+									title={color}
+									aria-label={color}
 									onclick={() => pick(bucket.id, color)}
 								></button>
 							{/each}
@@ -335,12 +330,6 @@
 
 	.swatch.current {
 		box-shadow: 0 0 0 2px var(--panel), 0 0 0 3.5px var(--fg);
-	}
-
-	.swatch.taken {
-		opacity: 0.25;
-		filter: grayscale(0.8);
-		cursor: not-allowed;
 	}
 
 	.name {
