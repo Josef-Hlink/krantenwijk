@@ -4,6 +4,38 @@
 
 	let mergeSelection = $state<Set<string>>(new Set());
 
+	// Drag a bucket by its grip to another card; it takes that card's slot.
+	let dragId = $state<string | null>(null);
+	let overId = $state<string | null>(null);
+	let dragIndex = $derived(bucketsStore.list.findIndex((b) => b.id === dragId));
+
+	function dragStart(e: DragEvent, id: string) {
+		dragId = id;
+		if (!e.dataTransfer) return;
+		e.dataTransfer.effectAllowed = 'move';
+		e.dataTransfer.setData('text/plain', id); // Firefox won't drag without a payload
+		const card = (e.currentTarget as HTMLElement).closest('.bucket');
+		if (card) e.dataTransfer.setDragImage(card, 12, 12);
+	}
+
+	function dragOver(e: DragEvent, id: string) {
+		if (!dragId || dragId === id) return;
+		e.preventDefault();
+		if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+		overId = id;
+	}
+
+	function drop(e: DragEvent, index: number) {
+		e.preventDefault();
+		if (dragId) bucketsStore.move(dragId, index);
+		dragEnd();
+	}
+
+	function dragEnd() {
+		dragId = null;
+		overId = null;
+	}
+
 	function toggleMerge(id: string) {
 		const next = new Set(mergeSelection);
 		if (next.has(id)) next.delete(id);
@@ -43,7 +75,7 @@
 		</p>
 	{/if}
 
-	{#each bucketsStore.list as bucket (bucket.id)}
+	{#each bucketsStore.list as bucket, index (bucket.id)}
 		{@const doors = bucketsStore.doorCounts.get(bucket.id) ?? 0}
 		{@const cards = bucketsStore.counts.get(bucket.id) ?? 0}
 		{@const over = doors > bucketsStore.maxStops}
@@ -54,12 +86,27 @@
 		<div
 			class="bucket"
 			class:activeb={bucket.id === bucketsStore.activeId}
+			class:dragging={bucket.id === dragId}
+			class:above={overId === bucket.id && dragIndex > index}
+			class:below={overId === bucket.id && dragIndex < index}
 			onclick={() => (bucketsStore.activeId = bucket.id)}
 			onkeydown={(e) => e.key === 'Enter' && (bucketsStore.activeId = bucket.id)}
+			ondragover={(e) => dragOver(e, bucket.id)}
+			ondragleave={() => overId === bucket.id && (overId = null)}
+			ondrop={(e) => drop(e, index)}
 			role="button"
 			tabindex="0"
 		>
 			<div class="row">
+				<span
+					class="grip"
+					title="Drag to reorder"
+					draggable="true"
+					role="presentation"
+					ondragstart={(e) => dragStart(e, bucket.id)}
+					ondragend={dragEnd}
+					onclick={(e) => e.stopPropagation()}>⠿</span
+				>
 				<input
 					type="checkbox"
 					title="Select for merge"
@@ -162,6 +209,33 @@
 	.bucket.activeb {
 		border-color: var(--accent);
 		box-shadow: 0 0 0 1px var(--accent);
+	}
+
+	.bucket.dragging {
+		opacity: 0.4;
+	}
+
+	/* the slot the dragged bucket will take: a rule on the side it lands */
+	.bucket.above {
+		box-shadow: 0 -3px 0 0 var(--accent);
+	}
+
+	.bucket.below {
+		box-shadow: 0 3px 0 0 var(--accent);
+	}
+
+	.grip {
+		color: var(--muted);
+		cursor: grab;
+		user-select: none;
+		font-size: 0.9rem;
+		line-height: 1;
+		padding: 0 0.1rem;
+		flex-shrink: 0;
+	}
+
+	.grip:active {
+		cursor: grabbing;
 	}
 
 	.row {

@@ -144,16 +144,43 @@ class BucketsStore {
 	private deleteCommand(bucketId: string): Command {
 		const store = this;
 		let snapshot: Bucket | undefined;
+		let index = 0;
 		return {
 			label: 'delete bucket',
 			apply() {
 				snapshot = store.buckets.get(bucketId);
+				index = [...store.buckets.keys()].indexOf(bucketId);
 				store.buckets.delete(bucketId);
 				if (store.activeId === bucketId) store.activeId = null;
 			},
 			revert() {
-				if (snapshot) store.buckets.set(bucketId, snapshot);
+				if (!snapshot) return;
+				store.buckets.set(bucketId, snapshot);
+				store.place(bucketId, index);
 			}
+		};
+	}
+
+	/**
+	 * Rail order is the round's order — it ranks the sorted export and the
+	 * list a phone picks from — and a Map only knows insertion order, so
+	 * moving a bucket means re-inserting them all.
+	 */
+	private place(bucketId: string, index: number) {
+		const order = [...this.buckets.keys()].filter((id) => id !== bucketId);
+		order.splice(index, 0, bucketId);
+		const entries = order.map((id) => [id, this.buckets.get(id)!] as const);
+		this.buckets.clear();
+		for (const [id, b] of entries) this.buckets.set(id, b);
+	}
+
+	private moveCommand(bucketId: string, index: number): Command {
+		const store = this;
+		const from = [...this.buckets.keys()].indexOf(bucketId);
+		return {
+			label: 'reorder buckets',
+			apply: () => store.place(bucketId, index),
+			revert: () => store.place(bucketId, from)
 		};
 	}
 
@@ -288,6 +315,13 @@ class BucketsStore {
 	unskip(recordIds: string[]): void {
 		if (!recordIds.length) return;
 		this.history.run(this.skipCommand('unskip door', recordIds, false));
+	}
+
+	/** Move a bucket to a slot in the rail (0 = top); its neighbours shift. */
+	move(bucketId: string, index: number): void {
+		const from = this.list.findIndex((b) => b.id === bucketId);
+		if (from < 0 || from === index) return;
+		this.history.run(this.moveCommand(bucketId, index));
 	}
 
 	/** Merge several buckets into the first: one undo step. */
