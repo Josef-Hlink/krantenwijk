@@ -84,14 +84,20 @@ def _require_database() -> None:
             "instance whose accounts you mean to change"
         )
     try:
-        with db.connection() as conn:
-            conn.execute("select 1")
+        ready = db.schema_present()
     except Exception as e:
         # Reaching the database is the other half. Better here than after
         # someone has typed a password twice.
         raise click.ClickException(
             f"could not reach the database at KRANTENWIJK_DATABASE_URL: {e}"
         ) from e
+    if not ready:
+        # Whoever creates the tables owns them, and that has to be the
+        # service — this command may well be running as postgres.
+        raise click.ClickException(
+            "the database has no tables yet — start the service first (it "
+            "creates them as its own role), then run this again"
+        )
 
 
 cli.add_command(demo)

@@ -5,6 +5,8 @@ cannot hold them. Nothing is persisted, nothing is logged with payloads.
 """
 
 import os
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import Cookie, Depends, FastAPI, HTTPException, Response
@@ -12,7 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
-from . import auth, cluster, deliveries, estimate, rounds, route
+from . import auth, cluster, db, deliveries, estimate, rounds, route
 from .auth import COOKIE_NAME, User
 from .deliveries import Delivery, Mark
 from .models import Assignment, Point, RouteResult
@@ -88,8 +90,23 @@ def get_routing_backend() -> route.RoutingBackend:
     return route.get_backend()
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    """Open the pool — and so create the schema — before the first request.
+
+    The role that first opens the pool owns the tables, and it has to be the
+    service's own. Doing it at startup rather than on the first storage
+    request means nothing else can get there first (see db.schema_present).
+    Unreachable database → the service fails to start, which systemd turns
+    into a retry, rather than serving 500s until someone notices.
+    """
+    if db.configured():
+        db.pool()
+    yield
+
+
 def create_app() -> FastAPI:
-    app = FastAPI(title="krantenwijk engine", version="0.1.0")
+    app = FastAPI(title="krantenwijk engine", version="0.1.0", lifespan=lifespan)
 
     app.add_middleware(
         CORSMiddleware,

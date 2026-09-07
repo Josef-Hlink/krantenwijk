@@ -218,3 +218,25 @@ def test_api_put_updates_in_place(signed_in, sample):
 def test_api_put_refuses_to_create(signed_in, sample):
     r = signed_in.put("/api/rounds/nope", json=sample.model_dump())
     assert r.status_code == 404
+
+
+def test_schema_probe_creates_nothing(postgres_url):
+    """The CLI asks before the service has ever connected; asking must not
+    itself create the tables, or the asker becomes their owner."""
+    import psycopg
+
+    from krantenwijk import db
+
+    with psycopg.connect(postgres_url, autocommit=True) as conn:
+        conn.execute("drop database if exists schemaprobe")
+        conn.execute("create database schemaprobe")
+    fresh = postgres_url.rsplit("/", 1)[0] + "/schemaprobe"
+    assert db.schema_present(fresh) is False
+    assert db.schema_present(fresh) is False  # still nothing, still not created
+
+
+def test_schema_present_after_the_service_opened_the_pool(store):
+    from krantenwijk import db
+
+    db.pool()
+    assert db.schema_present() is True

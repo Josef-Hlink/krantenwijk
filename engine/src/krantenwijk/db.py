@@ -16,6 +16,7 @@ import os
 import threading
 from pathlib import Path
 
+import psycopg
 from psycopg_pool import ConnectionPool
 
 SCHEMA = Path(__file__).parent / "schema.sql"
@@ -78,6 +79,25 @@ def pool() -> ConnectionPool:
 def connection():
     """A pooled connection, committed on clean exit of the ``with`` block."""
     return pool().connection()
+
+
+def schema_present(url: str | None = None) -> bool:
+    """Whether the tables exist — asked over a plain connection that creates
+    nothing.
+
+    The pool applies the schema, and whoever opens the first pool owns the
+    tables. That must be the service: on esther it connects as its own
+    role, while the account commands run as the postgres superuser. A CLI
+    that opened the pool on an empty database would leave tables the service
+    cannot touch, so the CLI asks this first and refuses to go further.
+    Raises like any connect would when the database is unreachable.
+    """
+    dsn = url or database_url()
+    if dsn is None:
+        raise StorageDisabled("no database configured")
+    with psycopg.connect(dsn, connect_timeout=10) as conn:
+        row = conn.execute("select to_regclass('public.users') is not null").fetchone()
+        return bool(row and row[0])
 
 
 def reset() -> None:
