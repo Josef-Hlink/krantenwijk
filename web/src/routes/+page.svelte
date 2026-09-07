@@ -113,7 +113,7 @@
 			<button class="primary" onclick={loadDemo}>Try the Vlissingen demo</button>
 			<p class="fine">
 				400 real letterboxes (© OpenStreetMap contributors) with invented residents —
-				every name and BSN is randomly generated, the round entirely fictional.
+				every name is randomly generated, the round entirely fictional.
 			</p>
 		</section>
 

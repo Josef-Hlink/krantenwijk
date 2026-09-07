@@ -9,8 +9,8 @@
 # Every other column is an "extra detail": it rides along untouched and
 # reappears in the export, and in the web app you can optionally show it
 # in the map popup under a name of your choosing (the demo's naam/soort)
-# — or leave it alone entirely (the demo's bsn: present in the file,
-# used nowhere, never leaves the browser).
+# — or leave it alone entirely (present in the file, used nowhere, never
+# leaves the browser).
 
 roles:
   id: id                  # opaque row id — the only join key you ever need

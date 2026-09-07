@@ -3,11 +3,9 @@
 The committed demo file uses *real* Vlissingen addresses — public data from
 OpenStreetMap (© OpenStreetMap contributors, ODbL; address data in the
 Netherlands originates from the public BAG register). What's fabricated is
-the round itself: opaque ids, invented residents (random names and
-elfproef-valid but meaningless BSNs, there to show that sensitive columns
-can ride along without ever being used), a category split, and the
-sampling. No real person or delivery is referenced, only letterboxes that
-exist.
+the round itself: opaque ids, invented residents (random names), a
+category split, and the sampling. No real person or delivery is referenced,
+only letterboxes that exist.
 
 Fetching hits the Overpass API (network); sampling/writing is deterministic
 and offline, so tests only exercise ``make_round``/``write_csv``.
@@ -39,12 +37,11 @@ out tags center;
 # south, west, north, east — Vlissingen and surroundings
 DEFAULT_BBOX = "51.42,3.53,51.49,3.64"
 
-CATEGORIES = [("griep", 0.8), ("pneum", 0.2)]
+CATEGORIES = [("krant", 0.8), ("folder", 0.2)]
 
 CSV_COLUMNS = [
     "id",
     "naam",
-    "bsn",
     "straat",
     "huisnr",
     "postcode",
@@ -109,25 +106,14 @@ SURNAMES = [
 ]
 
 
-def make_bsn(rng: random.Random) -> str:
-    """A random 9-digit number satisfying the BSN elfproef: 9·d1 + 8·d2 +
-    … + 2·d8 − d9 ≡ 0 (mod 11). Valid-looking, tied to nobody."""
-    while True:
-        digits = [rng.randint(1, 9)] + [rng.randint(0, 9) for _ in range(7)]
-        check = sum((9 - i) * d for i, d in enumerate(digits)) % 11
-        if check == 10:
-            continue
-        return "".join(map(str, digits + [check]))
-
-
 def synth_person(
     person_key: str, seed: int = 7, household: str | None = None
-) -> tuple[str, str]:
-    """Deterministic invented resident: (naam, bsn).
+) -> str:
+    """Deterministic invented resident: a name.
 
     Seeded per *person*, not per row — one resident can be called up twice
-    in the same round (a griep card and a pneum card), and both rows must
-    carry the same name and BSN. When a household key is given the surname
+    in the same round (a paper and a flyer), and both rows must
+    carry the same name. When a household key is given the surname
     is seeded from that, so several residents at one address read as one
     family.
     """
@@ -135,13 +121,13 @@ def synth_person(
     first = rng.choice(FIRST_NAMES)
     surname_rng = random.Random(f"{seed}:huis:{household}") if household else rng
     naam = f"{first} {surname_rng.choice(SURNAMES)}"
-    return naam, make_bsn(rng)
+    return naam
 
 
-def assign_people(door: str, n_cards: int, seed: int = 7) -> list[tuple[str, str]]:
+def assign_people(door: str, n_cards: int, seed: int = 7) -> list[str]:
     """Who each of a door's cards is for.
 
-    Cards are not people. A resident called up for both griep and pneum gets
+    Cards are not people. A resident called up for both paper and flyer gets
     two cards at one address, so a door with three cards may hold only two
     names — the case the walking view has to collapse.
     """
@@ -202,7 +188,7 @@ def fetch_addresses(place: str, bbox: str = DEFAULT_BBOX) -> list[AddressRecord]
     return records
 
 
-# Share of doors that call up more than one resident. A GP round really does
+# Share of doors that call up more than one resident. A real round really does
 # hit households twice — two parents, a couple — and the demo has to contain
 # the case or nothing downstream is ever exercised against it.
 CARD_COUNTS = [(1, 0.84), (2, 0.13), (3, 0.03)]
@@ -248,14 +234,14 @@ def write_csv(records: list[AddressRecord], out: TextIO, seed: int = 7) -> None:
     writer.writerow(CSV_COLUMNS)
 
     # Cards at one door are consecutive, so residents can be assigned per door.
-    people: dict[str, list[tuple[str, str]]] = {}
+    people: dict[str, list[str]] = {}
     counts: dict[str, int] = {}
     for r in records:
         counts[household_key(r)] = counts.get(household_key(r), 0) + 1
     for door, n_cards in counts.items():
         people[door] = assign_people(door, n_cards, seed=seed)
 
-    # A resident called up twice holds one griep card and one pneum card —
+    # A resident called up twice holds one paper and one flyer —
     # never two of the same. Their cards' categories are fixed here, where
     # the person assignment is known.
     per_person: dict[tuple[str, str], int] = {}
@@ -266,7 +252,7 @@ def write_csv(records: list[AddressRecord], out: TextIO, seed: int = 7) -> None:
         door = household_key(r)
         i = used.get(door, 0)
         used[door] = i + 1
-        naam, bsn = people[door][i]
+        naam = people[door][i]
         who = (door, naam)
         nth = per_person.get(who, 0)
         per_person[who] = nth + 1
@@ -280,7 +266,6 @@ def write_csv(records: list[AddressRecord], out: TextIO, seed: int = 7) -> None:
             [
                 r.id,
                 naam,
-                bsn,
                 r.street,
                 r.house_number,
                 r.postcode,

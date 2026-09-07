@@ -46,7 +46,7 @@ cd web && pnpm dev                  # web app → localhost:4382, proxies /api
 Try it with the Vlissingen demo on the landing page — real addresses from
 [OpenStreetMap](https://www.openstreetmap.org/copyright) (© OpenStreetMap
 contributors, ODbL), carrying an entirely fictional delivery round. No real
-people, patients, or deliveries are referenced anywhere in this repo.
+people or deliveries are referenced anywhere in this repo.
 
 ## License
 

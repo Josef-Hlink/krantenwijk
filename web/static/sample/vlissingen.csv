@@ -1,401 +1,401 @@
-id,naam,bsn,straat,huisnr,postcode,plaats,lat,lon,soort
-v-0000,Hanna van der Meer,384512914,Jozef Israelslaan,62,4382VN,Vlissingen,51.453489,3.5767203,griep
-v-0001,Jan van der Meer,155718976,Coosje Buskenstraat,151,4381LD,Vlissingen,51.445205,3.5715162,pneum
-v-0002,Kees Vos,474172831,Multatulilaan,1,4382BZ,Vlissingen,51.4526339,3.556649,pneum
-v-0003,Pieter de Boer,108913375,Van Hogendorpweg,164,4384HD,Vlissingen,51.4629671,3.5519983,griep
-v-0004,Lieke de Boer,113462906,Van Hogendorpweg,164,4384HD,Vlissingen,51.4629671,3.5519983,griep
-v-0005,Lieke de Vries,154379797,Bellamypark,9,4381CG,Vlissingen,51.4413967,3.5733723,pneum
-v-0006,Lieke de Vries,154379797,Bellamypark,9,4381CG,Vlissingen,51.4413967,3.5733723,griep
-v-0007,Teun van Leeuwen,824429436,Bloemenlaan,125,4382SK,Vlissingen,51.4549917,3.5725902,griep
-v-0008,Femke de Wit,802214307,Schubertlaan,34,4384LN,Vlissingen,51.464819,3.542746,griep
-v-0009,Anna de Bruin,454043648,Boulevard Bankert,408,4382AC,Vlissingen,51.4471294,3.5630186,griep
-v-0010,Kees van der Meer,621405607,Marinestraat,21,4381AW,Vlissingen,51.4414495,3.5806566,pneum
-v-0011,Gijs Kuipers,366998274,Spuistraat,12a,4381HR,Vlissingen,51.4425522,3.5729917,griep
-v-0012,Iris Smits,284745157,Blikkenburg,103,4385HJ,Vlissingen,51.4626412,3.5708859,griep
-v-0013,Bram van den Berg,670831098,Ruys de Beerenbrouckstraat,41,4384EP,Vlissingen,51.4622625,3.5533007,pneum
-v-0014,Pieter van den Berg,821243056,Ruys de Beerenbrouckstraat,41,4384EP,Vlissingen,51.4622625,3.5533007,griep
-v-0015,Sem Brouwer,411972881,Edisonweg,7a,4382NV,Vlissingen,51.4500057,3.5873255,griep
-v-0016,Sem Brouwer,411972881,Edisonweg,7a,4382NV,Vlissingen,51.4500057,3.5873255,pneum
-v-0017,Roos Smits,635157196,Badhuisstraat,34,4381LT,Vlissingen,51.4460497,3.5707242,pneum
-v-0018,Teun Smits,472827698,Badhuisstraat,34,4381LT,Vlissingen,51.4460497,3.5707242,griep
-v-0019,Teun Smits,472827698,Badhuisstraat,34,4381LT,Vlissingen,51.4460497,3.5707242,pneum
-v-0020,Hanna Maas,708496325,Boulevard Bankert,20,4382AA,Vlissingen,51.4440256,3.568361,griep
-v-0021,Otto Bakker,805777829,Pablo Picassoplein,139,4382KB,Vlissingen,51.4536301,3.5671931,griep
-v-0022,Marijke Hendriks,306893526,Noorderbaan,84,4386CB,Vlissingen,51.4669867,3.5844662,griep
-v-0023,Roos van Dijk,416690713,Bloemenlaan,55,4382SE,Vlissingen,51.4527809,3.5728285,griep
-v-0024,Daan de Bruin,730509977,Gildeweg,16-08,4383NK,Vlissingen,51.4571991,3.5865576,griep
-v-0025,Johanna van den Berg,839963130,Boulevard Bankert,224,4382AC,Vlissingen,51.446062,3.5646896,griep
-v-0026,Sanne Vos,320580878,Singel,233,4381VJ,Vlissingen,51.4500618,3.5781947,pneum
-v-0027,Kees Dijkstra,241083035,Oudstraat,14-G2,,Vlissingen,51.4625992,3.5581485,pneum
-v-0028,Iris Mulder,449299211,Blikkenburg,55,4385HJ,Vlissingen,51.4640196,3.5702175,griep
-v-0029,Bram de Boer,538782468,Singel,150a,4382LP,Vlissingen,51.4494889,3.5704447,griep
-v-0030,Niels Visser,886428828,Brahmslaan,3,4384LP,Vlissingen,51.4658527,3.54346,griep
-v-0031,Iris Bakker,934656848,Galgewei,42,4384RB,Vlissingen,51.4616816,3.532793,pneum
-v-0032,Daan Hendriks,783660674,Van Dishoeckstraat,144,4381VA,Vlissingen,51.4476974,3.5786031,griep
-v-0033,Teun van Leeuwen,322195780,Van Dishoeckstraat,42,4381TZ,Vlissingen,51.4472626,3.5786689,pneum
-v-0034,Teun Kuipers,737837184,Wijenburg,63,4385GT,Vlissingen,51.4639628,3.5749808,griep
-v-0035,Iris de Bruin,750432895,Blikkenburg,69,4385HJ,Vlissingen,51.4636265,3.5700796,griep
-v-0036,Ada Visser,832541564,Slangenburg,3,4385HT,Vlissingen,51.4625407,3.5722362,griep
-v-0037,Niels Dijkstra,559039207,Spuistraat,86a,4381HT,Vlissingen,51.443643,3.5723698,pneum
-v-0038,Ada Jansen,913795422,Nico Engelschmanlaan,1,4385KR,Vlissingen,51.4604458,3.5606944,pneum
-v-0039,Els de Vries,222050688,Berlagestraat,8,4383BJ,Vlissingen,51.4563015,3.5625998,pneum
-v-0040,Pieter Jansen,411944137,Galgewei,13,4384RB,Vlissingen,51.4622144,3.5324486,pneum
-v-0041,Lieke de Vries,214178195,Bedrijfsweg,15d,4387PD,Vlissingen,51.4721476,3.5899707,griep
-v-0042,Kees de Bruin,952860636,Singel,373,4381VK,Vlissingen,51.4497455,3.5797374,pneum
-v-0043,Ada Brouwer,362298749,Calandstraat,2,4382JX,Vlissingen,51.4535478,3.565741,griep
-v-0044,Pieter Smits,973785871,Hercules Segherslaan,15,4383VG,Vlissingen,51.4591653,3.5707482,griep
-v-0045,Lieke de Bruin,148019018,Westerzicht,630,4385BW,Vlissingen,51.461615,3.5838782,griep
-v-0046,Willem van Leeuwen,357987007,Colijnstraat,3,4384EH,Vlissingen,51.4628809,3.5549141,griep
-v-0047,Johanna van der Meer,669697059,Schuitvaartgracht,65,4382GH,Vlissingen,51.4500088,3.5694605,griep
-v-0048,Els Jansen,712396573,Bouwen Ewoutstraat,42b,4381PS,Vlissingen,51.4474489,3.5719015,griep
-v-0049,Sanne Jansen,783384178,Sint Jacobsstraat,11,4381EK,Vlissingen,51.4431574,3.5749236,griep
-v-0050,Daan Bakker,159360602,Jacob Marislaan,14,4382TA,Vlissingen,51.4542292,3.574364,griep
-v-0051,Els Hendriks,911091774,Singel,500,4381VP,Vlissingen,51.4488393,3.5841446,griep
-v-0052,Roos de Wit,694452592,Verlengde Bonedijkestraat,287,4383BC,Vlissingen,51.4556118,3.5628766,griep
-v-0053,Iris de Wit,535835139,De Savornin Lohmanlaan,7,4384KC,Vlissingen,51.4596697,3.5506086,griep
-v-0054,Roos Kuipers,541673609,Boulevard Bankert,622,4382AC,Vlissingen,51.4478215,3.5622378,griep
-v-0055,Roos Kuipers,541673609,Boulevard Bankert,622,4382AC,Vlissingen,51.4478215,3.5622378,pneum
-v-0056,Bram Smits,780670966,Spuistraat,3,4381HN,Vlissingen,51.4424917,3.5727794,griep
-v-0057,Jan van Leeuwen,209636993,Vredehoflaan,344,4382CJ,Vlissingen,51.4536617,3.5601008,griep
-v-0058,Johanna de Wit,198025245,Van Doornlaan,23,4386AH,Vlissingen,51.4657829,3.5921771,griep
-v-0059,Daan Jansen,568813480,De Tuinderij,30,4387AK,Vlissingen,51.4712295,3.5943585,griep
-v-0060,Kees Jansen,331501107,De Tuinderij,30,4387AK,Vlissingen,51.4712295,3.5943585,pneum
-v-0061,Kees Jansen,331501107,De Tuinderij,30,4387AK,Vlissingen,51.4712295,3.5943585,griep
-v-0062,Pieter Brouwer,145324254,Martin Luther Kingstraat,38,4384HT,Vlissingen,51.4645904,3.553477,griep
-v-0063,Pieter Mulder,326965026,Boulevard Bankert,52a,4382AC,Vlissingen,51.4442935,3.5679252,griep
-v-0064,Kees de Groot,500570164,Singel,229-G13,,Vlissingen,51.450317,3.5781891,griep
-v-0065,Jan de Vries,106272251,Bloemenlaan,3,4382SB,Vlissingen,51.450663,3.5738007,griep
-v-0066,Johanna de Wit,589106181,Singel,80,4382LC,Vlissingen,51.4488671,3.5676732,griep
-v-0067,Ada van Leeuwen,408270172,Westerzicht,285,4385AK,Vlissingen,51.4632172,3.5891807,pneum
-v-0068,Ada van Leeuwen,408270172,Westerzicht,285,4385AK,Vlissingen,51.4632172,3.5891807,griep
-v-0069,Kees de Wit,231571471,Tulpenlaan,28-G2,,Vlissingen,51.4513096,3.5719832,griep
-v-0070,Daan Vos,437033545,Dreesstraat,27,4384DA,Vlissingen,51.458397,3.5575698,griep
-v-0071,Bram Visser,223955103,Rosenburglaan,12,4385JD,Vlissingen,51.4623291,3.5670339,griep
-v-0072,Niels Dijkstra,307569123,Scheldestraat,86a,4382LZ,Vlissingen,51.4492576,3.5724115,pneum
-v-0073,Johanna de Wit,617135411,Paardenstraat,43,4381AH,Vlissingen,51.442709,3.5811051,griep
-v-0074,Iris de Wit,661097298,Paardenstraat,43,4381AH,Vlissingen,51.442709,3.5811051,griep
-v-0075,Iris de Wit,661097298,Paardenstraat,43,4381AH,Vlissingen,51.442709,3.5811051,pneum
-v-0076,Hanna Kuipers,252390647,Jan van de Capellelaan,57,4383VB,Vlissingen,51.4575454,3.5765377,griep
-v-0077,Teun de Wit,431292383,Peperdijk,171,4381EN,Vlissingen,51.4446601,3.5750158,griep
-v-0078,Roos de Wit,282987708,Vrouwestraat,51-T,,Vlissingen,51.4442424,3.5755737,griep
-v-0079,Teun Visser,272472554,Paul Krugerstraat,251,4382MH,Vlissingen,51.4507797,3.5800254,griep
-v-0080,Lieke de Bruin,791156096,Lindekerspad,4,4386ER,Vlissingen,51.4692421,3.5919252,griep
-v-0081,Willem Dijkstra,766225239,Hogeweg,65,4382JC,Vlissingen,51.4524584,3.5653915,griep
-v-0082,Teun van Dijk,966441321,Goeman Borgesiusstraat,61-G9,,Vlissingen,51.4615013,3.5479432,griep
-v-0083,Sanne Dekker,457726659,Visserijkade,95,4382ZA,Vlissingen,51.4476717,3.5930152,griep
-v-0084,Hanna Jansen,723297642,Glacisstraat,44c,4381RK,Vlissingen,51.4458311,3.5721231,griep
-v-0085,Daan Peters,383939203,Bosjeslaan,17-G11,,Vlissingen,51.4504731,3.5724303,griep
-v-0086,Niels de Wit,649427725,Sint Maartenlaan,4,4383AR,Vlissingen,51.4560089,3.5575652,pneum
-v-0087,Johanna Vos,755074646,Van Hallstraat,11,4384BL,Vlissingen,51.4577755,3.5547569,griep
-v-0088,Niels Jansen,456137646,Scheldestraat,1-205,4381RP,Vlissingen,51.4465308,3.5743608,griep
-v-0089,Anna Jansen,890425747,Scheldestraat,1-205,4381RP,Vlissingen,51.4465308,3.5743608,griep
-v-0090,Sanne Jansen,190331987,Scheldestraat,1-205,4381RP,Vlissingen,51.4465308,3.5743608,griep
-v-0091,Sanne Visser,728559055,Rommestraat,2,4384DJ,Vlissingen,51.4621797,3.5576612,pneum
-v-0092,Anna Hendriks,150944251,Klipperkade,3,4382ZM,Vlissingen,51.4468747,3.5864591,griep
-v-0093,Sanne Hendriks,222512866,Klipperkade,3,4382ZM,Vlissingen,51.4468747,3.5864591,griep
-v-0094,Willem Post,589753022,Papegaaienburg,3,4386DA,Vlissingen,51.4649467,3.5818132,griep
-v-0095,Anna Visser,915426092,Hercules Segherslaan,1,4383VG,Vlissingen,51.4598566,3.5705114,griep
-v-0096,Marijke Mulder,768093326,Tobagolaan,8-G4,,Vlissingen,51.4554811,3.5575612,pneum
-v-0097,Ada Maas,259976945,Zonnekers,13,4386EM,Vlissingen,51.4691237,3.5908773,griep
-v-0098,Roos van Leeuwen,128470501,Vredehoflaan,516,4382CJ,Vlissingen,51.4536191,3.5615125,griep
-v-0099,Otto van Leeuwen,212112922,Vredehoflaan,516,4382CJ,Vlissingen,51.4536191,3.5615125,griep
-v-0100,Iris Brouwer,728216139,Salvador Dalístraat,20,4382KC,Vlissingen,51.4544987,3.5662892,griep
-v-0101,Carla de Vries,643964502,Vredehoflaan,628,4382CK,Vlissingen,51.4540482,3.5599937,griep
-v-0102,Carla Visser,554736366,De Insulindestraat,46,4381NR,Vlissingen,51.4466459,3.5817262,pneum
-v-0103,Teun Jansen,306695121,Walstraat,120,4381GS,Vlissingen,51.4448254,3.5737034,griep
-v-0104,Iris van den Berg,495937721,Zuiderbaan,19,4386CK,Vlissingen,51.464912,3.5857935,griep
-v-0105,Pieter Hendriks,286579273,Ridderspoorlaan,27,4382PH,Vlissingen,51.4517135,3.5709841,griep
-v-0106,Iris de Bruin,516934399,Offenbachlaan,33,4384MH,Vlissingen,51.4650487,3.5480798,griep
-v-0107,Daan Dijkstra,480883476,Bakkersgang,21,4381JD,Vlissingen,51.4427967,3.5710908,griep
-v-0108,Bram Brouwer,216186328,Bonenburg,50,4385HK,Vlissingen,51.4636895,3.5713944,griep
-v-0109,Roos Hendriks,695772727,Vredehoflaan,776,4382CK,Vlissingen,51.4539455,3.5602294,griep
-v-0110,Sem Hendriks,416579541,Sint Kruislaan,55,4383AJ,Vlissingen,51.4553273,3.5579027,griep
-v-0111,Otto Bakker,843527961,Van Houtenplein,1-G1,,Vlissingen,51.4578666,3.5568238,griep
-v-0112,Otto de Boer,965620633,Kenau Hasselaarstraat,87,4382AH,Vlissingen,51.4466048,3.5638775,pneum
-v-0113,Willem Dekker,612454885,Koudekerkseweg,32,4382EC,Vlissingen,51.4492088,3.565611,griep
-v-0114,Femke Hendriks,872692036,Van de Spiegelstraat,71-G,,Vlissingen,51.4493468,3.5784549,griep
-v-0115,Sem van Leeuwen,295238197,Sottegemstraat,102,4382ER,Vlissingen,51.4508806,3.5694499,griep
-v-0116,Otto Dekker,482352152,Paul Krugerstraat,251a,4382MH,Vlissingen,51.4507847,3.5801218,griep
-v-0117,Johanna van der Meer,512277722,Westerzicht,500,4385BS,Vlissingen,51.4614866,3.5854162,griep
-v-0118,Hanna Kuipers,958827175,Boulevard Bankert,334,4382AC,Vlissingen,51.4469379,3.5629146,griep
-v-0119,Els Kuipers,990770126,Haagland,2,4386GM,Vlissingen,51.4673958,3.5635579,griep
-v-0120,Lieke Bos,833369854,President Rooseveltlaan,730,4382VX,Vlissingen,51.455321,3.5780053,griep
-v-0121,Femke Post,958249404,Bloemenlaan,37,4382SB,Vlissingen,51.4517897,3.5728755,griep
-v-0122,Femke de Wit,595815534,Wagnerlaan,3,4384LJ,Vlissingen,51.4632282,3.5453124,griep
-v-0123,Carla Dekker,820011174,Jacob van Campenstraat,32,4383BP,Vlissingen,51.4566316,3.5657251,griep
-v-0124,Johanna Bos,813588649,Papaverlaan,3,4382PM,Vlissingen,51.4523443,3.5711471,griep
-v-0125,Pieter de Groot,832757676,Hellingbaan,81,4381NN,Vlissingen,51.4449401,3.5742158,griep
-v-0126,Hanna de Groot,133885616,Hellingbaan,81,4381NN,Vlissingen,51.4449401,3.5742158,pneum
-v-0127,Iris Vos,844327050,Merkenburg,23,4385ET,Vlissingen,51.4613934,3.5743919,griep
-v-0128,Iris Vos,844327050,Merkenburg,23,4385ET,Vlissingen,51.4613934,3.5743919,pneum
-v-0129,Roos Brouwer,178258441,Korenbloemlaan,24,4382PD,Vlissingen,51.4513299,3.5705066,pneum
-v-0130,Carla Peters,564241891,Anjelierenlaan,99,4382VE,Vlissingen,51.4531885,3.575667,griep
-v-0131,Sem Bos,944131426,Paul Krugerstraat,311,4382MJ,Vlissingen,51.450224,3.5821772,pneum
-v-0132,Willem de Wit,256181287,Leeghwaterstraat,23,4382JJ,Vlissingen,51.452761,3.5652569,griep
-v-0133,Ada Bakker,420548968,De Kota Baroestraat,57,4381NX,Vlissingen,51.4497382,3.5799658,griep
-v-0134,Lieke van den Berg,298034487,Boulevard Evertsen,28,4382AD,Vlissingen,51.449186,3.560664,griep
-v-0135,Bram van den Berg,662543373,Boulevard Evertsen,28,4382AD,Vlissingen,51.449186,3.560664,pneum
-v-0136,Hendrik de Vries,104801359,Rommestraat,6-G8,,Vlissingen,51.4622646,3.5582005,pneum
-v-0137,Otto van der Meer,942304007,Van der Manderestraat,42,4381VS,Vlissingen,51.4490145,3.5748115,griep
-v-0138,Pieter de Bruin,962520111,Ferdinand Bollaan,23,4382RB,Vlissingen,51.4538048,3.5714783,griep
-v-0139,Pieter de Bruin,962520111,Ferdinand Bollaan,23,4382RB,Vlissingen,51.4538048,3.5714783,pneum
-v-0140,Lieke de Bruin,708593872,Van Dishoeckstraat,119,4381TW,Vlissingen,51.4486426,3.5783511,griep
-v-0141,Roos Dijkstra,506695554,Breestraat,7,4381HZ,Vlissingen,51.4421398,3.5717213,griep
-v-0142,Teun Visser,539614038,Glacisstraat,80,4381RL,Vlissingen,51.4463316,3.5733552,griep
-v-0143,Carla Hendriks,279944421,Vrijdomweg,2,4382BB,Vlissingen,51.4518308,3.5638517,pneum
-v-0144,Els Smits,555687764,Molenstraat,48,4381HX,Vlissingen,51.4427632,3.57235,griep
-v-0145,Hendrik Hendriks,659055156,Stadhuisplein,22-K109,4382LJ,Vlissingen,51.4480615,3.5682186,griep
-v-0146,Teun Bos,514369632,Van Dishoeckstraat,594,4382XW,Vlissingen,51.4515735,3.5799619,griep
-v-0147,Pieter Bos,188612622,Van Dishoeckstraat,594,4382XW,Vlissingen,51.4515735,3.5799619,pneum
-v-0148,Pieter Kuipers,939824450,De Kempenaerstraat,27,4384KA,Vlissingen,51.4605439,3.5494264,griep
-v-0149,Gijs van Leeuwen,197055667,Van Dishoeckstraat,95,4381TW,Vlissingen,51.4486391,3.5784083,pneum
-v-0150,Daan Brouwer,919733177,Nieuwe Kruidmolenweg,17,4382WB,Vlissingen,51.4524374,3.6065958,griep
-v-0151,Lieke van Dijk,417458782,Heideveld,18,4386GP,Vlissingen,51.468343,3.5620082,griep
-v-0152,Bram Dijkstra,846626858,Clijverstraat,7,4381PT,Vlissingen,51.4468978,3.5712601,griep
-v-0153,Bram Smits,204237907,Paauwenburgweg,14,4384JE,Vlissingen,51.4626345,3.5510706,griep
-v-0154,Roos Post,332381365,Scheldestraat,34,4381RT,Vlissingen,51.4475571,3.5738366,griep
-v-0155,Kees Post,611060139,Scheldestraat,34,4381RT,Vlissingen,51.4475571,3.5738366,griep
-v-0156,Gijs Vos,870836894,Nieuwstraat,230-GC,,Vlissingen,51.4427268,3.5780433,griep
-v-0157,Carla Bos,374672647,Leeghwaterstraat,86,4382JP,Vlissingen,51.4537492,3.5647477,pneum
-v-0158,Lieke Hendriks,152629725,Meidoornlaan,14,4382TK,Vlissingen,51.4523475,3.5772983,pneum
-v-0159,Lieke Hendriks,152629725,Meidoornlaan,14,4382TK,Vlissingen,51.4523475,3.5772983,griep
-v-0160,Teun Kuipers,151852868,Gerbrandystraat,92,4384NK,Vlissingen,51.4629941,3.5591809,pneum
-v-0161,Sem Kuipers,576687716,Gerbrandystraat,92,4384NK,Vlissingen,51.4629941,3.5591809,griep
-v-0162,Anna Smits,368274494,Van Dishoeckstraat,59,4381TV,Vlissingen,51.44793,3.5782659,griep
-v-0163,Lieke Dekker,269126661,Bosjeslaan,66,4382PV,Vlissingen,51.4527934,3.5719041,griep
-v-0164,Sanne Smits,533695776,De Meesterstraat,25,4384HE,Vlissingen,51.4619053,3.5516998,griep
-v-0165,Kees Mulder,748061381,Sabalaan,8,4383AN,Vlissingen,51.4563367,3.5569538,griep
-v-0166,Femke Jansen,287655465,Troelstraweg,357,4384GS,Vlissingen,51.4632611,3.5562895,griep
-v-0167,Pieter Jansen,170324795,Troelstraweg,357,4384GS,Vlissingen,51.4632611,3.5562895,griep
-v-0168,Els Bakker,581055263,Gerbrandystraat,156,4384NM,Vlissingen,51.4655298,3.5583121,griep
-v-0169,Sem Mulder,860321113,Albert Cuyplaan,4,4383XG,Vlissingen,51.455783,3.5788198,pneum
-v-0170,Femke de Vries,225496586,Verkuijl Quakkelaarstraat,50,4381TP,Vlissingen,51.4476658,3.5709276,griep
-v-0171,Femke Dijkstra,637589725,Schaepmanstraat,143,4384CX,Vlissingen,51.4622326,3.5555718,griep
-v-0172,Anna de Groot,841292085,Hobeinstraat,57,4381PB,Vlissingen,51.4467627,3.5703958,griep
-v-0173,Willem Vos,845873507,Westerzicht,483,4385BH,Vlissingen,51.4605907,3.5883334,griep
-v-0174,Lieke van Leeuwen,201559511,Burgemeester van Woelderenlaan,1-08,4382CL,Vlissingen,51.4514246,3.5584306,griep
-v-0175,Pieter van Leeuwen,835074213,Burgemeester van Woelderenlaan,1-08,4382CL,Vlissingen,51.4514246,3.5584306,griep
-v-0176,Sem de Wit,696881998,Clijverstraat,26,4381PW,Vlissingen,51.4470381,3.5722024,pneum
-v-0177,Anna de Wit,605751201,Clijverstraat,26,4381PW,Vlissingen,51.4470381,3.5722024,griep
-v-0178,Lieke Smits,562016491,Aagje Dekenstraat,12d,4381RZ,Vlissingen,51.4454982,3.5734045,griep
-v-0179,Iris van Leeuwen,655476064,Van Beethovenlaan,12,4384KN,Vlissingen,51.4595445,3.5459349,griep
-v-0180,Hanna Bakker,894578030,Duijvendrechtstraat,22,4382EV,Vlissingen,51.4499459,3.5660711,griep
-v-0181,Ada Smits,196603791,Grote Markt,27c,4381JB,Vlissingen,51.4417764,3.5716419,griep
-v-0182,Carla Maas,788486214,De Tuinderij,22,4387AK,Vlissingen,51.4708534,3.5942402,griep
-v-0183,Carla Maas,788486214,De Tuinderij,22,4387AK,Vlissingen,51.4708534,3.5942402,pneum
-v-0184,Carla de Groot,892389928,Irislaan,189,4383VT,Vlissingen,51.4567296,3.5770239,griep
-v-0185,Willem Vos,452015856,Hellingbaan,333,4381NN,Vlissingen,51.4458748,3.5748421,griep
-v-0186,Gijs de Groot,150929390,Crocuslaan,4,4382VA,Vlissingen,51.4515398,3.5740385,griep
-v-0187,Ada van der Meer,657553232,Verdilaan,8,4384LE,Vlissingen,51.4632789,3.545861,griep
-v-0188,Hanna van der Meer,683971700,Verdilaan,8,4384LE,Vlissingen,51.4632789,3.545861,griep
-v-0189,Kees Visser,634015898,Kommedijk,2-G18,,Vlissingen,51.4442998,3.5693635,pneum
-v-0190,Niels Smits,455855663,Paauwenburgweg,19,4384JA,Vlissingen,51.4590577,3.5510851,griep
-v-0191,Lieke de Boer,980582830,Govert Flincklaan,7,4383WB,Vlissingen,51.4586905,3.5696915,griep
-v-0192,Femke de Bruin,228727819,Voorstraat,18-G9,,Vlissingen,51.4676996,3.592772,pneum
-v-0193,Carla Peters,953579451,Kanariesprenk,35,4386DE,Vlissingen,51.4666189,3.5766712,pneum
-v-0194,Carla Peters,953579451,Kanariesprenk,35,4386DE,Vlissingen,51.4666189,3.5766712,griep
-v-0195,Kees van der Meer,609019284,Kenau Hasselaarstraat,151,4382AH,Vlissingen,51.4468991,3.5632767,griep
-v-0196,Hendrik Peters,791503951,Marnixplein,21,4386AA,Vlissingen,51.4644633,3.5916834,griep
-v-0197,Roos Peters,708171163,Marnixplein,21,4386AA,Vlissingen,51.4644633,3.5916834,griep
-v-0198,Roos de Vries,276814903,Anjelierenlaan,157,4382VG,Vlissingen,51.4529122,3.5777937,griep
-v-0199,Hanna Kuipers,185455980,Gasthuisstraat,20-G31,,Vlissingen,51.4418528,3.5703264,pneum
-v-0200,Otto Kuipers,482609953,Gasthuisstraat,20-G31,,Vlissingen,51.4418528,3.5703264,pneum
-v-0201,Otto Bakker,965916558,Papegaaienburg,38,4386DA,Vlissingen,51.4656081,3.5827384,griep
-v-0202,Daan Bakker,900322044,Papegaaienburg,38,4386DA,Vlissingen,51.4656081,3.5827384,griep
-v-0203,Daan Bakker,900322044,Papegaaienburg,38,4386DA,Vlissingen,51.4656081,3.5827384,pneum
-v-0204,Johanna Kuipers,159973843,Westerzicht,661,4385CC,Vlissingen,51.4600121,3.5859551,griep
-v-0205,Carla de Vries,746738900,Mesdaglaan,23,4382TB,Vlissingen,51.4545565,3.5750499,griep
-v-0206,Kees de Vries,572907242,Mesdaglaan,23,4382TB,Vlissingen,51.4545565,3.5750499,griep
-v-0207,Roos Dekker,709569014,Pablo Picassoplein,165,4382KB,Vlissingen,51.4537869,3.5675424,griep
-v-0208,Roos Bos,781325055,Steve Bikostraat,7,4384HS,Vlissingen,51.4655304,3.5545739,griep
-v-0209,Niels Dijkstra,791158093,Nieuw Bonedijkelaan,111,4382HD,Vlissingen,51.4520655,3.5675672,griep
-v-0210,Kees van Dijk,154160568,Hellingbaan,265,4381NN,Vlissingen,51.4454732,3.5747238,griep
-v-0211,Lieke van Dijk,557524246,Hellingbaan,265,4381NN,Vlissingen,51.4454732,3.5747238,griep
-v-0212,Niels de Vries,676511946,De Visserstraat,11,4384JS,Vlissingen,51.4612935,3.5499705,griep
-v-0213,Kees van der Meer,824800953,Doctor Ottestraat,103h,4382LV,Vlissingen,51.4493668,3.570675,griep
-v-0214,Hendrik de Vries,543676043,Dokter Gallandatstraat,1-01,4382LD,Vlissingen,51.4480391,3.5671731,griep
-v-0215,Niels de Groot,904426348,Palingstraat,66,4381AG,Vlissingen,51.4429464,3.5808832,griep
-v-0216,Gijs Visser,850395574,Beursstraat,20,4381CD,Vlissingen,51.4410946,3.5737514,griep
-v-0217,Femke Peters,337935543,Westerzicht,418,4385BN,Vlissingen,51.4612675,3.5868462,griep
-v-0218,Ada Mulder,367301611,Josine Reulinglaan,20,4385KX,Vlissingen,51.4594556,3.5623398,griep
-v-0219,Gijs van Leeuwen,128679359,Pablo Picassoplein,101,4382KB,Vlissingen,51.4540145,3.5668543,griep
-v-0220,Gijs van Leeuwen,128679359,Pablo Picassoplein,101,4382KB,Vlissingen,51.4540145,3.5668543,pneum
-v-0221,Jan Bos,945433803,Anjelierenlaan,106,4382VH,Vlissingen,51.4529792,3.5758378,griep
-v-0222,Kees Vos,282427168,Wilhelminastraat,12a,4381BP,Vlissingen,51.4429496,3.5777655,pneum
-v-0223,Iris van den Berg,451420810,Assumburg,7,4385EG,Vlissingen,51.4631243,3.5684393,griep
-v-0224,Niels Hendriks,949144083,Boulevard Bankert,676,4382AC,Vlissingen,51.4479234,3.5620671,griep
-v-0225,Marijke Kuipers,360799802,Frans Halslaan,4,4382RG,Vlissingen,51.4533655,3.5703434,griep
-v-0226,Johanna van Leeuwen,479935786,Schubertlaan,13,4384LL,Vlissingen,51.4628739,3.5420123,griep
-v-0227,Els van den Berg,557624101,Bizetlaan,18,4384KR,Vlissingen,51.4609304,3.5442671,griep
-v-0228,Els van den Berg,557624101,Bizetlaan,18,4384KR,Vlissingen,51.4609304,3.5442671,pneum
-v-0229,Niels Bos,830990045,De Kungsholmstraat,61,4381NZ,Vlissingen,51.4486456,3.5793537,griep
-v-0230,Sem Bakker,763031355,Van Dishoeckstraat,205,4382XR,Vlissingen,51.4508088,3.5790613,griep
-v-0231,Marijke Smits,201014695,Van Hogendorpweg,68,4384HA,Vlissingen,51.4633091,3.5543278,griep
-v-0232,Anna van der Meer,419915990,Van Hoorn van Burghstraat,27,4381ST,Vlissingen,51.4483327,3.5764031,griep
-v-0233,Roos Bos,927805650,Aagje Dekenstraat,5,4381RM,Vlissingen,51.4456038,3.5723446,griep
-v-0234,Roos Bos,420036921,Aagje Dekenstraat,5,4381RM,Vlissingen,51.4456038,3.5723446,pneum
-v-0235,Ada Maas,785093588,Sint Eustatiuslaan,18-G2,,Vlissingen,51.4550137,3.5586014,griep
-v-0236,Willem de Groot,973744716,Bloemenlaan,188,4383TD,Vlissingen,51.456215,3.5737167,griep
-v-0237,Pieter Bos,875085180,H. Roland Holstlaan,1,4385KJ,Vlissingen,51.4635449,3.56538,griep
-v-0238,Anna Bos,476872662,H. Roland Holstlaan,1,4385KJ,Vlissingen,51.4635449,3.56538,griep
-v-0239,Ada Kuipers,650124492,Vredehoflaan,91,4383AB,Vlissingen,51.4547147,3.5590745,griep
-v-0240,Gijs Mulder,564745200,De Stoppelaarstraat,1-G5,,Vlissingen,51.4660901,3.5905136,pneum
-v-0241,Johanna Bos,139012928,Vredehoflaan,280,4382CJ,Vlissingen,51.4536363,3.5599805,griep
-v-0242,Anna van Dijk,833439388,Rosenburglaan,283,4385KE,Vlissingen,51.4634005,3.5640922,pneum
-v-0243,Hendrik Visser,389936868,Badhuisstraat,19,4381LM,Vlissingen,51.4455984,3.5711981,griep
-v-0244,Pieter de Groot,264187799,Westerhavenweg,6,4382NM,Vlissingen,51.4496082,3.5958454,griep
-v-0245,Bram van Leeuwen,968101483,Merkenburg,9,4385ET,Vlissingen,51.4617157,3.5745309,pneum
-v-0246,Femke van Leeuwen,977178389,Merkenburg,9,4385ET,Vlissingen,51.4617157,3.5745309,griep
-v-0247,Femke Kuipers,110901368,Verkuijl Quakkelaarstraat,233,4381TN,Vlissingen,51.4487716,3.5756701,pneum
-v-0248,Roos Kuipers,101202404,Verkuijl Quakkelaarstraat,233,4381TN,Vlissingen,51.4487716,3.5756701,griep
-v-0249,Willem Kuipers,669355033,Verkuijl Quakkelaarstraat,233,4381TN,Vlissingen,51.4487716,3.5756701,griep
-v-0250,Otto Kuipers,455719391,Zuiderbaan,32,4386CG,Vlissingen,51.4658317,3.5849698,griep
-v-0251,Ada Kuipers,673615893,Zuiderbaan,32,4386CG,Vlissingen,51.4658317,3.5849698,griep
-v-0252,Johanna van den Berg,108250921,Westerzicht,260,4385AW,Vlissingen,51.4626619,3.5896086,griep
-v-0253,Hendrik Dijkstra,598501927,Branderijstraat,3,4381HK,Vlissingen,51.4426373,3.5748673,griep
-v-0254,Carla van den Berg,983999557,De Kungsholmstraat,69,4381NZ,Vlissingen,51.4486341,3.5798289,griep
-v-0255,Sem van der Meer,719928412,Hogeweg,185,4382RH,Vlissingen,51.45407,3.5697302,griep
-v-0256,Pieter van der Meer,575200741,Sint Eustatiuslaan,11,4383AE,Vlissingen,51.4552025,3.5590518,griep
-v-0257,Ada van der Meer,174490483,Sint Eustatiuslaan,11,4383AE,Vlissingen,51.4552025,3.5590518,pneum
-v-0258,Teun van Dijk,969104741,Gildeweg,17a,4383NH,Vlissingen,51.4561337,3.5845785,griep
-v-0259,Ada de Bruin,179829762,Stroomweg,22,4382WX,Vlissingen,51.4569829,3.5908859,pneum
-v-0260,Marijke Dijkstra,627555883,Wijenburg,52,4385GR,Vlissingen,51.4646249,3.5753677,griep
-v-0261,Roos de Boer,267612321,Zeilmaker,46,4381KX,Vlissingen,51.4458354,3.5816505,griep
-v-0262,Els de Bruin,770808967,Rosenburglaan,219,4385KL,Vlissingen,51.4605073,3.5641925,griep
-v-0263,Els de Bruin,770808967,Rosenburglaan,219,4385KL,Vlissingen,51.4605073,3.5641925,pneum
-v-0264,Jan de Wit,850476100,Gildeweg,19e,4383NH,Vlissingen,51.4565086,3.5847168,griep
-v-0265,Willem de Wit,153527754,Gildeweg,19e,4383NH,Vlissingen,51.4565086,3.5847168,griep
-v-0266,Daan Maas,836625304,Van Raaltestraat,59,4384GC,Vlissingen,51.4637286,3.557907,griep
-v-0267,Otto de Bruin,789738715,Coosje Buskenstraat,188,4381LJ,Vlissingen,51.4448828,3.5716867,griep
-v-0268,Lieke Visser,582310520,Batenburg,74,4385HD,Vlissingen,51.46465,3.5727277,pneum
-v-0269,Iris Post,141728917,Bloemenlaan,89a,4382SG,Vlissingen,51.4535122,3.5727308,griep
-v-0270,Lieke Vos,912649926,Scheldestraat,52b,4381RV,Vlissingen,51.448051,3.5735193,griep
-v-0271,Kees Vos,878062269,Scheldestraat,52b,4381RV,Vlissingen,51.448051,3.5735193,griep
-v-0272,Ada Smits,561660256,Nieuwe Vlissingseweg,115,4387AB,Vlissingen,51.4696473,3.595307,griep
-v-0273,Pieter Smits,194396460,Nieuwe Vlissingseweg,115,4387AB,Vlissingen,51.4696473,3.595307,griep
-v-0274,Carla Bakker,381510876,Talmalaan,29,4384KE,Vlissingen,51.4592337,3.5496186,griep
-v-0275,Anna Peters,165944547,Suze Groeneweglaan,11,4385KB,Vlissingen,51.4635091,3.5634289,griep
-v-0276,Femke de Bruin,240817564,Nieuwe Vlissingseweg,211,4387AE,Vlissingen,51.4735196,3.5972921,pneum
-v-0277,Hanna Jansen,171247796,Gravestraat,12,4381AP,Vlissingen,51.4421805,3.578488,pneum
-v-0278,Hendrik Vos,601885259,Adriaen Coortelaan,5-A136,4383SR,Vlissingen,51.4571449,3.571062,griep
-v-0279,Ada Brouwer,575300875,Vincent van Goghlaan,289,4382SW,Vlissingen,51.4549014,3.5777911,pneum
-v-0280,Marijke Post,812372475,Groenewoud,38,4381HE,Vlissingen,51.442559,3.5756418,griep
-v-0281,Els Post,479687924,Groenewoud,38,4381HE,Vlissingen,51.442559,3.5756418,griep
-v-0282,Sanne Post,816947508,Van Doornlaan,6,4386AK,Vlissingen,51.4659863,3.5924521,griep
-v-0283,Femke de Boer,187127281,Productweg,22,4387PG,Vlissingen,51.4718927,3.5901161,griep
-v-0284,Carla de Boer,916267374,Productweg,22,4387PG,Vlissingen,51.4718927,3.5901161,pneum
-v-0285,Pieter Bakker,440737357,Haagland,34,4386GM,Vlissingen,51.4677455,3.5617459,pneum
-v-0286,Anna Bakker,339707392,Westerzicht,131,4385AD,Vlissingen,51.4634699,3.584835,griep
-v-0287,Hendrik Smits,599323838,Kanariesprenk,229,4386DK,Vlissingen,51.4664837,3.5780282,griep
-v-0288,Anna de Wit,127528155,Coosje Buskenstraat,43a,4381LB,Vlissingen,51.4441571,3.5695442,griep
-v-0289,Sem de Vries,779595890,Vredehoflaan,822,4382CK,Vlissingen,51.454025,3.5602482,griep
-v-0290,Lieke van Leeuwen,706128382,Schutterijstraat,113,4381GM,Vlissingen,51.4441845,3.5716124,griep
-v-0291,Ada Kuipers,289631208,Kasteelstraat,38,4381RD,Vlissingen,51.4467722,3.5729792,griep
-v-0292,Bram Jansen,259124291,Wilhelminastraat,67,4381BN,Vlissingen,51.4430548,3.5772531,griep
-v-0293,Els Brouwer,590699878,Sabalaan,1,4383AN,Vlissingen,51.4557798,3.5569233,pneum
-v-0294,Sem Brouwer,903126035,Sabalaan,1,4383AN,Vlissingen,51.4557798,3.5569233,pneum
-v-0295,Sem Brouwer,903126035,Sabalaan,1,4383AN,Vlissingen,51.4557798,3.5569233,griep
-v-0296,Kees Visser,699577652,De Meesterstraat,45,4384HG,Vlissingen,51.4618941,3.5516682,griep
-v-0297,Teun Mulder,464620697,Boulevard De Ruyter,228,4381KH,Vlissingen,51.4408941,3.5705305,griep
-v-0298,Marijke van der Meer,718219594,Prins Hendrikweg,2-410,4382NS,Vlissingen,51.4487986,3.5870802,griep
-v-0299,Jan de Vries,507643938,Stadhuisplein,22-K108,4382LJ,Vlissingen,51.4479586,3.5683277,griep
-v-0300,Bram de Groot,523930069,Goeman Borgesiusstraat,43,4384JM,Vlissingen,51.4616358,3.5490277,griep
-v-0301,Pieter Hendriks,896882354,Toutenburg,34,4385GK,Vlissingen,51.4635038,3.5740885,griep
-v-0302,Hendrik Hendriks,475169864,Toutenburg,34,4385GK,Vlissingen,51.4635038,3.5740885,griep
-v-0303,Els Vos,622571047,Irislaan,177,4383VT,Vlissingen,51.4565876,3.5769428,griep
-v-0304,Sanne Vos,876196593,Irislaan,177,4383VT,Vlissingen,51.4565876,3.5769428,griep
-v-0305,Femke Bos,876226755,Verkuijl Quakkelaarstraat,13,4381PJ,Vlissingen,51.4476348,3.570173,griep
-v-0306,Pieter de Boer,376296343,Bouwen Ewoutstraat,82,4381PS,Vlissingen,51.4479125,3.572955,griep
-v-0307,Carla Bakker,582631798,Oranjedijk,60,4381AV,Vlissingen,51.4409354,3.5777619,griep
-v-0308,Marijke de Groot,491412708,Boulevard Evertsen,12,4382AD,Vlissingen,51.4489326,3.56105,griep
-v-0309,Marijke de Groot,491412708,Boulevard Evertsen,12,4382AD,Vlissingen,51.4489326,3.56105,pneum
-v-0310,Teun van Dijk,248787044,Boulevard Bankert,618,4382AC,Vlissingen,51.4478163,3.5622209,pneum
-v-0311,Daan Kuipers,989454071,Jan Allemanstraat,1-G10,,Vlissingen,51.4441668,3.5769553,griep
-v-0312,Lieke Smits,287983079,Schuitvaartgracht,383,4383BX,Vlissingen,51.4562372,3.5685551,griep
-v-0313,Els Visser,173123752,President Rooseveltlaan,756,4382VX,Vlissingen,51.4551605,3.578955,griep
-v-0314,Otto Visser,857036476,President Rooseveltlaan,756,4382VX,Vlissingen,51.4551605,3.578955,griep
-v-0315,Otto Visser,857036476,President Rooseveltlaan,756,4382VX,Vlissingen,51.4551605,3.578955,pneum
-v-0316,Hendrik van den Berg,396058383,Albionkade,329,4381KZ,Vlissingen,51.4460904,3.5824334,pneum
-v-0317,Hendrik van den Berg,396058383,Albionkade,329,4381KZ,Vlissingen,51.4460904,3.5824334,griep
-v-0318,Ada de Vries,151811830,Heideveld,10,4386GP,Vlissingen,51.4681681,3.5627959,griep
-v-0319,Niels Bakker,356988090,Clijverstraat,10,4381PW,Vlissingen,51.4468242,3.5716213,pneum
-v-0320,Kees Peters,513636742,Gerrit Rietveldstraat,63,4383CE,Vlissingen,51.4569093,3.5666599,pneum
-v-0321,Iris de Boer,645949693,Strandwal,95,4386HJ,Vlissingen,51.4686565,3.5653169,pneum
-v-0322,Johanna Hendriks,364948024,Hercules Segherslaan,242,4383VS,Vlissingen,51.4560867,3.5764349,griep
-v-0323,Pieter Post,865289694,Zuidbeekseweg,10,4386ND,Vlissingen,51.4641614,3.5610304,pneum
-v-0324,Willem Dijkstra,387371436,Westerstraat,15,4381JX,Vlissingen,51.4416902,3.5708525,griep
-v-0325,Sanne Visser,619290043,De Meesterstraat,1-G2,,Vlissingen,51.4619661,3.5515184,griep
-v-0326,Lieke de Bruin,509322645,Vredehoflaan,152,4382CH,Vlissingen,51.4529535,3.5604661,griep
-v-0327,Otto Kuipers,139641336,Tak van Poortvlietstraat,15,4384CL,Vlissingen,51.4610453,3.555064,griep
-v-0328,Ada Smits,365191917,Boulevard De Ruyter,192,4381KG,Vlissingen,51.440848,3.5705679,griep
-v-0329,Roos de Bruin,623903982,Piet Heinkade,21,4381NC,Vlissingen,51.4424276,3.5913013,griep
-v-0330,Kees Brouwer,273494879,Hendrikstraat,70,4381AB,Vlissingen,51.4432389,3.5787939,griep
-v-0331,Els de Groot,117236494,Nieuwe Vlissingseweg,57,4387AA,Vlissingen,51.468126,3.5944983,griep
-v-0332,Iris Smits,970115179,Schuitvaartgracht,1,4382GG,Vlissingen,51.4492359,3.5664393,griep
-v-0333,Johanna Brouwer,123299482,Bossenburg,48,4385EA,Vlissingen,51.462106,3.5759823,griep
-v-0334,Iris Mulder,391740878,Goeman Borgesiusstraat,85,4384JN,Vlissingen,51.462149,3.548306,griep
-v-0335,Femke Bos,549891225,Vredehoflaan,670,4382CK,Vlissingen,51.4541902,3.5599594,griep
-v-0336,Teun Jansen,132490043,Sterkenburg,66,4385GG,Vlissingen,51.4625899,3.5731846,griep
-v-0337,Otto Visser,459504198,Gasthuisstraat,17-G15,,Vlissingen,51.4424824,3.5695676,griep
-v-0338,Lieke Post,276241654,Coosje Buskenstraat,88,4381LG,Vlissingen,51.4438625,3.5696447,griep
-v-0339,Teun van den Berg,744282640,Prins Hendrikweg,2-505,4382NS,Vlissingen,51.4487451,3.5866647,griep
-v-0340,Teun van den Berg,744282640,Prins Hendrikweg,2-505,4382NS,Vlissingen,51.4487451,3.5866647,pneum
-v-0341,Niels van der Meer,884305272,Pablo Picassoplein,53,4382KB,Vlissingen,51.4529235,3.5667547,griep
-v-0342,Hanna Dekker,686036566,Kreekrug,31,4386GR,Vlissingen,51.4692055,3.562854,pneum
-v-0343,Hanna Dekker,686036566,Kreekrug,31,4386GR,Vlissingen,51.4692055,3.562854,griep
-v-0344,Hanna Peters,530554549,Paul Krugerstraat,49,4382MB,Vlissingen,51.449597,3.5734349,griep
-v-0345,Pieter Mulder,393869234,De Beaufortstraat,37-G13,,Vlissingen,51.4601653,3.5565248,griep
-v-0346,Johanna van den Berg,227287186,Westerzicht,721,4385CD,Vlissingen,51.4603923,3.584695,griep
-v-0347,Anna van den Berg,373546506,Westerzicht,721,4385CD,Vlissingen,51.4603923,3.584695,pneum
-v-0348,Sem Bakker,427480711,Schutterijstraat,163,4381GN,Vlissingen,51.4441152,3.5714877,pneum
-v-0349,Hanna Mulder,102104694,Crocuslaan,7,4382VA,Vlissingen,51.4517865,3.5740052,griep
-v-0350,Hanna de Vries,567806121,Anjelierenlaan,32,4382PX,Vlissingen,51.4527976,3.5706387,griep
-v-0351,Marijke de Vries,788409967,Duijvendrechtstraat,19,4382ET,Vlissingen,51.4497626,3.56592,pneum
-v-0352,Ada Vos,943821186,Hobeinstraat,99,4381PC,Vlissingen,51.4471834,3.5693285,griep
-v-0353,Willem Brouwer,579913399,Tak van Poortvlietstraat,7,4384CL,Vlissingen,51.4608445,3.5551071,griep
-v-0354,Hendrik Mulder,958871607,Marnixplein,15,4386AA,Vlissingen,51.4645544,3.591974,griep
-v-0355,Roos Peters,330132878,Schaepmanstraat,185,4384CZ,Vlissingen,51.4626525,3.5554395,pneum
-v-0356,Hanna Post,762762457,Schaepmanstraat,183,4384CZ,Vlissingen,51.4625712,3.5553645,griep
-v-0357,Iris van Leeuwen,226442147,Meidoornlaan,27,4382TJ,Vlissingen,51.452639,3.5770921,pneum
-v-0358,Femke van den Berg,900508498,Pablo Picassoplein,49,4382KB,Vlissingen,51.4532801,3.5665865,griep
-v-0359,Carla van der Meer,289486762,Gerbrandystraat,63,4384NC,Vlissingen,51.4629073,3.5586707,pneum
-v-0360,Johanna van der Meer,317852772,Gerbrandystraat,63,4384NC,Vlissingen,51.4629073,3.5586707,griep
-v-0361,Lieke van der Meer,608273855,Batenburg,69,4385HG,Vlissingen,51.4649276,3.5724551,pneum
-v-0362,Bram van Leeuwen,460773689,Boulevard De Ruyter,32,4381KB,Vlissingen,51.4405309,3.5719656,pneum
-v-0363,Femke Mulder,389903115,President Rooseveltlaan,1-T,,Vlissingen,51.4536798,3.556695,pneum
-v-0364,Els van Dijk,205009803,Sarazijnstraat,11,4381CL,Vlissingen,51.4413345,3.5747318,griep
-v-0365,Anna Visser,990044129,Singel,2,4382LA,Vlissingen,51.4476863,3.5664198,griep
-v-0366,Pieter Kuipers,296171384,Paul Krugerstraat,303,4382MJ,Vlissingen,51.4503121,3.5819666,pneum
-v-0367,Gijs Kuipers,105252025,Paul Krugerstraat,303,4382MJ,Vlissingen,51.4503121,3.5819666,griep
-v-0368,Gijs de Groot,550315706,Boulevard Bankert,540,4382AC,Vlissingen,51.4476346,3.5622224,griep
-v-0369,Otto Bos,434267454,Singel,355,4381VK,Vlissingen,51.4498289,3.579696,griep
-v-0370,Hendrik Peters,402123037,Vredehoflaan,542,4382CJ,Vlissingen,51.4535992,3.5613467,griep
-v-0371,Iris van den Berg,369836431,Verholen Vliet,32,4382NJ,Vlissingen,51.4521877,3.6034691,pneum
-v-0372,Niels Bos,936278353,Paul Krugerstraat,409,4382ML,Vlissingen,51.4499795,3.5840321,griep
-v-0373,Gijs van Dijk,951569399,Koudekerkseweg,2-5,4382EB,Vlissingen,51.4482064,3.5657007,griep
-v-0374,Kees Dekker,463159524,Anna Blamanlaan,106,4385KK,Vlissingen,51.4593156,3.5607451,griep
-v-0375,Hanna de Groot,273587213,Abraham Kuyperstraat,2-G7,,Vlissingen,51.4642626,3.5554896,griep
-v-0376,Bram Brouwer,227040053,Westerzicht,813,4385CG,Vlissingen,51.4624426,3.5831977,griep
-v-0377,Johanna Dekker,699766837,Coosje Buskenstraat,1,4381LA,Vlissingen,51.4438504,3.5688312,griep
-v-0378,Els Bakker,505110337,President Rooseveltlaan,762a,4382VX,Vlissingen,51.4550753,3.5794409,griep
-v-0379,Niels Vos,335937263,Lunenburg,30,4385EP,Vlissingen,51.4614701,3.5727479,griep
-v-0380,Kees de Boer,300129804,Menno van Coehoorngracht,22,4383BS,Vlissingen,51.4559914,3.5650108,griep
-v-0381,Bram Hendriks,831644588,Van Hallstraat,1,4384BL,Vlissingen,51.4577257,3.5548369,griep
-v-0382,Hanna Bakker,271892808,Martin Luther Kingstraat,72,4384HV,Vlissingen,51.4655655,3.554225,griep
-v-0383,Johanna Hendriks,868619334,Van der Manderestraat,13a,4381VR,Vlissingen,51.4491657,3.5740853,griep
-v-0384,Iris Brouwer,951039854,Groen van Prinstererlaan,14,4384CG,Vlissingen,51.4581434,3.5540861,griep
-v-0385,Otto van den Berg,541985152,Tooroplaan,20,4382VR,Vlissingen,51.4541623,3.577838,griep
-v-0386,Sem Hendriks,585504088,Van Dishoeckstraat,180,4381VA,Vlissingen,51.4476634,3.579011,griep
-v-0387,Kees Peters,505281806,Rubenslaan,154,4383WH,Vlissingen,51.4591088,3.5737063,griep
-v-0388,Sanne de Groot,324820082,Grenswegeling,10,4384NA,Vlissingen,51.4602714,3.5596708,griep
-v-0389,Iris van den Berg,955961440,Abraham Kuyperstraat,2-G10,,Vlissingen,51.4642286,3.555377,griep
-v-0390,Femke Dijkstra,330258783,Rembrandtlaan,5,4382RL,Vlissingen,51.4532914,3.5694836,griep
-v-0391,Daan de Bruin,692996400,Nieuwe Kruidmolenweg,1d,4382WB,Vlissingen,51.4544477,3.6029342,griep
-v-0392,Sem Bos,293073855,Pablo Picassoplein,9,4382KB,Vlissingen,51.4530342,3.5668394,griep
-v-0393,Sem Bos,293073855,Pablo Picassoplein,9,4382KB,Vlissingen,51.4530342,3.5668394,pneum
-v-0394,Kees Brouwer,258626690,Nieuwstraat,116,4381CW,Vlissingen,51.4419367,3.5758852,griep
-v-0395,Carla Brouwer,240464618,Nieuwstraat,116,4381CW,Vlissingen,51.4419367,3.5758852,pneum
-v-0396,Carla Brouwer,240464618,Nieuwstraat,116,4381CW,Vlissingen,51.4419367,3.5758852,griep
-v-0397,Marijke de Wit,179760415,Emmastraat,25,4381BD,Vlissingen,51.4417558,3.5781901,griep
-v-0398,Hendrik de Wit,176388576,Emmastraat,25,4381BD,Vlissingen,51.4417558,3.5781901,pneum
-v-0399,Sem de Wit,903068692,Emmastraat,25,4381BD,Vlissingen,51.4417558,3.5781901,pneum
+id,naam,straat,huisnr,postcode,plaats,lat,lon,soort
+v-0000,Hanna van der Meer,Jozef Israelslaan,62,4382VN,Vlissingen,51.453489,3.5767203,krant
+v-0001,Jan van der Meer,Coosje Buskenstraat,151,4381LD,Vlissingen,51.445205,3.5715162,folder
+v-0002,Kees Vos,Multatulilaan,1,4382BZ,Vlissingen,51.4526339,3.556649,folder
+v-0003,Pieter de Boer,Van Hogendorpweg,164,4384HD,Vlissingen,51.4629671,3.5519983,krant
+v-0004,Lieke de Boer,Van Hogendorpweg,164,4384HD,Vlissingen,51.4629671,3.5519983,krant
+v-0005,Lieke de Vries,Bellamypark,9,4381CG,Vlissingen,51.4413967,3.5733723,folder
+v-0006,Lieke de Vries,Bellamypark,9,4381CG,Vlissingen,51.4413967,3.5733723,krant
+v-0007,Teun van Leeuwen,Bloemenlaan,125,4382SK,Vlissingen,51.4549917,3.5725902,krant
+v-0008,Femke de Wit,Schubertlaan,34,4384LN,Vlissingen,51.464819,3.542746,krant
+v-0009,Anna de Bruin,Boulevard Bankert,408,4382AC,Vlissingen,51.4471294,3.5630186,krant
+v-0010,Kees van der Meer,Marinestraat,21,4381AW,Vlissingen,51.4414495,3.5806566,folder
+v-0011,Gijs Kuipers,Spuistraat,12a,4381HR,Vlissingen,51.4425522,3.5729917,krant
+v-0012,Iris Smits,Blikkenburg,103,4385HJ,Vlissingen,51.4626412,3.5708859,krant
+v-0013,Bram van den Berg,Ruys de Beerenbrouckstraat,41,4384EP,Vlissingen,51.4622625,3.5533007,folder
+v-0014,Pieter van den Berg,Ruys de Beerenbrouckstraat,41,4384EP,Vlissingen,51.4622625,3.5533007,krant
+v-0015,Sem Brouwer,Edisonweg,7a,4382NV,Vlissingen,51.4500057,3.5873255,krant
+v-0016,Sem Brouwer,Edisonweg,7a,4382NV,Vlissingen,51.4500057,3.5873255,folder
+v-0017,Roos Smits,Badhuisstraat,34,4381LT,Vlissingen,51.4460497,3.5707242,folder
+v-0018,Teun Smits,Badhuisstraat,34,4381LT,Vlissingen,51.4460497,3.5707242,krant
+v-0019,Teun Smits,Badhuisstraat,34,4381LT,Vlissingen,51.4460497,3.5707242,folder
+v-0020,Hanna Maas,Boulevard Bankert,20,4382AA,Vlissingen,51.4440256,3.568361,krant
+v-0021,Otto Bakker,Pablo Picassoplein,139,4382KB,Vlissingen,51.4536301,3.5671931,krant
+v-0022,Marijke Hendriks,Noorderbaan,84,4386CB,Vlissingen,51.4669867,3.5844662,krant
+v-0023,Roos van Dijk,Bloemenlaan,55,4382SE,Vlissingen,51.4527809,3.5728285,krant
+v-0024,Daan de Bruin,Gildeweg,16-08,4383NK,Vlissingen,51.4571991,3.5865576,krant
+v-0025,Johanna van den Berg,Boulevard Bankert,224,4382AC,Vlissingen,51.446062,3.5646896,krant
+v-0026,Sanne Vos,Singel,233,4381VJ,Vlissingen,51.4500618,3.5781947,folder
+v-0027,Kees Dijkstra,Oudstraat,14-G2,,Vlissingen,51.4625992,3.5581485,folder
+v-0028,Iris Mulder,Blikkenburg,55,4385HJ,Vlissingen,51.4640196,3.5702175,krant
+v-0029,Bram de Boer,Singel,150a,4382LP,Vlissingen,51.4494889,3.5704447,krant
+v-0030,Niels Visser,Brahmslaan,3,4384LP,Vlissingen,51.4658527,3.54346,krant
+v-0031,Iris Bakker,Galgewei,42,4384RB,Vlissingen,51.4616816,3.532793,folder
+v-0032,Daan Hendriks,Van Dishoeckstraat,144,4381VA,Vlissingen,51.4476974,3.5786031,krant
+v-0033,Teun van Leeuwen,Van Dishoeckstraat,42,4381TZ,Vlissingen,51.4472626,3.5786689,folder
+v-0034,Teun Kuipers,Wijenburg,63,4385GT,Vlissingen,51.4639628,3.5749808,krant
+v-0035,Iris de Bruin,Blikkenburg,69,4385HJ,Vlissingen,51.4636265,3.5700796,krant
+v-0036,Ada Visser,Slangenburg,3,4385HT,Vlissingen,51.4625407,3.5722362,krant
+v-0037,Niels Dijkstra,Spuistraat,86a,4381HT,Vlissingen,51.443643,3.5723698,folder
+v-0038,Ada Jansen,Nico Engelschmanlaan,1,4385KR,Vlissingen,51.4604458,3.5606944,folder
+v-0039,Els de Vries,Berlagestraat,8,4383BJ,Vlissingen,51.4563015,3.5625998,folder
+v-0040,Pieter Jansen,Galgewei,13,4384RB,Vlissingen,51.4622144,3.5324486,folder
+v-0041,Lieke de Vries,Bedrijfsweg,15d,4387PD,Vlissingen,51.4721476,3.5899707,krant
+v-0042,Kees de Bruin,Singel,373,4381VK,Vlissingen,51.4497455,3.5797374,folder
+v-0043,Ada Brouwer,Calandstraat,2,4382JX,Vlissingen,51.4535478,3.565741,krant
+v-0044,Pieter Smits,Hercules Segherslaan,15,4383VG,Vlissingen,51.4591653,3.5707482,krant
+v-0045,Lieke de Bruin,Westerzicht,630,4385BW,Vlissingen,51.461615,3.5838782,krant
+v-0046,Willem van Leeuwen,Colijnstraat,3,4384EH,Vlissingen,51.4628809,3.5549141,krant
+v-0047,Johanna van der Meer,Schuitvaartgracht,65,4382GH,Vlissingen,51.4500088,3.5694605,krant
+v-0048,Els Jansen,Bouwen Ewoutstraat,42b,4381PS,Vlissingen,51.4474489,3.5719015,krant
+v-0049,Sanne Jansen,Sint Jacobsstraat,11,4381EK,Vlissingen,51.4431574,3.5749236,krant
+v-0050,Daan Bakker,Jacob Marislaan,14,4382TA,Vlissingen,51.4542292,3.574364,krant
+v-0051,Els Hendriks,Singel,500,4381VP,Vlissingen,51.4488393,3.5841446,krant
+v-0052,Roos de Wit,Verlengde Bonedijkestraat,287,4383BC,Vlissingen,51.4556118,3.5628766,krant
+v-0053,Iris de Wit,De Savornin Lohmanlaan,7,4384KC,Vlissingen,51.4596697,3.5506086,krant
+v-0054,Roos Kuipers,Boulevard Bankert,622,4382AC,Vlissingen,51.4478215,3.5622378,krant
+v-0055,Roos Kuipers,Boulevard Bankert,622,4382AC,Vlissingen,51.4478215,3.5622378,folder
+v-0056,Bram Smits,Spuistraat,3,4381HN,Vlissingen,51.4424917,3.5727794,krant
+v-0057,Jan van Leeuwen,Vredehoflaan,344,4382CJ,Vlissingen,51.4536617,3.5601008,krant
+v-0058,Johanna de Wit,Van Doornlaan,23,4386AH,Vlissingen,51.4657829,3.5921771,krant
+v-0059,Daan Jansen,De Tuinderij,30,4387AK,Vlissingen,51.4712295,3.5943585,krant
+v-0060,Kees Jansen,De Tuinderij,30,4387AK,Vlissingen,51.4712295,3.5943585,folder
+v-0061,Kees Jansen,De Tuinderij,30,4387AK,Vlissingen,51.4712295,3.5943585,krant
+v-0062,Pieter Brouwer,Martin Luther Kingstraat,38,4384HT,Vlissingen,51.4645904,3.553477,krant
+v-0063,Pieter Mulder,Boulevard Bankert,52a,4382AC,Vlissingen,51.4442935,3.5679252,krant
+v-0064,Kees de Groot,Singel,229-G13,,Vlissingen,51.450317,3.5781891,krant
+v-0065,Jan de Vries,Bloemenlaan,3,4382SB,Vlissingen,51.450663,3.5738007,krant
+v-0066,Johanna de Wit,Singel,80,4382LC,Vlissingen,51.4488671,3.5676732,krant
+v-0067,Ada van Leeuwen,Westerzicht,285,4385AK,Vlissingen,51.4632172,3.5891807,folder
+v-0068,Ada van Leeuwen,Westerzicht,285,4385AK,Vlissingen,51.4632172,3.5891807,krant
+v-0069,Kees de Wit,Tulpenlaan,28-G2,,Vlissingen,51.4513096,3.5719832,krant
+v-0070,Daan Vos,Dreesstraat,27,4384DA,Vlissingen,51.458397,3.5575698,krant
+v-0071,Bram Visser,Rosenburglaan,12,4385JD,Vlissingen,51.4623291,3.5670339,krant
+v-0072,Niels Dijkstra,Scheldestraat,86a,4382LZ,Vlissingen,51.4492576,3.5724115,folder
+v-0073,Johanna de Wit,Paardenstraat,43,4381AH,Vlissingen,51.442709,3.5811051,krant
+v-0074,Iris de Wit,Paardenstraat,43,4381AH,Vlissingen,51.442709,3.5811051,krant
+v-0075,Iris de Wit,Paardenstraat,43,4381AH,Vlissingen,51.442709,3.5811051,folder
+v-0076,Hanna Kuipers,Jan van de Capellelaan,57,4383VB,Vlissingen,51.4575454,3.5765377,krant
+v-0077,Teun de Wit,Peperdijk,171,4381EN,Vlissingen,51.4446601,3.5750158,krant
+v-0078,Roos de Wit,Vrouwestraat,51-T,,Vlissingen,51.4442424,3.5755737,krant
+v-0079,Teun Visser,Paul Krugerstraat,251,4382MH,Vlissingen,51.4507797,3.5800254,krant
+v-0080,Lieke de Bruin,Lindekerspad,4,4386ER,Vlissingen,51.4692421,3.5919252,krant
+v-0081,Willem Dijkstra,Hogeweg,65,4382JC,Vlissingen,51.4524584,3.5653915,krant
+v-0082,Teun van Dijk,Goeman Borgesiusstraat,61-G9,,Vlissingen,51.4615013,3.5479432,krant
+v-0083,Sanne Dekker,Visserijkade,95,4382ZA,Vlissingen,51.4476717,3.5930152,krant
+v-0084,Hanna Jansen,Glacisstraat,44c,4381RK,Vlissingen,51.4458311,3.5721231,krant
+v-0085,Daan Peters,Bosjeslaan,17-G11,,Vlissingen,51.4504731,3.5724303,krant
+v-0086,Niels de Wit,Sint Maartenlaan,4,4383AR,Vlissingen,51.4560089,3.5575652,folder
+v-0087,Johanna Vos,Van Hallstraat,11,4384BL,Vlissingen,51.4577755,3.5547569,krant
+v-0088,Niels Jansen,Scheldestraat,1-205,4381RP,Vlissingen,51.4465308,3.5743608,krant
+v-0089,Anna Jansen,Scheldestraat,1-205,4381RP,Vlissingen,51.4465308,3.5743608,krant
+v-0090,Sanne Jansen,Scheldestraat,1-205,4381RP,Vlissingen,51.4465308,3.5743608,krant
+v-0091,Sanne Visser,Rommestraat,2,4384DJ,Vlissingen,51.4621797,3.5576612,folder
+v-0092,Anna Hendriks,Klipperkade,3,4382ZM,Vlissingen,51.4468747,3.5864591,krant
+v-0093,Sanne Hendriks,Klipperkade,3,4382ZM,Vlissingen,51.4468747,3.5864591,krant
+v-0094,Willem Post,Papegaaienburg,3,4386DA,Vlissingen,51.4649467,3.5818132,krant
+v-0095,Anna Visser,Hercules Segherslaan,1,4383VG,Vlissingen,51.4598566,3.5705114,krant
+v-0096,Marijke Mulder,Tobagolaan,8-G4,,Vlissingen,51.4554811,3.5575612,folder
+v-0097,Ada Maas,Zonnekers,13,4386EM,Vlissingen,51.4691237,3.5908773,krant
+v-0098,Roos van Leeuwen,Vredehoflaan,516,4382CJ,Vlissingen,51.4536191,3.5615125,krant
+v-0099,Otto van Leeuwen,Vredehoflaan,516,4382CJ,Vlissingen,51.4536191,3.5615125,krant
+v-0100,Iris Brouwer,Salvador Dalístraat,20,4382KC,Vlissingen,51.4544987,3.5662892,krant
+v-0101,Carla de Vries,Vredehoflaan,628,4382CK,Vlissingen,51.4540482,3.5599937,krant
+v-0102,Carla Visser,De Insulindestraat,46,4381NR,Vlissingen,51.4466459,3.5817262,folder
+v-0103,Teun Jansen,Walstraat,120,4381GS,Vlissingen,51.4448254,3.5737034,krant
+v-0104,Iris van den Berg,Zuiderbaan,19,4386CK,Vlissingen,51.464912,3.5857935,krant
+v-0105,Pieter Hendriks,Ridderspoorlaan,27,4382PH,Vlissingen,51.4517135,3.5709841,krant
+v-0106,Iris de Bruin,Offenbachlaan,33,4384MH,Vlissingen,51.4650487,3.5480798,krant
+v-0107,Daan Dijkstra,Bakkersgang,21,4381JD,Vlissingen,51.4427967,3.5710908,krant
+v-0108,Bram Brouwer,Bonenburg,50,4385HK,Vlissingen,51.4636895,3.5713944,krant
+v-0109,Roos Hendriks,Vredehoflaan,776,4382CK,Vlissingen,51.4539455,3.5602294,krant
+v-0110,Sem Hendriks,Sint Kruislaan,55,4383AJ,Vlissingen,51.4553273,3.5579027,krant
+v-0111,Otto Bakker,Van Houtenplein,1-G1,,Vlissingen,51.4578666,3.5568238,krant
+v-0112,Otto de Boer,Kenau Hasselaarstraat,87,4382AH,Vlissingen,51.4466048,3.5638775,folder
+v-0113,Willem Dekker,Koudekerkseweg,32,4382EC,Vlissingen,51.4492088,3.565611,krant
+v-0114,Femke Hendriks,Van de Spiegelstraat,71-G,,Vlissingen,51.4493468,3.5784549,krant
+v-0115,Sem van Leeuwen,Sottegemstraat,102,4382ER,Vlissingen,51.4508806,3.5694499,krant
+v-0116,Otto Dekker,Paul Krugerstraat,251a,4382MH,Vlissingen,51.4507847,3.5801218,krant
+v-0117,Johanna van der Meer,Westerzicht,500,4385BS,Vlissingen,51.4614866,3.5854162,krant
+v-0118,Hanna Kuipers,Boulevard Bankert,334,4382AC,Vlissingen,51.4469379,3.5629146,krant
+v-0119,Els Kuipers,Haagland,2,4386GM,Vlissingen,51.4673958,3.5635579,krant
+v-0120,Lieke Bos,President Rooseveltlaan,730,4382VX,Vlissingen,51.455321,3.5780053,krant
+v-0121,Femke Post,Bloemenlaan,37,4382SB,Vlissingen,51.4517897,3.5728755,krant
+v-0122,Femke de Wit,Wagnerlaan,3,4384LJ,Vlissingen,51.4632282,3.5453124,krant
+v-0123,Carla Dekker,Jacob van Campenstraat,32,4383BP,Vlissingen,51.4566316,3.5657251,krant
+v-0124,Johanna Bos,Papaverlaan,3,4382PM,Vlissingen,51.4523443,3.5711471,krant
+v-0125,Pieter de Groot,Hellingbaan,81,4381NN,Vlissingen,51.4449401,3.5742158,krant
+v-0126,Hanna de Groot,Hellingbaan,81,4381NN,Vlissingen,51.4449401,3.5742158,folder
+v-0127,Iris Vos,Merkenburg,23,4385ET,Vlissingen,51.4613934,3.5743919,krant
+v-0128,Iris Vos,Merkenburg,23,4385ET,Vlissingen,51.4613934,3.5743919,folder
+v-0129,Roos Brouwer,Korenbloemlaan,24,4382PD,Vlissingen,51.4513299,3.5705066,folder
+v-0130,Carla Peters,Anjelierenlaan,99,4382VE,Vlissingen,51.4531885,3.575667,krant
+v-0131,Sem Bos,Paul Krugerstraat,311,4382MJ,Vlissingen,51.450224,3.5821772,folder
+v-0132,Willem de Wit,Leeghwaterstraat,23,4382JJ,Vlissingen,51.452761,3.5652569,krant
+v-0133,Ada Bakker,De Kota Baroestraat,57,4381NX,Vlissingen,51.4497382,3.5799658,krant
+v-0134,Lieke van den Berg,Boulevard Evertsen,28,4382AD,Vlissingen,51.449186,3.560664,krant
+v-0135,Bram van den Berg,Boulevard Evertsen,28,4382AD,Vlissingen,51.449186,3.560664,folder
+v-0136,Hendrik de Vries,Rommestraat,6-G8,,Vlissingen,51.4622646,3.5582005,folder
+v-0137,Otto van der Meer,Van der Manderestraat,42,4381VS,Vlissingen,51.4490145,3.5748115,krant
+v-0138,Pieter de Bruin,Ferdinand Bollaan,23,4382RB,Vlissingen,51.4538048,3.5714783,krant
+v-0139,Pieter de Bruin,Ferdinand Bollaan,23,4382RB,Vlissingen,51.4538048,3.5714783,folder
+v-0140,Lieke de Bruin,Van Dishoeckstraat,119,4381TW,Vlissingen,51.4486426,3.5783511,krant
+v-0141,Roos Dijkstra,Breestraat,7,4381HZ,Vlissingen,51.4421398,3.5717213,krant
+v-0142,Teun Visser,Glacisstraat,80,4381RL,Vlissingen,51.4463316,3.5733552,krant
+v-0143,Carla Hendriks,Vrijdomweg,2,4382BB,Vlissingen,51.4518308,3.5638517,folder
+v-0144,Els Smits,Molenstraat,48,4381HX,Vlissingen,51.4427632,3.57235,krant
+v-0145,Hendrik Hendriks,Stadhuisplein,22-K109,4382LJ,Vlissingen,51.4480615,3.5682186,krant
+v-0146,Teun Bos,Van Dishoeckstraat,594,4382XW,Vlissingen,51.4515735,3.5799619,krant
+v-0147,Pieter Bos,Van Dishoeckstraat,594,4382XW,Vlissingen,51.4515735,3.5799619,folder
+v-0148,Pieter Kuipers,De Kempenaerstraat,27,4384KA,Vlissingen,51.4605439,3.5494264,krant
+v-0149,Gijs van Leeuwen,Van Dishoeckstraat,95,4381TW,Vlissingen,51.4486391,3.5784083,folder
+v-0150,Daan Brouwer,Nieuwe Kruidmolenweg,17,4382WB,Vlissingen,51.4524374,3.6065958,krant
+v-0151,Lieke van Dijk,Heideveld,18,4386GP,Vlissingen,51.468343,3.5620082,krant
+v-0152,Bram Dijkstra,Clijverstraat,7,4381PT,Vlissingen,51.4468978,3.5712601,krant
+v-0153,Bram Smits,Paauwenburgweg,14,4384JE,Vlissingen,51.4626345,3.5510706,krant
+v-0154,Roos Post,Scheldestraat,34,4381RT,Vlissingen,51.4475571,3.5738366,krant
+v-0155,Kees Post,Scheldestraat,34,4381RT,Vlissingen,51.4475571,3.5738366,krant
+v-0156,Gijs Vos,Nieuwstraat,230-GC,,Vlissingen,51.4427268,3.5780433,krant
+v-0157,Carla Bos,Leeghwaterstraat,86,4382JP,Vlissingen,51.4537492,3.5647477,folder
+v-0158,Lieke Hendriks,Meidoornlaan,14,4382TK,Vlissingen,51.4523475,3.5772983,folder
+v-0159,Lieke Hendriks,Meidoornlaan,14,4382TK,Vlissingen,51.4523475,3.5772983,krant
+v-0160,Teun Kuipers,Gerbrandystraat,92,4384NK,Vlissingen,51.4629941,3.5591809,folder
+v-0161,Sem Kuipers,Gerbrandystraat,92,4384NK,Vlissingen,51.4629941,3.5591809,krant
+v-0162,Anna Smits,Van Dishoeckstraat,59,4381TV,Vlissingen,51.44793,3.5782659,krant
+v-0163,Lieke Dekker,Bosjeslaan,66,4382PV,Vlissingen,51.4527934,3.5719041,krant
+v-0164,Sanne Smits,De Meesterstraat,25,4384HE,Vlissingen,51.4619053,3.5516998,krant
+v-0165,Kees Mulder,Sabalaan,8,4383AN,Vlissingen,51.4563367,3.5569538,krant
+v-0166,Femke Jansen,Troelstraweg,357,4384GS,Vlissingen,51.4632611,3.5562895,krant
+v-0167,Pieter Jansen,Troelstraweg,357,4384GS,Vlissingen,51.4632611,3.5562895,krant
+v-0168,Els Bakker,Gerbrandystraat,156,4384NM,Vlissingen,51.4655298,3.5583121,krant
+v-0169,Sem Mulder,Albert Cuyplaan,4,4383XG,Vlissingen,51.455783,3.5788198,folder
+v-0170,Femke de Vries,Verkuijl Quakkelaarstraat,50,4381TP,Vlissingen,51.4476658,3.5709276,krant
+v-0171,Femke Dijkstra,Schaepmanstraat,143,4384CX,Vlissingen,51.4622326,3.5555718,krant
+v-0172,Anna de Groot,Hobeinstraat,57,4381PB,Vlissingen,51.4467627,3.5703958,krant
+v-0173,Willem Vos,Westerzicht,483,4385BH,Vlissingen,51.4605907,3.5883334,krant
+v-0174,Lieke van Leeuwen,Burgemeester van Woelderenlaan,1-08,4382CL,Vlissingen,51.4514246,3.5584306,krant
+v-0175,Pieter van Leeuwen,Burgemeester van Woelderenlaan,1-08,4382CL,Vlissingen,51.4514246,3.5584306,krant
+v-0176,Sem de Wit,Clijverstraat,26,4381PW,Vlissingen,51.4470381,3.5722024,folder
+v-0177,Anna de Wit,Clijverstraat,26,4381PW,Vlissingen,51.4470381,3.5722024,krant
+v-0178,Lieke Smits,Aagje Dekenstraat,12d,4381RZ,Vlissingen,51.4454982,3.5734045,krant
+v-0179,Iris van Leeuwen,Van Beethovenlaan,12,4384KN,Vlissingen,51.4595445,3.5459349,krant
+v-0180,Hanna Bakker,Duijvendrechtstraat,22,4382EV,Vlissingen,51.4499459,3.5660711,krant
+v-0181,Ada Smits,Grote Markt,27c,4381JB,Vlissingen,51.4417764,3.5716419,krant
+v-0182,Carla Maas,De Tuinderij,22,4387AK,Vlissingen,51.4708534,3.5942402,krant
+v-0183,Carla Maas,De Tuinderij,22,4387AK,Vlissingen,51.4708534,3.5942402,folder
+v-0184,Carla de Groot,Irislaan,189,4383VT,Vlissingen,51.4567296,3.5770239,krant
+v-0185,Willem Vos,Hellingbaan,333,4381NN,Vlissingen,51.4458748,3.5748421,krant
+v-0186,Gijs de Groot,Crocuslaan,4,4382VA,Vlissingen,51.4515398,3.5740385,krant
+v-0187,Ada van der Meer,Verdilaan,8,4384LE,Vlissingen,51.4632789,3.545861,krant
+v-0188,Hanna van der Meer,Verdilaan,8,4384LE,Vlissingen,51.4632789,3.545861,krant
+v-0189,Kees Visser,Kommedijk,2-G18,,Vlissingen,51.4442998,3.5693635,folder
+v-0190,Niels Smits,Paauwenburgweg,19,4384JA,Vlissingen,51.4590577,3.5510851,krant
+v-0191,Lieke de Boer,Govert Flincklaan,7,4383WB,Vlissingen,51.4586905,3.5696915,krant
+v-0192,Femke de Bruin,Voorstraat,18-G9,,Vlissingen,51.4676996,3.592772,folder
+v-0193,Carla Peters,Kanariesprenk,35,4386DE,Vlissingen,51.4666189,3.5766712,folder
+v-0194,Carla Peters,Kanariesprenk,35,4386DE,Vlissingen,51.4666189,3.5766712,krant
+v-0195,Kees van der Meer,Kenau Hasselaarstraat,151,4382AH,Vlissingen,51.4468991,3.5632767,krant
+v-0196,Hendrik Peters,Marnixplein,21,4386AA,Vlissingen,51.4644633,3.5916834,krant
+v-0197,Roos Peters,Marnixplein,21,4386AA,Vlissingen,51.4644633,3.5916834,krant
+v-0198,Roos de Vries,Anjelierenlaan,157,4382VG,Vlissingen,51.4529122,3.5777937,krant
+v-0199,Hanna Kuipers,Gasthuisstraat,20-G31,,Vlissingen,51.4418528,3.5703264,folder
+v-0200,Otto Kuipers,Gasthuisstraat,20-G31,,Vlissingen,51.4418528,3.5703264,folder
+v-0201,Otto Bakker,Papegaaienburg,38,4386DA,Vlissingen,51.4656081,3.5827384,krant
+v-0202,Daan Bakker,Papegaaienburg,38,4386DA,Vlissingen,51.4656081,3.5827384,krant
+v-0203,Daan Bakker,Papegaaienburg,38,4386DA,Vlissingen,51.4656081,3.5827384,folder
+v-0204,Johanna Kuipers,Westerzicht,661,4385CC,Vlissingen,51.4600121,3.5859551,krant
+v-0205,Carla de Vries,Mesdaglaan,23,4382TB,Vlissingen,51.4545565,3.5750499,krant
+v-0206,Kees de Vries,Mesdaglaan,23,4382TB,Vlissingen,51.4545565,3.5750499,krant
+v-0207,Roos Dekker,Pablo Picassoplein,165,4382KB,Vlissingen,51.4537869,3.5675424,krant
+v-0208,Roos Bos,Steve Bikostraat,7,4384HS,Vlissingen,51.4655304,3.5545739,krant
+v-0209,Niels Dijkstra,Nieuw Bonedijkelaan,111,4382HD,Vlissingen,51.4520655,3.5675672,krant
+v-0210,Kees van Dijk,Hellingbaan,265,4381NN,Vlissingen,51.4454732,3.5747238,krant
+v-0211,Lieke van Dijk,Hellingbaan,265,4381NN,Vlissingen,51.4454732,3.5747238,krant
+v-0212,Niels de Vries,De Visserstraat,11,4384JS,Vlissingen,51.4612935,3.5499705,krant
+v-0213,Kees van der Meer,Doctor Ottestraat,103h,4382LV,Vlissingen,51.4493668,3.570675,krant
+v-0214,Hendrik de Vries,Dokter Gallandatstraat,1-01,4382LD,Vlissingen,51.4480391,3.5671731,krant
+v-0215,Niels de Groot,Palingstraat,66,4381AG,Vlissingen,51.4429464,3.5808832,krant
+v-0216,Gijs Visser,Beursstraat,20,4381CD,Vlissingen,51.4410946,3.5737514,krant
+v-0217,Femke Peters,Westerzicht,418,4385BN,Vlissingen,51.4612675,3.5868462,krant
+v-0218,Ada Mulder,Josine Reulinglaan,20,4385KX,Vlissingen,51.4594556,3.5623398,krant
+v-0219,Gijs van Leeuwen,Pablo Picassoplein,101,4382KB,Vlissingen,51.4540145,3.5668543,krant
+v-0220,Gijs van Leeuwen,Pablo Picassoplein,101,4382KB,Vlissingen,51.4540145,3.5668543,folder
+v-0221,Jan Bos,Anjelierenlaan,106,4382VH,Vlissingen,51.4529792,3.5758378,krant
+v-0222,Kees Vos,Wilhelminastraat,12a,4381BP,Vlissingen,51.4429496,3.5777655,folder
+v-0223,Iris van den Berg,Assumburg,7,4385EG,Vlissingen,51.4631243,3.5684393,krant
+v-0224,Niels Hendriks,Boulevard Bankert,676,4382AC,Vlissingen,51.4479234,3.5620671,krant
+v-0225,Marijke Kuipers,Frans Halslaan,4,4382RG,Vlissingen,51.4533655,3.5703434,krant
+v-0226,Johanna van Leeuwen,Schubertlaan,13,4384LL,Vlissingen,51.4628739,3.5420123,krant
+v-0227,Els van den Berg,Bizetlaan,18,4384KR,Vlissingen,51.4609304,3.5442671,krant
+v-0228,Els van den Berg,Bizetlaan,18,4384KR,Vlissingen,51.4609304,3.5442671,folder
+v-0229,Niels Bos,De Kungsholmstraat,61,4381NZ,Vlissingen,51.4486456,3.5793537,krant
+v-0230,Sem Bakker,Van Dishoeckstraat,205,4382XR,Vlissingen,51.4508088,3.5790613,krant
+v-0231,Marijke Smits,Van Hogendorpweg,68,4384HA,Vlissingen,51.4633091,3.5543278,krant
+v-0232,Anna van der Meer,Van Hoorn van Burghstraat,27,4381ST,Vlissingen,51.4483327,3.5764031,krant
+v-0233,Roos Bos,Aagje Dekenstraat,5,4381RM,Vlissingen,51.4456038,3.5723446,krant
+v-0234,Roos Bos,Aagje Dekenstraat,5,4381RM,Vlissingen,51.4456038,3.5723446,folder
+v-0235,Ada Maas,Sint Eustatiuslaan,18-G2,,Vlissingen,51.4550137,3.5586014,krant
+v-0236,Willem de Groot,Bloemenlaan,188,4383TD,Vlissingen,51.456215,3.5737167,krant
+v-0237,Pieter Bos,H. Roland Holstlaan,1,4385KJ,Vlissingen,51.4635449,3.56538,krant
+v-0238,Anna Bos,H. Roland Holstlaan,1,4385KJ,Vlissingen,51.4635449,3.56538,krant
+v-0239,Ada Kuipers,Vredehoflaan,91,4383AB,Vlissingen,51.4547147,3.5590745,krant
+v-0240,Gijs Mulder,De Stoppelaarstraat,1-G5,,Vlissingen,51.4660901,3.5905136,folder
+v-0241,Johanna Bos,Vredehoflaan,280,4382CJ,Vlissingen,51.4536363,3.5599805,krant
+v-0242,Anna van Dijk,Rosenburglaan,283,4385KE,Vlissingen,51.4634005,3.5640922,folder
+v-0243,Hendrik Visser,Badhuisstraat,19,4381LM,Vlissingen,51.4455984,3.5711981,krant
+v-0244,Pieter de Groot,Westerhavenweg,6,4382NM,Vlissingen,51.4496082,3.5958454,krant
+v-0245,Bram van Leeuwen,Merkenburg,9,4385ET,Vlissingen,51.4617157,3.5745309,folder
+v-0246,Femke van Leeuwen,Merkenburg,9,4385ET,Vlissingen,51.4617157,3.5745309,krant
+v-0247,Femke Kuipers,Verkuijl Quakkelaarstraat,233,4381TN,Vlissingen,51.4487716,3.5756701,folder
+v-0248,Roos Kuipers,Verkuijl Quakkelaarstraat,233,4381TN,Vlissingen,51.4487716,3.5756701,krant
+v-0249,Willem Kuipers,Verkuijl Quakkelaarstraat,233,4381TN,Vlissingen,51.4487716,3.5756701,krant
+v-0250,Otto Kuipers,Zuiderbaan,32,4386CG,Vlissingen,51.4658317,3.5849698,krant
+v-0251,Ada Kuipers,Zuiderbaan,32,4386CG,Vlissingen,51.4658317,3.5849698,krant
+v-0252,Johanna van den Berg,Westerzicht,260,4385AW,Vlissingen,51.4626619,3.5896086,krant
+v-0253,Hendrik Dijkstra,Branderijstraat,3,4381HK,Vlissingen,51.4426373,3.5748673,krant
+v-0254,Carla van den Berg,De Kungsholmstraat,69,4381NZ,Vlissingen,51.4486341,3.5798289,krant
+v-0255,Sem van der Meer,Hogeweg,185,4382RH,Vlissingen,51.45407,3.5697302,krant
+v-0256,Pieter van der Meer,Sint Eustatiuslaan,11,4383AE,Vlissingen,51.4552025,3.5590518,krant
+v-0257,Ada van der Meer,Sint Eustatiuslaan,11,4383AE,Vlissingen,51.4552025,3.5590518,folder
+v-0258,Teun van Dijk,Gildeweg,17a,4383NH,Vlissingen,51.4561337,3.5845785,krant
+v-0259,Ada de Bruin,Stroomweg,22,4382WX,Vlissingen,51.4569829,3.5908859,folder
+v-0260,Marijke Dijkstra,Wijenburg,52,4385GR,Vlissingen,51.4646249,3.5753677,krant
+v-0261,Roos de Boer,Zeilmaker,46,4381KX,Vlissingen,51.4458354,3.5816505,krant
+v-0262,Els de Bruin,Rosenburglaan,219,4385KL,Vlissingen,51.4605073,3.5641925,krant
+v-0263,Els de Bruin,Rosenburglaan,219,4385KL,Vlissingen,51.4605073,3.5641925,folder
+v-0264,Jan de Wit,Gildeweg,19e,4383NH,Vlissingen,51.4565086,3.5847168,krant
+v-0265,Willem de Wit,Gildeweg,19e,4383NH,Vlissingen,51.4565086,3.5847168,krant
+v-0266,Daan Maas,Van Raaltestraat,59,4384GC,Vlissingen,51.4637286,3.557907,krant
+v-0267,Otto de Bruin,Coosje Buskenstraat,188,4381LJ,Vlissingen,51.4448828,3.5716867,krant
+v-0268,Lieke Visser,Batenburg,74,4385HD,Vlissingen,51.46465,3.5727277,folder
+v-0269,Iris Post,Bloemenlaan,89a,4382SG,Vlissingen,51.4535122,3.5727308,krant
+v-0270,Lieke Vos,Scheldestraat,52b,4381RV,Vlissingen,51.448051,3.5735193,krant
+v-0271,Kees Vos,Scheldestraat,52b,4381RV,Vlissingen,51.448051,3.5735193,krant
+v-0272,Ada Smits,Nieuwe Vlissingseweg,115,4387AB,Vlissingen,51.4696473,3.595307,krant
+v-0273,Pieter Smits,Nieuwe Vlissingseweg,115,4387AB,Vlissingen,51.4696473,3.595307,krant
+v-0274,Carla Bakker,Talmalaan,29,4384KE,Vlissingen,51.4592337,3.5496186,krant
+v-0275,Anna Peters,Suze Groeneweglaan,11,4385KB,Vlissingen,51.4635091,3.5634289,krant
+v-0276,Femke de Bruin,Nieuwe Vlissingseweg,211,4387AE,Vlissingen,51.4735196,3.5972921,folder
+v-0277,Hanna Jansen,Gravestraat,12,4381AP,Vlissingen,51.4421805,3.578488,folder
+v-0278,Hendrik Vos,Adriaen Coortelaan,5-A136,4383SR,Vlissingen,51.4571449,3.571062,krant
+v-0279,Ada Brouwer,Vincent van Goghlaan,289,4382SW,Vlissingen,51.4549014,3.5777911,folder
+v-0280,Marijke Post,Groenewoud,38,4381HE,Vlissingen,51.442559,3.5756418,krant
+v-0281,Els Post,Groenewoud,38,4381HE,Vlissingen,51.442559,3.5756418,krant
+v-0282,Sanne Post,Van Doornlaan,6,4386AK,Vlissingen,51.4659863,3.5924521,krant
+v-0283,Femke de Boer,Productweg,22,4387PG,Vlissingen,51.4718927,3.5901161,krant
+v-0284,Carla de Boer,Productweg,22,4387PG,Vlissingen,51.4718927,3.5901161,folder
+v-0285,Pieter Bakker,Haagland,34,4386GM,Vlissingen,51.4677455,3.5617459,folder
+v-0286,Anna Bakker,Westerzicht,131,4385AD,Vlissingen,51.4634699,3.584835,krant
+v-0287,Hendrik Smits,Kanariesprenk,229,4386DK,Vlissingen,51.4664837,3.5780282,krant
+v-0288,Anna de Wit,Coosje Buskenstraat,43a,4381LB,Vlissingen,51.4441571,3.5695442,krant
+v-0289,Sem de Vries,Vredehoflaan,822,4382CK,Vlissingen,51.454025,3.5602482,krant
+v-0290,Lieke van Leeuwen,Schutterijstraat,113,4381GM,Vlissingen,51.4441845,3.5716124,krant
+v-0291,Ada Kuipers,Kasteelstraat,38,4381RD,Vlissingen,51.4467722,3.5729792,krant
+v-0292,Bram Jansen,Wilhelminastraat,67,4381BN,Vlissingen,51.4430548,3.5772531,krant
+v-0293,Els Brouwer,Sabalaan,1,4383AN,Vlissingen,51.4557798,3.5569233,folder
+v-0294,Sem Brouwer,Sabalaan,1,4383AN,Vlissingen,51.4557798,3.5569233,folder
+v-0295,Sem Brouwer,Sabalaan,1,4383AN,Vlissingen,51.4557798,3.5569233,krant
+v-0296,Kees Visser,De Meesterstraat,45,4384HG,Vlissingen,51.4618941,3.5516682,krant
+v-0297,Teun Mulder,Boulevard De Ruyter,228,4381KH,Vlissingen,51.4408941,3.5705305,krant
+v-0298,Marijke van der Meer,Prins Hendrikweg,2-410,4382NS,Vlissingen,51.4487986,3.5870802,krant
+v-0299,Jan de Vries,Stadhuisplein,22-K108,4382LJ,Vlissingen,51.4479586,3.5683277,krant
+v-0300,Bram de Groot,Goeman Borgesiusstraat,43,4384JM,Vlissingen,51.4616358,3.5490277,krant
+v-0301,Pieter Hendriks,Toutenburg,34,4385GK,Vlissingen,51.4635038,3.5740885,krant
+v-0302,Hendrik Hendriks,Toutenburg,34,4385GK,Vlissingen,51.4635038,3.5740885,krant
+v-0303,Els Vos,Irislaan,177,4383VT,Vlissingen,51.4565876,3.5769428,krant
+v-0304,Sanne Vos,Irislaan,177,4383VT,Vlissingen,51.4565876,3.5769428,krant
+v-0305,Femke Bos,Verkuijl Quakkelaarstraat,13,4381PJ,Vlissingen,51.4476348,3.570173,krant
+v-0306,Pieter de Boer,Bouwen Ewoutstraat,82,4381PS,Vlissingen,51.4479125,3.572955,krant
+v-0307,Carla Bakker,Oranjedijk,60,4381AV,Vlissingen,51.4409354,3.5777619,krant
+v-0308,Marijke de Groot,Boulevard Evertsen,12,4382AD,Vlissingen,51.4489326,3.56105,krant
+v-0309,Marijke de Groot,Boulevard Evertsen,12,4382AD,Vlissingen,51.4489326,3.56105,folder
+v-0310,Teun van Dijk,Boulevard Bankert,618,4382AC,Vlissingen,51.4478163,3.5622209,folder
+v-0311,Daan Kuipers,Jan Allemanstraat,1-G10,,Vlissingen,51.4441668,3.5769553,krant
+v-0312,Lieke Smits,Schuitvaartgracht,383,4383BX,Vlissingen,51.4562372,3.5685551,krant
+v-0313,Els Visser,President Rooseveltlaan,756,4382VX,Vlissingen,51.4551605,3.578955,krant
+v-0314,Otto Visser,President Rooseveltlaan,756,4382VX,Vlissingen,51.4551605,3.578955,krant
+v-0315,Otto Visser,President Rooseveltlaan,756,4382VX,Vlissingen,51.4551605,3.578955,folder
+v-0316,Hendrik van den Berg,Albionkade,329,4381KZ,Vlissingen,51.4460904,3.5824334,folder
+v-0317,Hendrik van den Berg,Albionkade,329,4381KZ,Vlissingen,51.4460904,3.5824334,krant
+v-0318,Ada de Vries,Heideveld,10,4386GP,Vlissingen,51.4681681,3.5627959,krant
+v-0319,Niels Bakker,Clijverstraat,10,4381PW,Vlissingen,51.4468242,3.5716213,folder
+v-0320,Kees Peters,Gerrit Rietveldstraat,63,4383CE,Vlissingen,51.4569093,3.5666599,folder
+v-0321,Iris de Boer,Strandwal,95,4386HJ,Vlissingen,51.4686565,3.5653169,folder
+v-0322,Johanna Hendriks,Hercules Segherslaan,242,4383VS,Vlissingen,51.4560867,3.5764349,krant
+v-0323,Pieter Post,Zuidbeekseweg,10,4386ND,Vlissingen,51.4641614,3.5610304,folder
+v-0324,Willem Dijkstra,Westerstraat,15,4381JX,Vlissingen,51.4416902,3.5708525,krant
+v-0325,Sanne Visser,De Meesterstraat,1-G2,,Vlissingen,51.4619661,3.5515184,krant
+v-0326,Lieke de Bruin,Vredehoflaan,152,4382CH,Vlissingen,51.4529535,3.5604661,krant
+v-0327,Otto Kuipers,Tak van Poortvlietstraat,15,4384CL,Vlissingen,51.4610453,3.555064,krant
+v-0328,Ada Smits,Boulevard De Ruyter,192,4381KG,Vlissingen,51.440848,3.5705679,krant
+v-0329,Roos de Bruin,Piet Heinkade,21,4381NC,Vlissingen,51.4424276,3.5913013,krant
+v-0330,Kees Brouwer,Hendrikstraat,70,4381AB,Vlissingen,51.4432389,3.5787939,krant
+v-0331,Els de Groot,Nieuwe Vlissingseweg,57,4387AA,Vlissingen,51.468126,3.5944983,krant
+v-0332,Iris Smits,Schuitvaartgracht,1,4382GG,Vlissingen,51.4492359,3.5664393,krant
+v-0333,Johanna Brouwer,Bossenburg,48,4385EA,Vlissingen,51.462106,3.5759823,krant
+v-0334,Iris Mulder,Goeman Borgesiusstraat,85,4384JN,Vlissingen,51.462149,3.548306,krant
+v-0335,Femke Bos,Vredehoflaan,670,4382CK,Vlissingen,51.4541902,3.5599594,krant
+v-0336,Teun Jansen,Sterkenburg,66,4385GG,Vlissingen,51.4625899,3.5731846,krant
+v-0337,Otto Visser,Gasthuisstraat,17-G15,,Vlissingen,51.4424824,3.5695676,krant
+v-0338,Lieke Post,Coosje Buskenstraat,88,4381LG,Vlissingen,51.4438625,3.5696447,krant
+v-0339,Teun van den Berg,Prins Hendrikweg,2-505,4382NS,Vlissingen,51.4487451,3.5866647,krant
+v-0340,Teun van den Berg,Prins Hendrikweg,2-505,4382NS,Vlissingen,51.4487451,3.5866647,folder
+v-0341,Niels van der Meer,Pablo Picassoplein,53,4382KB,Vlissingen,51.4529235,3.5667547,krant
+v-0342,Hanna Dekker,Kreekrug,31,4386GR,Vlissingen,51.4692055,3.562854,folder
+v-0343,Hanna Dekker,Kreekrug,31,4386GR,Vlissingen,51.4692055,3.562854,krant
+v-0344,Hanna Peters,Paul Krugerstraat,49,4382MB,Vlissingen,51.449597,3.5734349,krant
+v-0345,Pieter Mulder,De Beaufortstraat,37-G13,,Vlissingen,51.4601653,3.5565248,krant
+v-0346,Johanna van den Berg,Westerzicht,721,4385CD,Vlissingen,51.4603923,3.584695,krant
+v-0347,Anna van den Berg,Westerzicht,721,4385CD,Vlissingen,51.4603923,3.584695,folder
+v-0348,Sem Bakker,Schutterijstraat,163,4381GN,Vlissingen,51.4441152,3.5714877,folder
+v-0349,Hanna Mulder,Crocuslaan,7,4382VA,Vlissingen,51.4517865,3.5740052,krant
+v-0350,Hanna de Vries,Anjelierenlaan,32,4382PX,Vlissingen,51.4527976,3.5706387,krant
+v-0351,Marijke de Vries,Duijvendrechtstraat,19,4382ET,Vlissingen,51.4497626,3.56592,folder
+v-0352,Ada Vos,Hobeinstraat,99,4381PC,Vlissingen,51.4471834,3.5693285,krant
+v-0353,Willem Brouwer,Tak van Poortvlietstraat,7,4384CL,Vlissingen,51.4608445,3.5551071,krant
+v-0354,Hendrik Mulder,Marnixplein,15,4386AA,Vlissingen,51.4645544,3.591974,krant
+v-0355,Roos Peters,Schaepmanstraat,185,4384CZ,Vlissingen,51.4626525,3.5554395,folder
+v-0356,Hanna Post,Schaepmanstraat,183,4384CZ,Vlissingen,51.4625712,3.5553645,krant
+v-0357,Iris van Leeuwen,Meidoornlaan,27,4382TJ,Vlissingen,51.452639,3.5770921,folder
+v-0358,Femke van den Berg,Pablo Picassoplein,49,4382KB,Vlissingen,51.4532801,3.5665865,krant
+v-0359,Carla van der Meer,Gerbrandystraat,63,4384NC,Vlissingen,51.4629073,3.5586707,folder
+v-0360,Johanna van der Meer,Gerbrandystraat,63,4384NC,Vlissingen,51.4629073,3.5586707,krant
+v-0361,Lieke van der Meer,Batenburg,69,4385HG,Vlissingen,51.4649276,3.5724551,folder
+v-0362,Bram van Leeuwen,Boulevard De Ruyter,32,4381KB,Vlissingen,51.4405309,3.5719656,folder
+v-0363,Femke Mulder,President Rooseveltlaan,1-T,,Vlissingen,51.4536798,3.556695,folder
+v-0364,Els van Dijk,Sarazijnstraat,11,4381CL,Vlissingen,51.4413345,3.5747318,krant
+v-0365,Anna Visser,Singel,2,4382LA,Vlissingen,51.4476863,3.5664198,krant
+v-0366,Pieter Kuipers,Paul Krugerstraat,303,4382MJ,Vlissingen,51.4503121,3.5819666,folder
+v-0367,Gijs Kuipers,Paul Krugerstraat,303,4382MJ,Vlissingen,51.4503121,3.5819666,krant
+v-0368,Gijs de Groot,Boulevard Bankert,540,4382AC,Vlissingen,51.4476346,3.5622224,krant
+v-0369,Otto Bos,Singel,355,4381VK,Vlissingen,51.4498289,3.579696,krant
+v-0370,Hendrik Peters,Vredehoflaan,542,4382CJ,Vlissingen,51.4535992,3.5613467,krant
+v-0371,Iris van den Berg,Verholen Vliet,32,4382NJ,Vlissingen,51.4521877,3.6034691,folder
+v-0372,Niels Bos,Paul Krugerstraat,409,4382ML,Vlissingen,51.4499795,3.5840321,krant
+v-0373,Gijs van Dijk,Koudekerkseweg,2-5,4382EB,Vlissingen,51.4482064,3.5657007,krant
+v-0374,Kees Dekker,Anna Blamanlaan,106,4385KK,Vlissingen,51.4593156,3.5607451,krant
+v-0375,Hanna de Groot,Abraham Kuyperstraat,2-G7,,Vlissingen,51.4642626,3.5554896,krant
+v-0376,Bram Brouwer,Westerzicht,813,4385CG,Vlissingen,51.4624426,3.5831977,krant
+v-0377,Johanna Dekker,Coosje Buskenstraat,1,4381LA,Vlissingen,51.4438504,3.5688312,krant
+v-0378,Els Bakker,President Rooseveltlaan,762a,4382VX,Vlissingen,51.4550753,3.5794409,krant
+v-0379,Niels Vos,Lunenburg,30,4385EP,Vlissingen,51.4614701,3.5727479,krant
+v-0380,Kees de Boer,Menno van Coehoorngracht,22,4383BS,Vlissingen,51.4559914,3.5650108,krant
+v-0381,Bram Hendriks,Van Hallstraat,1,4384BL,Vlissingen,51.4577257,3.5548369,krant
+v-0382,Hanna Bakker,Martin Luther Kingstraat,72,4384HV,Vlissingen,51.4655655,3.554225,krant
+v-0383,Johanna Hendriks,Van der Manderestraat,13a,4381VR,Vlissingen,51.4491657,3.5740853,krant
+v-0384,Iris Brouwer,Groen van Prinstererlaan,14,4384CG,Vlissingen,51.4581434,3.5540861,krant
+v-0385,Otto van den Berg,Tooroplaan,20,4382VR,Vlissingen,51.4541623,3.577838,krant
+v-0386,Sem Hendriks,Van Dishoeckstraat,180,4381VA,Vlissingen,51.4476634,3.579011,krant
+v-0387,Kees Peters,Rubenslaan,154,4383WH,Vlissingen,51.4591088,3.5737063,krant
+v-0388,Sanne de Groot,Grenswegeling,10,4384NA,Vlissingen,51.4602714,3.5596708,krant
+v-0389,Iris van den Berg,Abraham Kuyperstraat,2-G10,,Vlissingen,51.4642286,3.555377,krant
+v-0390,Femke Dijkstra,Rembrandtlaan,5,4382RL,Vlissingen,51.4532914,3.5694836,krant
+v-0391,Daan de Bruin,Nieuwe Kruidmolenweg,1d,4382WB,Vlissingen,51.4544477,3.6029342,krant
+v-0392,Sem Bos,Pablo Picassoplein,9,4382KB,Vlissingen,51.4530342,3.5668394,krant
+v-0393,Sem Bos,Pablo Picassoplein,9,4382KB,Vlissingen,51.4530342,3.5668394,folder
+v-0394,Kees Brouwer,Nieuwstraat,116,4381CW,Vlissingen,51.4419367,3.5758852,krant
+v-0395,Carla Brouwer,Nieuwstraat,116,4381CW,Vlissingen,51.4419367,3.5758852,folder
+v-0396,Carla Brouwer,Nieuwstraat,116,4381CW,Vlissingen,51.4419367,3.5758852,krant
+v-0397,Marijke de Wit,Emmastraat,25,4381BD,Vlissingen,51.4417558,3.5781901,krant
+v-0398,Hendrik de Wit,Emmastraat,25,4381BD,Vlissingen,51.4417558,3.5781901,folder
+v-0399,Sem de Wit,Emmastraat,25,4381BD,Vlissingen,51.4417558,3.5781901,folder

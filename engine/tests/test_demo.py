@@ -62,35 +62,26 @@ def test_cards_at_one_door_share_a_coordinate_and_keep_their_own_ids():
 
 def test_a_household_shares_a_surname():
     people = assign_people("badhuisstraat|34", 3, seed=7)
-    assert len({naam.split()[-1] for naam, _ in people}) == 1
+    assert len({naam.split()[-1] for naam in people}) == 1
 
 
 def test_one_resident_can_be_called_up_twice():
-    """Cards are not people: griep and pneum go to the same door, for the
+    """Cards are not people: paper and flyer go to the same door, for the
     same person, as two rows. The walking view has to collapse that to one
     name, so the demo has to contain it."""
     shapes = {
-        len({naam for naam, _ in assign_people(f"straat|{i}", 3, seed=7)})
+        len({naam for naam in assign_people(f"straat|{i}", 3, seed=7)})
         for i in range(60)
     }
     assert 2 in shapes, "expected some 3-card doors to hold only two residents"
     assert 3 in shapes, "and some to hold three"
 
 
-def test_a_repeat_call_up_keeps_one_identity():
-    people = assign_people("straat|1", 3, seed=7)
-    by_name: dict[str, set[str]] = {}
-    for naam, bsn in people:
-        by_name.setdefault(naam, set()).add(bsn)
-    for naam, bsns in by_name.items():
-        assert len(bsns) == 1, f"{naam} must be one person with one BSN"
-
-
 def test_categories_assigned():
     result = make_round(fake_addresses(600), n=200, seed=7)
     cats = {r.category for r in result}
-    assert cats <= {"griep", "pneum"}
-    assert "griep" in cats
+    assert cats <= {"krant", "folder"}
+    assert "krant" in cats
 
 
 def test_committed_demo_file(records):
@@ -106,7 +97,6 @@ def test_csv_columns_match_schema_example():
     assert CSV_COLUMNS == [
         "id",
         "naam",
-        "bsn",
         "straat",
         "huisnr",
         "postcode",
@@ -120,12 +110,3 @@ def test_csv_columns_match_schema_example():
 def test_synth_person_deterministic_per_id():
     assert synth_person("v-0000") == synth_person("v-0000")
     assert synth_person("v-0000") != synth_person("v-0001")
-
-
-def test_synth_bsn_passes_elfproef():
-    for i in range(200):
-        _, bsn = synth_person(f"v-{i:04d}")
-        assert len(bsn) == 9 and bsn.isdigit()
-        digits = [int(d) for d in bsn]
-        weighted = sum((9 - i) * d for i, d in enumerate(digits[:8])) - digits[8]
-        assert weighted % 11 == 0

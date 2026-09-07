@@ -4,7 +4,7 @@
  * This is the privacy chokepoint. The planning model keeps every uploaded
  * column verbatim in `Rec.extra` so export can round-trip them; a saved round
  * must not. `detailsOf()` below reads `recordsStore.shownDetails` and nothing
- * else, so a column the user never ticked "show on map" — a BSN, a birthdate —
+ * else, so a column the user never ticked "show on map" — a birthdate, a phone number —
  * cannot reach the server or a phone screen, however the caller misuses this.
  *
  * If you add a field here, ask what it looks like on a lockscreen in a stolen

@@ -7,7 +7,7 @@
  * so next year's identical export maps itself.
  *
  * Identity is its own thing rather than a role because it is not one column.
- * A merged export can reuse the same patient number across two lists with
+ * A merged export can reuse the same customer number across two lists with
  * only a source column telling them apart, so the id is whatever set of
  * columns the user says makes a row unique — and if they pick nothing, every
  * row gets a generated one rather than a collision.

@@ -56,7 +56,7 @@ beforeEach(() => {
 
 describe('reading a door', () => {
 	it('deduplicates names, because cards are not people', () => {
-		// one resident due both griep and pneum holds two cards at one address
+		// one resident due both paper and flyer holds two cards at one address
 		expect(walkStore.stops[3].names).toEqual(['Lieke de Vries']);
 		expect(walkStore.stops[3].cardCount).toBe(2);
 	});

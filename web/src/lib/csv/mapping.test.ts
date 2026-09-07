@@ -16,20 +16,20 @@ import {
 	type Mapping
 } from './mapping.svelte';
 
-const columns = ['patientnr', 'Bron', 'straat', 'huisnr'];
-const row = (patientnr: string, bron: string, huisnr = '1') => ({
-	patientnr,
+const columns = ['klantnr', 'Bron', 'straat', 'huisnr'];
+const row = (klantnr: string, bron: string, huisnr = '1') => ({
+	klantnr,
 	Bron: bron,
 	straat: 'Badhuisstraat',
 	huisnr
 });
 
-/** The merged griep + pneumo shape: patient numbers repeat, only the source differs. */
-const merged = [row('100', 'griep'), row('101', 'griep'), row('100', 'pneumo'), row('102', 'pneumo')];
+/** The merged paper + flyer shape: customer numbers repeat, only the source differs. */
+const merged = [row('100', 'krant'), row('101', 'krant'), row('100', 'folder'), row('102', 'folder')];
 
 describe('identity', () => {
 	it('says how many distinct ids the chosen columns spell for the rows', () => {
-		expect(identity(merged, ['patientnr'])).toEqual({
+		expect(identity(merged, ['klantnr'])).toEqual({
 			rows: 4,
 			unique: 3,
 			blank: 0,
@@ -38,17 +38,17 @@ describe('identity', () => {
 	});
 
 	it('is satisfied once the combination is unique', () => {
-		expect(identity(merged, ['patientnr', 'Bron'])).toMatchObject({ unique: 4, duplicates: 0 });
+		expect(identity(merged, ['klantnr', 'Bron'])).toMatchObject({ unique: 4, duplicates: 0 });
 	});
 
 	it('counts every extra copy, not every row involved', () => {
 		const rows = [row('1', 'a'), row('1', 'a'), row('1', 'a')];
-		expect(identity(rows, ['patientnr']).duplicates).toBe(2);
+		expect(identity(rows, ['klantnr']).duplicates).toBe(2);
 	});
 
 	it('treats a row with all id columns empty as blank, not as a duplicate', () => {
-		const rows = [row('', ''), row('', ''), row('7', 'griep')];
-		expect(identity(rows, ['patientnr', 'Bron'])).toEqual({
+		const rows = [row('', ''), row('', ''), row('7', 'krant')];
+		expect(identity(rows, ['klantnr', 'Bron'])).toEqual({
 			rows: 3,
 			unique: 1,
 			blank: 2,
@@ -65,17 +65,17 @@ describe('applyMapping', () => {
 	const roles = { street: 'straat', house_number: 'huisnr' } as const;
 
 	it('builds the id from several columns', () => {
-		const recs = applyMapping(merged, columns, { roles, idColumns: ['patientnr', 'Bron'] });
-		expect(recs.map((r) => r.id)).toEqual(['100|griep', '101|griep', '100|pneumo', '102|pneumo']);
+		const recs = applyMapping(merged, columns, { roles, idColumns: ['klantnr', 'Bron'] });
+		expect(recs.map((r) => r.id)).toEqual(['100|krant', '101|krant', '100|folder', '102|folder']);
 	});
 
 	it('keeps a single id column as the bare value', () => {
-		const recs = applyMapping([row('100', 'griep')], columns, { roles, idColumns: ['patientnr'] });
+		const recs = applyMapping([row('100', 'krant')], columns, { roles, idColumns: ['klantnr'] });
 		expect(recs[0].id).toBe('100');
 	});
 
 	it('numbers colliding ids rather than losing a record', () => {
-		const recs = applyMapping(merged, columns, { roles, idColumns: ['patientnr'] });
+		const recs = applyMapping(merged, columns, { roles, idColumns: ['klantnr'] });
 		expect(recs).toHaveLength(4);
 		expect(recs.map((r) => r.id)).toEqual(['100', '101', '100#2', '102']);
 	});
@@ -88,15 +88,15 @@ describe('applyMapping', () => {
 	it('generates an id for a row whose id columns are empty', () => {
 		const recs = applyMapping([row('', ''), row('', '')], columns, {
 			roles,
-			idColumns: ['patientnr']
+			idColumns: ['klantnr']
 		});
 		expect(recs[0].id).not.toBe(recs[1].id);
 		expect(recs[0].id).not.toBe('');
 	});
 
 	it('keeps the id columns in extra so the export still carries them', () => {
-		const recs = applyMapping(merged, columns, { roles, idColumns: ['patientnr', 'Bron'] });
-		expect(recs[2].extra).toEqual({ patientnr: '100', Bron: 'pneumo' });
+		const recs = applyMapping(merged, columns, { roles, idColumns: ['klantnr', 'Bron'] });
+		expect(recs[2].extra).toEqual({ klantnr: '100', Bron: 'folder' });
 	});
 });
 
@@ -106,15 +106,15 @@ describe('guessMapping', () => {
 	});
 
 	it('leaves the id empty when nothing looks like one', () => {
-		expect(guessMapping(['patientnr', 'straat', 'huisnr']).idColumns).toEqual([]);
+		expect(guessMapping(['klantnr', 'straat', 'huisnr']).idColumns).toEqual([]);
 	});
 });
 
 describe('uniqueCounts', () => {
 	it('counts distinct non-blank values per column', () => {
-		const rows = [row('1', 'griep'), row('2', 'griep'), row('', 'pneumo')];
-		expect(uniqueCounts(rows, ['patientnr', 'Bron', 'straat'])).toEqual({
-			patientnr: 2,
+		const rows = [row('1', 'krant'), row('2', 'krant'), row('', 'folder')];
+		expect(uniqueCounts(rows, ['klantnr', 'Bron', 'straat'])).toEqual({
+			klantnr: 2,
 			Bron: 2,
 			straat: 1
 		});

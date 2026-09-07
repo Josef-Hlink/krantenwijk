@@ -9,7 +9,7 @@
  *
  * The fence is `cards`. Each holds *only* the columns the user ticked "show
  * on map" during column mapping, already resolved to the labels they chose —
- * never the full `Rec.extra` bag. That is what keeps a `bsn` column in the
+ * never the full `Rec.extra` bag. That is what keeps a birthdate column in the
  * upload from ever reaching a phone screen. `buildRound()` in ./serialize.ts
  * is the single place that rule is applied; keep it that way.
  */

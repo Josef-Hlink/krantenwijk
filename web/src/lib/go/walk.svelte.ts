@@ -7,7 +7,7 @@
  * This one consumes a finished, minimal server payload and persists progress,
  * which is the opposite lifecycle contract on both counts. Keeping the types
  * apart is what stops "render all the details" from ever meaning "render the
- * BSN column".
+ * whole file".
  *
  * `/plan` plans a round; this walks one.
  */
@@ -30,7 +30,7 @@ export interface WalkStop extends Stop {
 	legToNext: { distance_m: number; duration_s: number } | null;
 	/**
 	 * Who lives here, deduplicated. Cards are not people: a resident called
-	 * up for both griep and pneum holds two cards at one address, and you
+	 * up for both krant and folder holds two cards at one address, and you
 	 * still only want to read one name off the screen.
 	 */
 	names: string[];
