@@ -25,28 +25,50 @@ class Capability {
 
   async ensure(): Promise<void> {
     if (this.checked) return;
-    return this.refresh();
+    return this.inflight ?? this.refresh();
   }
 
-  /** Ask again — after signing in or out, when the answer has just changed. */
+  /**
+   * Ask again — after signing in or out, when the answer has just changed.
+   * Always a fresh request: one started before the change would answer for
+   * the old state, so a refresh queues behind whatever is in flight.
+   */
   async refresh(): Promise<void> {
-    this.inflight ??= (async () => {
-      try {
-        const s = await status();
-        this.accounts = s.accounts === true;
-        this.rounds = s.rounds === true;
-        this.user = s.user ?? null;
-      } catch {
-        this.accounts = false;
-        this.rounds = false;
-        this.user = null;
-      } finally {
-        this.checked = true;
-        this.inflight = null;
-      }
-    })();
-    return this.inflight;
+    const previous = this.inflight ?? Promise.resolve();
+    const run = previous.then(() => this.ask());
+    this.inflight = run;
+    try {
+      await run;
+    } finally {
+      if (this.inflight === run) this.inflight = null;
+    }
+  }
+
+  private async ask(): Promise<void> {
+    try {
+      const s = await status();
+      this.accounts = s.accounts === true;
+      this.rounds = s.rounds === true;
+      this.user = s.user ?? null;
+    } catch {
+      this.accounts = false;
+      this.rounds = false;
+      this.user = null;
+    } finally {
+      this.checked = true;
+    }
   }
 }
 
 export const capability = new Capability();
+
+// A tab left open on /plan while you sign in somewhere else — another tab,
+// a phone — still believes it is a guest. Coming back to it is the moment to
+// ask again; one small request, only for tabs that ever asked at all.
+if (typeof document !== "undefined") {
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && capability.checked) {
+      void capability.refresh();
+    }
+  });
+}
